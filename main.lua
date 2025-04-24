@@ -1,23 +1,16 @@
+
 local carta = require("models.carta")
 local tabuleiro = require("models.tabuleiro")
-
 local anim8 = require 'anim8'
-
+local Animacao = require("interface.Animacao")
 
 local minhaCarta = carta.novo(1, "midia/images/cartas/gata.png", "midia/images/verso.png")
 local imagem
 local animacao
 
 function love.load()
-    imagem = love.graphics.newImage("midia/sprites/trofeu.png")
-        -- Substitua 32,32 pelo tamanho real de cada frame
-        local larguraFrame = 120
-        local alturaFrame = 120
-    
-        local grid = anim8.newGrid(larguraFrame, alturaFrame, imagem:getWidth(), imagem:getHeight())
-        
-        -- Se está tudo na mesma linha (horizontal), anima todos os frames da linha 1
-        animacao = anim8.newAnimation(grid('1-73', 1), 0.1) -- 73 frames, 0.1s por frame
+    animacao = Animacao.nova("midia/sprites/heart_sprite.png", 64, 64, '1-7', 0.1)
+        animacao:setPosicao(100, 100)
     minhaCarta.x = 100
     minhaCarta.y = 100
 end
@@ -33,7 +26,7 @@ function love.mousepressed(x, y)
 end
 
 function love.draw()
-    
+    love.graphics.clear(1, 1, 1, 1)
     minhaCarta:draw()
-    animacao:draw(imagem, 100, 100)
+    animacao:draw()
 end
