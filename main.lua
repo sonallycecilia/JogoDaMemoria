@@ -1,7 +1,7 @@
 
-local Carta = require("models.carta")
+local Carta = require("classes.carta")
 local Animacao = require("interface.animacao")
-local Tabuleiro = require("models.Tabuleiro")
+local Tabuleiro = require("classes.Tabuleiro")
 
 
 local carta, animacao, tabuleiro
