@@ -1,7 +1,7 @@
 
-local Carta = require("models.carta")
+local Carta = require("classes.carta")
 local Animacao = require("interface.animacao")
-local Tabuleiro = require("models.Tabuleiro")
+local Tabuleiro = require("classes.Tabuleiro")
 
 
 local carta, animacao, tabuleiro
@@ -31,6 +31,10 @@ function love.load()
     end
 end
 
+function love.update(dt)
+    animacao:update(dt)
+end
+
 function love.mousepressed(x, y)
     for _, carta in ipairs(tabuleiro.cartas) do
         if carta:clicada(x, y) then
@@ -39,6 +43,7 @@ function love.mousepressed(x, y)
         end
     end
 end
+
 function love.draw()
     --love.graphics.clear(1, 1, 1, 1)
     
