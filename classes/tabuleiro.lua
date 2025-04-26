@@ -3,7 +3,7 @@ Tabuleiro.__index = Tabuleiro
 
 local MIN_CARTAS = 24
 local MAX_CARTAS = 48
-local ESPACAMENTO = 5
+local ESPACAMENTO = 10
 
 function Tabuleiro.novo(nivel)
     local novo = setmetatable({}, Tabuleiro)
@@ -11,8 +11,6 @@ function Tabuleiro.novo(nivel)
     novo.largura = 800
     novo.altura = 600
     novo.cartas = {}
-    
-    -- Tamanho da carta padrão (pode ser ajustado se necessário)
     novo.tamanhoCarta = 100
     
     novo:definirLayout()
@@ -21,23 +19,21 @@ end
 
 function Tabuleiro:definirLayout()
     if self.nivel == 1 then
-        -- Número mínimo de cartas (ajustar para o quadrado mais próximo de 24 ou mais)
-        local lado = math.ceil(math.sqrt(MIN_CARTAS))
-        self.colunas = lado
-        self.linhas = lado
+        self.colunas = 5
+        self.linhas = 5
     elseif self.nivel == 2 then
-        self.colunas = 8
+        self.colunas = 6
         self.linhas = 6
     else
-        self.colunas = 6
-        self.linhas = 4
+        self.colunas = 7
+        self.linhas = 7
     end
 
     -- Centraliza o tabuleiro com base no número de cartas e seus tamanhos
     local totalLargura = self.colunas * self.tamanhoCarta + (self.colunas - 1) * ESPACAMENTO
     local totalAltura = self.linhas * self.tamanhoCarta + (self.linhas - 1) * ESPACAMENTO
-    self.x = (self.largura - totalLargura) / 2
-    self.y = (self.altura - totalAltura) / 2
+    self.x = 200
+    self.y = 80
 end
 
 function Tabuleiro:setPosicao(x, y)
@@ -52,15 +48,12 @@ end
 
 function Tabuleiro:draw()
     love.graphics.setColor(0, 0, 0)
-    love.graphics.print("Tabuleiro Nível: " .. self.nivel, 10, 10)
-    love.graphics.print("Grade: " .. self.colunas .. "x" .. self.linhas, 10, 30)
-
     for linha = 0, self.linhas - 1 do
         for coluna = 0, self.colunas - 1 do
             local x = self.x + coluna * (self.tamanhoCarta + ESPACAMENTO)
             local y = self.y + linha * (self.tamanhoCarta + ESPACAMENTO)
             
-            -- Desenhar fundo cinza claro caso não tenha carta
+            -- cores e formato
             love.graphics.setColor(1, 1, 1)
             love.graphics.rectangle("fill", x, y, self.tamanhoCarta, self.tamanhoCarta)
 
@@ -72,8 +65,6 @@ function Tabuleiro:draw()
             end
         end
     end
-
-    love.graphics.setColor(1, 1, 1) -- Resetar cor
 end
 
 return Tabuleiro

@@ -9,7 +9,7 @@ local versoCarta = "midia/images/verso.png"
 
 function love.load()
     animacao = Animacao.nova("midia/sprites/heart_sprite.png", 64, 64, '1-7', 0.1)
-    animacao:setPosicao(50, 50)
+    animacao:setPosicao(850, 0)
 
     --carregando imagens das cartas
     local dadosCartas = {
@@ -22,8 +22,7 @@ function love.load()
 
     }
 
-    tabuleiro = Tabuleiro.novo(1)
-    tabuleiro:setPosicao(200, 200)
+    tabuleiro = Tabuleiro.novo(3)
 
     for _, cartaInfo in ipairs(dadosCartas) do
         carta = Carta.novo(cartaInfo.id, cartaInfo.frente, versoCarta, 100, 100)
@@ -45,7 +44,7 @@ function love.mousepressed(x, y)
 end
 
 function love.draw()
-    --love.graphics.clear(1, 1, 1, 1)
+    love.graphics.clear(1, 1, 1, 1)
     
     tabuleiro:draw()
     animacao:draw()
