@@ -1,77 +1,49 @@
-local Carta = {}
+Carta = {}
 Carta.__index = Carta
 
 -- CONSTRUTOR
-function Carta.novo(id, caminhoImagemFrente, caminhoImagemVerso, largura, altura)
-    local nova = setmetatable({
+function Carta:new(id, caminhoImagemFrente, caminhoImagemVerso, largura, altura)
+    local novaCarta = {
         id = id,
-        isRevelada = false,
+        revelada = false,  -- Estado da carta (revelada ou não)
         largura = largura,
-        altura = altura
-    }, Carta)
-
-    nova:setImagemFrente(caminhoImagemFrente)
-    nova:setImagemVerso(caminhoImagemVerso)
-    
-    return nova
+        altura = altura,
+        imagemFrente = love.graphics.newImage(caminhoImagemFrente),  -- Imagem da frente da carta
+        imagemVerso = love.graphics.newImage(caminhoImagemVerso)     -- Imagem do verso da carta
+    }
+    setmetatable(novaCarta, Carta)  -- Definir a metatabela corretamente
+    return novaCarta
 end
 
--- Função para configurar a imagem da frente
-function Carta:setImagemFrente(caminhoImagemFrente)
-    local status, imagem = pcall(love.graphics.newImage, caminhoImagemFrente)
-    if status then
-        self.imagemFrente = imagem
-    else
-        self:gerarErro("Erro ao carregar imagem da frente", caminhoImagemFrente)
-    end
-end
-
--- Função para configurar a imagem do verso
-function Carta:setImagemVerso(caminhoImagemVerso)
-    local status, imagem = pcall(love.graphics.newImage, caminhoImagemVerso)
-    if status then
-        self.imagemVerso = imagem
-    else
-        self:gerarErro("Erro ao carregar imagem do verso", caminhoImagemVerso)
-    end
-end
-
--- Método para gerar erro com informações sobre a falha
-function Carta:gerarErro(tipoErro, caminhoImagem)
-    print(tipoErro .. ": " .. caminhoImagem)
-end
-
--- Função para alternar o lado da carta
+-- Função para alternar o estado de revelação da carta
 function Carta:alternarLado()
-    self.isRevelada = not self.isRevelada
+    self.revelada = not self.revelada
 end
 
--- Função para configurar a posição da carta
+-- Função para definir a posição da carta
 function Carta:setPosicao(x, y)
     self.x = x
     self.y = y
 end
 
--- Função para verificar se a carta foi clicada
+-- Função para verificar se a carta foi clicada (verificação de clique)
 function Carta:clicada(mx, my)
     return mx >= self.x and mx <= self.x + self.largura and my >= self.y and my <= self.y + self.altura
 end
 
--- Função para desenhar a carta (frente ou verso)
+-- Função para desenhar a carta (exibe a frente ou o verso dependendo do estado)
 function Carta:draw()
-    if self.isRevelada then
-        self:desenharImagem(self.imagemFrente, "frente")
+    if self.revelada then
+        self:drawImagem(self.imagemFrente)  -- Desenha a frente se revelada
     else
-        self:desenharImagem(self.imagemVerso, "verso")
+        self:drawImagem(self.imagemVerso)   -- Desenha o verso caso contrário
     end
 end
 
--- Função auxiliar para desenhar a imagem
-function Carta:desenharImagem(imagem, tipo)
+-- Função auxiliar para desenhar a imagem da carta
+function Carta:drawImagem(imagem)
     if imagem then
         love.graphics.draw(imagem, self.x, self.y, 0, self.largura / imagem:getWidth(), self.altura / imagem:getHeight())
-    else
-        
     end
 end
 

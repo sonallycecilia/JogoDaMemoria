@@ -1,32 +1,37 @@
-
 local Carta = require("classes.carta")
 local Animacao = require("interface.animacao")
-local Tabuleiro = require("classes.Tabuleiro")
+local Tabuleiro = require("classes.tabuleiro")
+local Menu = require("interface.menu")
+if os.getenv "LOCAL_LUA_DEBUGGER_VSCODE" == "1" then
+    local lldebugger = require "lldebugger"
+    lldebugger.start()
+    local run = love.run
+    function love.run(...)
+        local f = lldebugger.call(run, false, ...)
+        return function(...) return lldebugger.call(f, false, ...) end
+    end
+end
 
-
-local carta, animacao, tabuleiro
+local carta, animacao, tabuleiro, menu
 local versoCarta = "midia/images/verso.png"
 
 function love.load()
     animacao = Animacao.nova("midia/sprites/heart_sprite.png", 64, 64, '1-7', 0.1)
-    animacao:setPosicao(50, 50)
+    animacao:setPosicao(850, 0)
 
     --carregando imagens das cartas
     local dadosCartas = {
-        {id = 1, frente = "midia/images/cartas/coracao.png"},
-        {id = 2, frente = "midia/images/cartas/morcego.png"},
-        {id = 3, frente = "midia/images/cartas/borboleta.png"},
-        {id = 4, frente = "midia/images/cartas/bomba.png"},
-        {id = 5, frente = "midia/images/cartas/gato.png"},
-        {id = 6, frente = "midia/images/cartas/lua.png"},
-
+        {id = 1, frente = "midia/images/cartas/fada.png"},
+        {id = 2, frente = "midia/images/cartas/naly.png"},
+        {id = 3, frente = "midia/images/cartas/elfa.png"},
+        {id = 4, frente = "midia/images/cartas/draenei.png"},
     }
 
-    tabuleiro = Tabuleiro.novo(1)
-    tabuleiro:setPosicao(200, 200)
+    menu = Menu:new()
+    tabuleiro = Tabuleiro:new(1)
 
     for _, cartaInfo in ipairs(dadosCartas) do
-        carta = Carta.novo(cartaInfo.id, cartaInfo.frente, versoCarta, 100, 100)
+        carta = Carta:new(cartaInfo.id, cartaInfo.frente, versoCarta, 100, 100)
         tabuleiro:addCarta(carta)
     end
 end
@@ -44,9 +49,16 @@ function love.mousepressed(x, y)
     end
 end
 
+function love.keypressed(key)
+    if key == "w" then
+        
+    end
+
+end
+
 function love.draw()
-    --love.graphics.clear(1, 1, 1, 1)
-    
+    love.graphics.clear(1, 1, 1, 1)
+    --menu:draw()
     tabuleiro:draw()
     animacao:draw()
 end
