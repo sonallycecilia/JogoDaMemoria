@@ -12,6 +12,7 @@ function Carta:new(id, caminhoImagemFrente)
         revelada = false,  -- Estado da carta (revelada ou não)
         largura = LARGURA,
         altura = ALTURA,
+        pathImagem = caminhoImagemFrente,
         imagemFrente = love.graphics.newImage(caminhoImagemFrente),  -- Imagem da frente da carta
         imagemVerso = love.graphics.newImage(VERSO)     -- Imagem do verso da carta
     }

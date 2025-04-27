@@ -12,28 +12,35 @@ if os.getenv "LOCAL_LUA_DEBUGGER_VSCODE" == "1" then
     end
 end
 
-local carta, animacao, tabuleiro, menu
-local versoCarta = "midia/images/verso.png"
+local carta, animacao, tabuleiro, menu, song
 
 function love.load()
     animacao = Animacao.nova("midia/sprites/heart_sprite.png", 64, 64, '1-7', 0.1)
     animacao:setPosicao(850, 0)
+    
+    song = love.audio.newSource("midia/audio/loop-8-28783.mp3", "stream")
+    --song:setLooping(true)
+    song:play()
 
     --carregando imagens das cartas
-    local dadosCartas = {
-        {id = 1, frente = "midia/images/cartas/fada.png"},
-        {id = 2, frente = "midia/images/cartas/naly.png"},
-        {id = 3, frente = "midia/images/cartas/elfa.png"},
-        {id = 4, frente = "midia/images/cartas/draenei.png"},
+    local cartas = {
+        Carta:new(1, "midia/images/cartas/fada.png"),
+        Carta:new(2, "midia/images/cartas/naly.png"),
+        Carta:new(3, "midia/images/cartas/elfa.png"),
+        Carta:new(4, "midia/images/cartas/draenei.png"),
+        Carta:new(5, "midia/images/cartas/borboleta.png"),
+        Carta:new(6, "midia/images/cartas/lua.png"),
+        Carta:new(7, "midia/images/cartas/coracao.png"),
+        Carta:new(8, "midia/images/cartas/draenei.png"),
+        Carta:new(9, "midia/images/cartas/flor.png"),
+        Carta:new(10, "midia/images/cartas/gato.png"),
+        Carta:new(11, "midia/images/cartas/pocao.png"),
+        Carta:new(12, "midia/images/cartas/planta.png"),
+
     }
 
     menu = Menu:new()
-    tabuleiro = Tabuleiro:new(1)
-
-    for _, cartaInfo in ipairs(dadosCartas) do
-        carta = Carta:new(cartaInfo.id, cartaInfo.frente)
-        tabuleiro:addCarta(carta)
-    end
+    tabuleiro = Tabuleiro:new(3, cartas)
     
 end
 
