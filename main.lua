@@ -1,4 +1,3 @@
-
 local Carta = require("classes.carta")
 local Animacao = require("interface.animacao")
 local Tabuleiro = require("classes.tabuleiro")
@@ -20,7 +19,7 @@ function love.load()
     }
 
     menu = Menu:new()
-    tabuleiro = Tabuleiro.novo(1)
+    tabuleiro = Tabuleiro:new(1)
 
     for _, cartaInfo in ipairs(dadosCartas) do
         carta = Carta.novo(cartaInfo.id, cartaInfo.frente, versoCarta, 100, 100)
