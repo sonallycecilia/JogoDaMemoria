@@ -1,10 +1,10 @@
 
 local Carta = require("classes.carta")
 local Animacao = require("interface.animacao")
-local Tabuleiro = require("classes.Tabuleiro")
+local Tabuleiro = require("classes.tabuleiro")
+local Menu = require("interface.menu")
 
-
-local carta, animacao, tabuleiro
+local carta, animacao, tabuleiro, menu
 local versoCarta = "midia/images/verso.png"
 
 function love.load()
@@ -13,16 +13,14 @@ function love.load()
 
     --carregando imagens das cartas
     local dadosCartas = {
-        {id = 1, frente = "midia/images/cartas/coracao.png"},
-        {id = 2, frente = "midia/images/cartas/morcego.png"},
-        {id = 3, frente = "midia/images/cartas/borboleta.png"},
-        {id = 4, frente = "midia/images/cartas/bomba.png"},
-        {id = 5, frente = "midia/images/cartas/gato.png"},
-        {id = 6, frente = "midia/images/cartas/lua.png"},
-
+        {id = 1, frente = "midia/images/cartas/fada.png"},
+        {id = 2, frente = "midia/images/cartas/naly.png"},
+        {id = 3, frente = "midia/images/cartas/elfa.png"},
+        {id = 4, frente = "midia/images/cartas/draenei.png"},
     }
 
-    tabuleiro = Tabuleiro.novo(3)
+    menu = Menu:new()
+    tabuleiro = Tabuleiro.novo(1)
 
     for _, cartaInfo in ipairs(dadosCartas) do
         carta = Carta.novo(cartaInfo.id, cartaInfo.frente, versoCarta, 100, 100)
@@ -43,9 +41,16 @@ function love.mousepressed(x, y)
     end
 end
 
+function love.keypressed(key)
+    if key == "w" then
+        
+    end
+
+end
+
 function love.draw()
     love.graphics.clear(1, 1, 1, 1)
-    
+    --menu:draw()
     tabuleiro:draw()
     animacao:draw()
 end

@@ -29,9 +29,6 @@ function Tabuleiro:definirLayout()
         self.linhas = 7
     end
 
-    -- Centraliza o tabuleiro com base no número de cartas e seus tamanhos
-    local totalLargura = self.colunas * self.tamanhoCarta + (self.colunas - 1) * ESPACAMENTO
-    local totalAltura = self.linhas * self.tamanhoCarta + (self.linhas - 1) * ESPACAMENTO
     self.x = 200
     self.y = 80
 end
