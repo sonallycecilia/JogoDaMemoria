@@ -2,6 +2,15 @@ local Carta = require("classes.carta")
 local Animacao = require("interface.animacao")
 local Tabuleiro = require("classes.tabuleiro")
 local Menu = require("interface.menu")
+if os.getenv "LOCAL_LUA_DEBUGGER_VSCODE" == "1" then
+    local lldebugger = require "lldebugger"
+    lldebugger.start()
+    local run = love.run
+    function love.run(...)
+        local f = lldebugger.call(run, false, ...)
+        return function(...) return lldebugger.call(f, false, ...) end
+    end
+end
 
 local carta, animacao, tabuleiro, menu
 local versoCarta = "midia/images/verso.png"
@@ -22,7 +31,7 @@ function love.load()
     tabuleiro = Tabuleiro:new(1)
 
     for _, cartaInfo in ipairs(dadosCartas) do
-        carta = Carta.novo(cartaInfo.id, cartaInfo.frente, versoCarta, 100, 100)
+        carta = Carta:new(cartaInfo.id, cartaInfo.frente, versoCarta, 100, 100)
         tabuleiro:addCarta(carta)
     end
 end

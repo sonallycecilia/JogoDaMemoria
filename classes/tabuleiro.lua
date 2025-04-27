@@ -1,7 +1,6 @@
 Tabuleiro = {}
-Tabuleiro.__index = Tabuleiro  -- Definindo a metatable para o Tabuleiro
+Tabuleiro.__index = Tabuleiro
 
-local MIN_CARTAS = 24
 local MAX_CARTAS = 48
 local ESPACAMENTO = 10
 local POS_X = 200
@@ -16,7 +15,7 @@ function Tabuleiro:new(nivel)
         tamanhoCarta = 100
     }
     setmetatable(novo, Tabuleiro)
-    novo:definirLayout()  -- Configura o layout com base no nível
+    novo:definirLayout()
     return novo
 end
 
