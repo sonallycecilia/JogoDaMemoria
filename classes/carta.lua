@@ -1,15 +1,19 @@
 Carta = {}
 Carta.__index = Carta
 
+local ALTURA = 100
+local LARGURA = 100
+local VERSO = "midia/images/verso.png"
+
 -- CONSTRUTOR
-function Carta:new(id, caminhoImagemFrente, caminhoImagemVerso, largura, altura)
+function Carta:new(id, caminhoImagemFrente)
     local novaCarta = {
         id = id,
         revelada = false,  -- Estado da carta (revelada ou não)
-        largura = largura,
-        altura = altura,
+        largura = LARGURA,
+        altura = ALTURA,
         imagemFrente = love.graphics.newImage(caminhoImagemFrente),  -- Imagem da frente da carta
-        imagemVerso = love.graphics.newImage(caminhoImagemVerso)     -- Imagem do verso da carta
+        imagemVerso = love.graphics.newImage(VERSO)     -- Imagem do verso da carta
     }
     setmetatable(novaCarta, Carta)  -- Definir a metatabela corretamente
     return novaCarta

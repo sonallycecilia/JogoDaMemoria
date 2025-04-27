@@ -31,9 +31,10 @@ function love.load()
     tabuleiro = Tabuleiro:new(1)
 
     for _, cartaInfo in ipairs(dadosCartas) do
-        carta = Carta:new(cartaInfo.id, cartaInfo.frente, versoCarta, 100, 100)
+        carta = Carta:new(cartaInfo.id, cartaInfo.frente)
         tabuleiro:addCarta(carta)
     end
+    
 end
 
 function love.update(dt)

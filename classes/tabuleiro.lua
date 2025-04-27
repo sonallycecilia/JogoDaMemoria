@@ -3,8 +3,8 @@ Tabuleiro.__index = Tabuleiro
 
 local MAX_CARTAS = 48
 local ESPACAMENTO = 10
-local POS_X = 200
-local POS_Y = 80
+local POS_X = 100
+local POS_Y = 50
 
 function Tabuleiro:new(nivel)
     local novo = {
@@ -24,6 +24,7 @@ function Tabuleiro:definirLayout()
     if self.nivel == 1 then
         self.colunas = 5
         self.linhas = 5
+
     elseif self.nivel == 2 then
         self.colunas = 6
         self.linhas = 6
@@ -43,6 +44,22 @@ function Tabuleiro:addCarta(carta)
         table.insert(self.cartas, carta)
     end
 end
+
+function Tabuleiro:deepCopyCartas()
+    local copiaCartas = {}
+
+    -- Cópia profunda das cartas
+    for _, carta in ipairs(self.cartas) do
+        local novaCarta = Carta:new(carta.id, carta.imagemFrente:getFilename(), carta.imagemVerso:getFilename(), carta.largura, carta.altura)
+        novaCarta.revelada = carta.revelada
+        novaCarta.x = carta.x
+        novaCarta.y = carta.y
+        table.insert(copiaCartas, novaCarta)
+    end
+
+    return copiaCartas
+end
+
 
 -- Função para desenhar o tabuleiro e as cartas
 function Tabuleiro:draw()
