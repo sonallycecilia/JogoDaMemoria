@@ -2,6 +2,7 @@ local Carta = require("classes.carta")
 local Animacao = require("interface.animacao")
 local Tabuleiro = require("classes.tabuleiro")
 local Menu = require("interface.menu")
+
 if os.getenv "LOCAL_LUA_DEBUGGER_VSCODE" == "1" then
     local lldebugger = require "lldebugger"
     lldebugger.start()
