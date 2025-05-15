@@ -2,6 +2,7 @@ local Carta = require("classes.carta")
 local Animacao = require("interface.animacao")
 local Tabuleiro = require("classes.tabuleiro")
 local Menu = require("interface.menu")
+
 if os.getenv "LOCAL_LUA_DEBUGGER_VSCODE" == "1" then
     local lldebugger = require "lldebugger"
     lldebugger.start()
@@ -40,7 +41,7 @@ function love.load()
     }
 
     menu = Menu:new()
-    tabuleiro = Tabuleiro:new(3, cartas)
+    tabuleiro = Tabuleiro:new(1, cartas)
     
 end
 
@@ -50,10 +51,7 @@ end
 
 function love.mousepressed(x, y)
     for _, carta in ipairs(tabuleiro.cartas) do
-        if carta:clicada(x, y) then
-            carta:alternarLado()
-            break  -- Se quiser virar só uma por clique
-        end
+        carta:onClick(x, y)
     end
 end
 

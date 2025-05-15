@@ -1,5 +1,5 @@
 Carta = {}
-Carta.__index = Carta
+Carta.__index = Carta --permite usar metodo com dois pontos
 
 local ALTURA = 100
 local LARGURA = 100
@@ -9,14 +9,14 @@ local VERSO = "midia/images/verso.png"
 function Carta:new(id, caminhoImagemFrente)
     local novaCarta = {
         id = id,
-        revelada = false,  -- Estado da carta (revelada ou não)
         largura = LARGURA,
         altura = ALTURA,
-        pathImagem = caminhoImagemFrente,
-        imagemFrente = love.graphics.newImage(caminhoImagemFrente),  -- Imagem da frente da carta
-        imagemVerso = love.graphics.newImage(VERSO)     -- Imagem do verso da carta
+        pathImagem = caminhoImagemFrente, --precisa ficar pois pegamos o caminho da imagem
+        imagemFrente = love.graphics.newImage(caminhoImagemFrente),
+        imagemVerso = love.graphics.newImage(VERSO),
+        revelada = true, -- se não for passado, assume false
     }
-    setmetatable(novaCarta, Carta)  -- Definir a metatabela corretamente
+    setmetatable(novaCarta, Carta) --permite o uso de :, ligando a metatable de cima
     return novaCarta
 end
 
@@ -31,9 +31,17 @@ function Carta:setPosicao(x, y)
     self.y = y
 end
 
+
 -- Função para verificar se a carta foi clicada (verificação de clique)
 function Carta:clicada(mx, my)
-    return mx >= self.x and mx <= self.x + self.largura and my >= self.y and my <= self.y + self.altura
+    return mx >= self.x and mx <= self.x + self.largura and
+           my >= self.y and my <= self.y + self.altura
+end
+
+function Carta:onClick(mx, my)
+    if self:clicada(mx, my) then
+        self:alternarLado()
+    end
 end
 
 -- Função para desenhar a carta (exibe a frente ou o verso dependendo do estado)

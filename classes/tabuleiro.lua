@@ -43,15 +43,7 @@ function Tabuleiro:gerarCopiaDeCartas(dadosCartas)
 end
 
 function Tabuleiro:gerarCopiaUnica(cartaOriginal)
-    if not cartaOriginal then
-        return nil
-    end
-
-    local novaCarta = Carta:new(cartaOriginal.id, cartaOriginal.pathImagem)
-    novaCarta.revelada = false
-    novaCarta.x = 0
-    novaCarta.y = 0
-    return novaCarta
+    return Carta:new(cartaOriginal.id, cartaOriginal.pathImagem)
 end
 
 function Tabuleiro:definirLayout()
