@@ -1,8 +1,7 @@
 local Carta = require("classes.carta")
 local Animacao = require("interface.animacao")
 local Tabuleiro = require("classes.tabuleiro")
-local Menu = require("interface.menu")
-
+local Menu = require("interface.telas.menu")
 if os.getenv "LOCAL_LUA_DEBUGGER_VSCODE" == "1" then
     local lldebugger = require "lldebugger"
     lldebugger.start()
@@ -37,11 +36,12 @@ function love.load()
         Carta:new(10, "midia/images/cartas/gato.png"),
         Carta:new(11, "midia/images/cartas/pocao.png"),
         Carta:new(12, "midia/images/cartas/planta.png"),
+        
 
     }
 
     menu = Menu:new()
-    tabuleiro = Tabuleiro:new(3, cartas)
+    tabuleiro = Tabuleiro:new(1, cartas)
     
 end
 
