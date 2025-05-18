@@ -6,9 +6,8 @@ function Botao:new(x, y, largura, altura, texto, funcao)
         y = y,
         largura = largura,
         altura = altura,
-        texto = texto,
         funcao = funcao, -- o que o botão vai fazer quando clicado
-        hover = false
+        hover = false --saber se o mouse está em cima do botão
     }
     self.__index = self
     return setmetatable(novo, self)
@@ -20,10 +19,10 @@ function Botao:draw()
     else
         love.graphics.setColor(0.5, 0.5, 0.5) -- cor normal
     end
+
     love.graphics.rectangle("fill", self.x, self.y, self.largura, self.altura)
 
     love.graphics.setColor(0, 0, 0) -- cor preta para o texto
-    love.graphics.printf(self.texto, self.x, self.y + self.altura/2 - 10, self.largura, "center")
 end
 
 function Botao:update(mx, my)
@@ -33,8 +32,8 @@ function Botao:update(mx, my)
 end
 
 function Botao:mousepressed(mx, my, button)
-    if button == 1 and self.hover then
-        self.funcao() -- chama a função associada
+    if button == 1 and self.hover and self.funcao then
+        self.funcao()
     end
 end
 

@@ -1,7 +1,8 @@
 local Carta = require("classes.carta")
 local Animacao = require("interface.animacao")
 local Tabuleiro = require("classes.tabuleiro")
-local Menu = require("interface.telas.menu")
+local MenuPrincipal = require("interface.telas.menuPrincipal")
+
 if os.getenv "LOCAL_LUA_DEBUGGER_VSCODE" == "1" then
     local lldebugger = require "lldebugger"
     lldebugger.start()
@@ -12,15 +13,24 @@ if os.getenv "LOCAL_LUA_DEBUGGER_VSCODE" == "1" then
     end
 end
 
-local carta, animacao, tabuleiro, menu, song
+local LARGURA_TELA, ALTURA_TELA
+local menuPrincipal
+local carta, animacao, tabuleiro, song, imagemFundoTelaInicial, imagemFundoPartida
 
 function love.load()
+    LARGURA_TELA = love.graphics.getWidth()
+    ALTURA_TELA = love.graphics.getHeight()
+
     animacao = Animacao.nova("midia/sprites/heart_sprite.png", 64, 64, '1-7', 0.1)
     animacao:setPosicao(850, 0)
+
+    imagemFundoPartida = love.graphics.newImage("midia/images/telaPartida.png")
+    imagemFundoTelaInicial = love.graphics.newImage("midia/images/telaInicial.png")
     
-    song = love.audio.newSource("midia/audio/loop-8-28783.mp3", "stream")
+    
+    --song = love.audio.newSource("midia/audio/loop-8-28783.mp3", "stream")
     --song:setLooping(true)
-    song:play()
+    --song:play()
 
     --carregando imagens das cartas
     local cartas = {
@@ -36,13 +46,10 @@ function love.load()
         Carta:new(10, "midia/images/cartas/gato.png"),
         Carta:new(11, "midia/images/cartas/pocao.png"),
         Carta:new(12, "midia/images/cartas/planta.png"),
-        
-
     }
 
-    menu = Menu:new()
+    menuPrincipal = MenuPrincipal:new()
     tabuleiro = Tabuleiro:new(1, cartas)
-    
 end
 
 function love.update(dt)
@@ -66,8 +73,15 @@ function love.keypressed(key)
 end
 
 function love.draw()
-    love.graphics.clear(1, 1, 1, 1)
-    --menu:draw()
-    tabuleiro:draw()
+    ---love.graphics.clear(1, 1, 1, 1)
+    local escalaX = LARGURA_TELA / imagemFundoTelaInicial:getWidth()
+    local escalaY = ALTURA_TELA / imagemFundoTelaInicial:getHeight()
+
+
+    love.graphics.draw(imagemFundoTelaInicial, 0, 0, 0, escalaX, escalaY)
+    --love.graphics.draw(imagemFundoPartida, 0, 0)
+    menuPrincipal:draw()
+
+    --tabuleiro:draw()
     animacao:draw()
 end
