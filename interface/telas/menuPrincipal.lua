@@ -1,5 +1,5 @@
-local Botao = require("interface.botao")
-local Tabuleiro = require("classes.tabuleiro") --no caso, depois vai ser Partida
+local Botao = require("interface.botao") --no caso, depois vai ser Partida
+local Partida = require("classes.partida")
 
 local ALTURA_TELA, LARGURA_TELA
 
@@ -8,8 +8,9 @@ MenuPrincipal = {}
 function MenuPrincipal:new()
     local novo = {
         botoes = {
-            Botao:new(100, 100, 200, 50, "Iniciar Partida", function()
-                print("Iniciar Partida")
+            Botao:new(100, 100, 200, 50, "Iniciar Partida",
+                function()
+                    Partida:new("modoDeJogo", 1)
             end),
             Botao:new(100, 200, 200, 50, "Sair", function()
                 love.event.quit()
@@ -30,6 +31,13 @@ function MenuPrincipal:draw()
         botao:draw()
     end
 end
+
+function MenuPrincipal:clicada(x, y, button)
+    for _, botao in ipairs(self.botoes) do
+        botao:clicada(x, y, button)
+    end
+end
+
 
 function MenuPrincipal:update(dt)
     local mx, my = love.mouse.getPosition()
