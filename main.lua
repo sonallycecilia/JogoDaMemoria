@@ -2,6 +2,8 @@ local Carta = require("classes.carta")
 local Animacao = require("interface.animacao")
 local Tabuleiro = require("classes.tabuleiro")
 local MenuPrincipal = require("interface.telas.menuPrincipal")
+local Partida = require("classes.partida")
+local love = require("love")
 
 if os.getenv "LOCAL_LUA_DEBUGGER_VSCODE" == "1" then
     local lldebugger = require "lldebugger"
@@ -15,7 +17,7 @@ end
 
 local LARGURA_TELA, ALTURA_TELA
 local menuPrincipal
-local carta, animacao, tabuleiro, song, imagemFundoTelaInicial, imagemFundoPartida
+local carta, animacao, partida, song, imagemFundoTelaInicial, imagemFundoPartida
 
 function love.load()
     LARGURA_TELA = love.graphics.getWidth()
@@ -49,7 +51,8 @@ function love.load()
     }
 
     menuPrincipal = MenuPrincipal:new()
-    tabuleiro = Tabuleiro:new(1, cartas)
+    partida = Partida:new("modoDejogo", 1, cartas)
+    
 end
 
 function love.update(dt)
@@ -57,13 +60,16 @@ function love.update(dt)
 end
 
 function love.mousepressed(x, y)
-    for _, carta in ipairs(tabuleiro.cartas) do
-        if carta:clicada(x, y) then
-            carta:alternarLado()
-            break  -- Se quiser virar só uma por clique
+    if partida and partida.tabuleiro and partida.tabuleiro.cartas then
+        for _, carta in ipairs(partida.tabuleiro.cartas) do
+            if carta:clicada(x, y) then
+                carta:alternarLado()
+                break
+            end
         end
     end
 end
+
 
 function love.keypressed(key)
     if key == "w" then
@@ -80,8 +86,8 @@ function love.draw()
 
     love.graphics.draw(imagemFundoTelaInicial, 0, 0, 0, escalaX, escalaY)
     --love.graphics.draw(imagemFundoPartida, 0, 0)
-    menuPrincipal:draw()
+    --menuPrincipal:draw()
 
-    --tabuleiro:draw()
+    partida.tabuleiro:draw()
     animacao:draw()
 end

@@ -1,6 +1,8 @@
 local Botao = require("interface.botao")
 local Tabuleiro = require("classes.tabuleiro") --no caso, depois vai ser Partida
 
+local ALTURA_TELA, LARGURA_TELA
+
 MenuPrincipal = {}
 
 function MenuPrincipal:new()

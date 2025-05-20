@@ -2,8 +2,8 @@ Tabuleiro = {}
 Tabuleiro.__index = Tabuleiro --permite chamadas com self
 
 local ESPACAMENTO = 10
-local POS_X = 100
-local POS_Y = 50
+local POS_X = 150
+local POS_Y = 100
 
 function Tabuleiro:new(nivel, dadosCartas)
     local novo = {
