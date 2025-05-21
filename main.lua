@@ -1,7 +1,7 @@
-local Carta = require("classes.carta")
 local Animacao = require("interface.animacao")
 local MenuPrincipal = require("interface.telas.menuPrincipal")
 local Partida = require("classes.partida")
+
 local Config = require("config")
 local love = require("love")
 
@@ -43,13 +43,12 @@ function love.mousepressed(x, y, button)
     local jogadas = 2
     if partida and partida.tabuleiro and partida.tabuleiro.cartas then
         for _, carta in ipairs(partida.tabuleiro.cartas) do
-            if carta:clicada(x, y) then
+            if carta:clicada(x, y) and jogadas <= 0 then
                 carta:alternarLado()
-                carta:poder()     
+                carta:poder()
             end
         end
     end
-
    --menuPrincipal:mousepressed(x, y, button)
 end
 
