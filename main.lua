@@ -1,9 +1,14 @@
 local Animacao = require("interface.animacao")
+<<<<<<< HEAD
 local MenuPrincipal = require("interface.telas.menuPrincipal")
 local Partida = require("classes.partida")
 
 local Config = require("config")
 local love = require("love")
+=======
+local Tabuleiro = require("classes.tabuleiro")
+local Menu = require("interface.menu")
+>>>>>>> main
 
 if os.getenv "LOCAL_LUA_DEBUGGER_VSCODE" == "1" then
     local lldebugger = require "lldebugger"
@@ -30,8 +35,30 @@ function love.load()
     --song:setLooping(true)
     --song:play()
 
+<<<<<<< HEAD
     menuPrincipal = MenuPrincipal:new()
     partida = Partida:new("modoDejogo", 3)
+=======
+    --carregando imagens das cartas
+    local cartas = {
+        Carta:new(1, "midia/images/cartas/fada.png"),
+        Carta:new(2, "midia/images/cartas/naly.png"),
+        Carta:new(3, "midia/images/cartas/elfa.png"),
+        Carta:new(4, "midia/images/cartas/draenei.png"),
+        Carta:new(5, "midia/images/cartas/rogue.png"),
+        Carta:new(6, "midia/images/cartas/lua.png"),
+        Carta:new(7, "midia/images/cartas/coracao.png"),
+        Carta:new(8, "midia/images/cartas/bomba.png"),
+        Carta:new(9, "midia/images/cartas/flor.png"),
+        Carta:new(10, "midia/images/cartas/gato.png"),
+        Carta:new(11, "midia/images/cartas/pocao.png"),
+        Carta:new(12, "midia/images/cartas/planta.png"),
+
+    }
+
+    menu = Menu:new()
+    tabuleiro = Tabuleiro:new(1, cartas)
+>>>>>>> main
     
 end
 
@@ -39,6 +66,7 @@ function love.update(dt)
     animacao:update(dt)
 end
 
+<<<<<<< HEAD
 function love.mousepressed(x, y, button)
     local jogadas = 2
     if partida and partida.tabuleiro and partida.tabuleiro.cartas then
@@ -48,6 +76,11 @@ function love.mousepressed(x, y, button)
                 carta:poder()
             end
         end
+=======
+function love.mousepressed(x, y)
+    for _, carta in ipairs(tabuleiro.cartas) do
+        carta:onClick(x, y)
+>>>>>>> main
     end
    --menuPrincipal:mousepressed(x, y, button)
 end

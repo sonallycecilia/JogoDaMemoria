@@ -46,12 +46,16 @@ function Tabuleiro:gerarCopiaDeCartas(dadosCartas)
 end
 
 function Tabuleiro:gerarCopiaUnica(cartaOriginal)
+<<<<<<< HEAD
     if not cartaOriginal then
         return nil
     end
 
     local novaCarta = Carta:new(cartaOriginal.id, cartaOriginal.pathImagem)
     return novaCarta
+=======
+    return Carta:new(cartaOriginal.id, cartaOriginal.pathImagem)
+>>>>>>> main
 end
 
 function Tabuleiro:definirLayout()
