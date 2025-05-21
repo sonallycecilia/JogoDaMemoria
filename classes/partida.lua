@@ -26,22 +26,14 @@ function Partida:new(modoDeJogo, nivel)
 end
 
 function Partida:carregarCartas()
-    local cartas = {
-        Carta:new(1, "midia/images/cartas/fada.png"),
-        Carta:new(2, "midia/images/cartas/naly.png"),
-        Carta:new(3, "midia/images/cartas/elfa.png"),
-        Carta:new(4, "midia/images/cartas/draenei.png"),
-        Carta:new(5, "midia/images/cartas/borboleta.png"),
-        Carta:new(6, "midia/images/cartas/lua.png"),
-        Carta:new(7, "midia/images/cartas/coracao.png"),
-        Carta:new(8, "midia/images/cartas/draenei.png"),
-        Carta:new(9, "midia/images/cartas/flor.png"),
-        Carta:new(10, "midia/images/cartas/gato.png"),
-        Carta:new(11, "midia/images/cartas/pocao.png"),
-        Carta:new(12, "midia/images/cartas/planta.png"),
-    }
+    local cartas = {}
+    for i = 0, 11 do
+        local carta = Carta:new(i, Config.deck[i + 1])
+        table.insert(cartas, carta)
+    end
     return cartas
 end
+
 
 function Partida:atualizarTelaFundo()
     love.graphics.draw(Config.janela.IMAGEM_TELA_PARTIDA, 0, 0, 0)

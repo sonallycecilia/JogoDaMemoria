@@ -8,5 +8,20 @@ Config.janela = {
     IMAGEM_TELA_PARTIDA = "midia/images/telaPartida.png",
 }
 
+Config.deck = {
+        "midia/images/cartas/fada.png",
+        "midia/images/cartas/naly.png",
+        "midia/images/cartas/elfa.png",
+        "midia/images/cartas/draenei.png",
+        "midia/images/cartas/borboleta.png",
+        "midia/images/cartas/lua.png",
+        "midia/images/cartas/coracao.png",
+        "midia/images/cartas/draenei.png",
+        "midia/images/cartas/flor.png",
+        "midia/images/cartas/gato.png",
+        "midia/images/cartas/pocao.png",
+        "midia/images/cartas/planta.png",
+}
+
 return Config
 

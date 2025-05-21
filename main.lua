@@ -1,6 +1,5 @@
 local Carta = require("classes.carta")
 local Animacao = require("interface.animacao")
-local Tabuleiro = require("classes.tabuleiro")
 local MenuPrincipal = require("interface.telas.menuPrincipal")
 local Partida = require("classes.partida")
 local Config = require("config")
@@ -16,7 +15,8 @@ if os.getenv "LOCAL_LUA_DEBUGGER_VSCODE" == "1" then
     end
 end
 
-local menuPrincipal, imagemFundoAtual, imagemFundoPartida, imagemFundoTelaInicial
+local menuPrincipal
+local imagemFundoPartida, imagemFundoTelaInicial
 local carta, animacao, partida, song
 
 function love.load()
@@ -26,14 +26,12 @@ function love.load()
     imagemFundoPartida = love.graphics.newImage(Config.janela.IMAGEM_TELA_PARTIDA)
     imagemFundoTelaInicial = love.graphics.newImage(Config.janela.IMAGEM_TELA_INICIAL)
     
-    imagemFundoAtual = imagemFundoTelaInicial
-    
     --song = love.audio.newSource("midia/audio/loop-8-28783.mp3", "stream")
     --song:setLooping(true)
     --song:play()
 
     menuPrincipal = MenuPrincipal:new()
-    partida = Partida:new("modoDejogo", 1)
+    partida = Partida:new("modoDejogo", 3)
     
 end
 
@@ -42,11 +40,12 @@ function love.update(dt)
 end
 
 function love.mousepressed(x, y, button)
+    local jogadas = 2
     if partida and partida.tabuleiro and partida.tabuleiro.cartas then
         for _, carta in ipairs(partida.tabuleiro.cartas) do
             if carta:clicada(x, y) then
                 carta:alternarLado()
-                break
+                carta:poder()     
             end
         end
     end
@@ -67,14 +66,12 @@ function love.draw()
     local escalaTelaX = Config.janela.LARGURA_TELA / imagemFundoTelaInicial:getWidth()
     local escalaTelaY = Config.janela.ALTURA_TELA / imagemFundoTelaInicial:getHeight()
 
-
-    imagemFundoAtual = love.graphics.draw(imagemFundoTelaInicial, 0, 0, 0, escalaTelaX, escalaTelaY)
-    --love.graphics.draw(imagemFundoPartida, 0, 0)
-    menuPrincipal:draw()
+    love.graphics.draw(imagemFundoTelaInicial, 0, 0, 0, escalaTelaX, escalaTelaY)
+    
+    --menuPrincipal:draw()
     
     if partida then
         partida.tabuleiro:draw()
-        imagemFundoAtual = imagemFundoPartida
     end
     animacao:draw()
 end
