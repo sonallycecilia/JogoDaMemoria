@@ -3,11 +3,10 @@ local Config = require("config")
 local Botao = {}
 local Botao_mt = { __index = Botao }
 
-function Botao:new(x, y, width, height, textoOrImagemPath, funcao)
+function Botao:new(configTable, textoOrImagemPath, x, y, scaleX, scaleY, funcao, width, height)
     local imagem = nil
     local texto = nil
 
-    -- Se o arquivo existir, é uma imagem
     if love.filesystem.getInfo(textoOrImagemPath) then
         imagem = love.graphics.newImage(textoOrImagemPath)
     else
@@ -15,26 +14,22 @@ function Botao:new(x, y, width, height, textoOrImagemPath, funcao)
     end
 
     local novoBotao = {
-        x = x,
-        y = y,
-        width = width,
-        height = height,
+        x = x or 0,
+        y = y or 0,
+        width = width or configTable.botoes.largura,
+        height = height or configTable.botoes.altura,
         texto = texto,
         imagem = imagem,
-
-        corNormal = Config.botoes.coresBotao.normal,
-        corHover = Config.botoes.coresBotao.hover,
-        corSelecionado = Config.botoes.coresBotao.selecionado,
-
         funcao = funcao,
         selecionado = false,
-        mouseSobre = false
+        mouseSobre = false,
+        scaleX = scaleX or configTable.scaleX or 1.0,
+        scaleY = scaleY or configTable.scaleY or 1.0,
     }
 
     setmetatable(novoBotao, Botao_mt)
     return novoBotao
 end
-
 
 function Botao:update(mx, my)
     self.mouseSobre = mx >= self.x and mx <= self.x + self.width and
@@ -42,39 +37,22 @@ function Botao:update(mx, my)
 end
 
 function Botao:clicar()
-    if self.mouseSobre then
-        self.selecionado = not self.selecionado
-        if self.funcao then
-            self.funcao()
-        end
+    if self.mouseSobre and self.funcao then
+        self.funcao()
+        love.graphics.setColor(1, 1, 1, 0.5)
     end
 end
-
 
 function Botao:draw()
-    local cor = self.corNormal
-    if self.selecionado then
-        cor = self.corSelecionado
-    elseif self.mouseSobre then
-        cor = self.corHover
-    end
-
-    love.graphics.setColor(cor)
-
-    -- Desenha a imagem do botão, se existir
     if self.imagem then
-        love.graphics.draw(self.imagem, self.x, self.y)
-    else
-        -- Desenha um botão retangular padrão, se não tiver imagem
+        love.graphics.setColor(1, 1, 1) -- Resetar cor
+        love.graphics.draw(self.imagem, self.x, self.y, 0, self.scaleX, self.scaleY)
+    elseif self.texto then
+        love.graphics.setColor(1, 1, 1)
         love.graphics.rectangle("fill", self.x, self.y, self.width, self.height)
-
-        -- Só desenha o texto se existir
-        if self.texto then
-            love.graphics.setColor(0, 0, 0)
-            love.graphics.printf(self.texto, self.x, self.y + self.height / 2 - 8, self.width, "center")
-        end
+        love.graphics.setColor(0, 0, 0)
+        love.graphics.printf(self.texto, self.x, self.y + self.height / 2 - 8, self.width, "center")
     end
 end
-
 
 return Botao

@@ -1,6 +1,7 @@
 local Animacao = require("interface.animacao")
 local Menu = require("interface.menu")
-
+local Frame = require("interface.frame")
+local Botao = require("interface.botao")
 local Partida = require("classes.partida")
 
 local Config = require("config")
@@ -15,11 +16,8 @@ if os.getenv "LOCAL_LUA_DEBUGGER_VSCODE" == "1" then
     end
 end
 
-local menuPrincipal, animacao
-local botoes = {}
-local video
-local videoSource
-local botaoIniciarPartida, botaoConfiguracao, botaoSair
+local animacao
+local botaoIniciarJogo, botaoConfiguracao, botaoConquistas, botaoCreditos, botaoSkins, botaoSair
 local imagemAtualFundo, imagemFundoPartida, imagemFundoTelaInicial
 
 local partida
@@ -29,15 +27,6 @@ function love.load()
     animacao = Animacao.nova("midia/sprites/heart_sprite.png", 64, 64, '1-7', 0.1)
     animacao:setPosicao(850, 0)
 
-    video = love.graphics.newVideo("midia/videos/telaInicial.ogv")
-    if not video then
-        error("Falha ao carregar o vídeo!")
-    else
-        video:setLooping(true)
-        video:play()
-    end
-
-
 
     imagemFundoPartida = love.graphics.newImage(Config.janela.IMAGEM_TELA_PARTIDA)
     imagemFundoTelaInicial = love.graphics.newImage(Config.janela.IMAGEM_TELA_INICIAL)
@@ -46,7 +35,55 @@ function love.load()
     --song:setLooping(true)
     --song:play()
 
-    menuPrincipal = Menu:new()
+    --Botões
+    botaoIniciarJogo = Botao:new(Config,
+                    Config.botoes.imagemPath.menuPrincipal.iniciarJogo,
+                    80, 540,
+                    0.5, 0.5,
+                    function()
+                        partida = Partida:new(Config.deck)
+    end)
+
+    botaoConfiguracao = Botao:new(Config,
+                    Config.botoes.imagemPath.menuPrincipal.configuracoes,
+                    80, 590,
+                    0.5, 0.5,
+                    function()
+                        print("Configurações")
+    end)
+
+    botaoConquistas = Botao:new(Config,
+                    Config.botoes.imagemPath.menuPrincipal.conquistas,
+                    80, 640,
+                    0.5, 0.5,
+                    function()
+                        print("Conquistas")
+    end)
+
+    botaoCreditos = Botao:new(Config,
+                    Config.botoes.imagemPath.menuPrincipal.creditos,
+                    80, 690,
+                    0.5, 0.5,
+                    function()
+                        print("Créditos")
+    end)
+
+    botaoSkins = Botao:new(Config,
+                    Config.botoes.imagemPath.menuPrincipal.skins,
+                    80, 740,
+                    0.5, 0.5,
+                    function()
+                        print("Skins")
+    end)
+
+    botaoSair = Botao:new(Config,
+                    Config.botoes.imagemPath.menuPrincipal.sair,
+                    1400, 790,
+                    0.5, 0.5,
+                    function()
+                        love.event.quit()
+    end)
+
 end
 
 function love.update(dt)
@@ -69,9 +106,12 @@ function love.draw()
     local escalaTelaX = Config.janela.LARGURA_TELA / imagemFundoTelaInicial:getWidth()
     local escalaTelaY = Config.janela.ALTURA_TELA / imagemFundoTelaInicial:getHeight()
 
-    love.graphics.draw(video, 100, 100)
-
     love.graphics.draw(imagemFundoTelaInicial, 0, 0, 0, escalaTelaX, escalaTelaY)
-    --menuPrincipal:draw()
-    animacao:draw()
+    botaoIniciarJogo:draw()
+    botaoConfiguracao:draw()
+    botaoConquistas:draw()
+    botaoCreditos:draw()
+    botaoSkins:draw()
+    botaoSair:draw()
+    --animacao:draw()
 end

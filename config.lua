@@ -22,12 +22,21 @@ Config.scaleY = 0.5
 Config.defaultErrorImage = "assets/erro.png"
 
 Config.botoes = {
-    largura = 200,
-    altura = 50,
+    largura = 404,
+    altura = 80,
     coresBotao = {
         normal = hexToRGB("#b66e54"),
         hover = hexToRGB("#ce8f79"),
-        selecionado = hexToRGB("#ce8f79")
+    },
+    imagemPath = {
+        menuPrincipal ={
+        iniciarJogo = "midia/botoes/menuPrincipal/iniciarJogo.png",
+        configuracoes = "midia/botoes/menuPrincipal/configuracoes.png",
+        conquistas = "midia/botoes/menuPrincipal/conquistas.png",
+        creditos = "midia/botoes/menuPrincipal/creditos.png",
+        skins = "midia/botoes/menuPrincipal/skins.png",
+        sair = "midia/botoes/menuPrincipal/sair.png",
+        }
     }
 }
 
@@ -45,6 +54,17 @@ Config.deck = {
         "midia/images/cartas/pocao.png",
         "midia/images/cartas/planta.png",
 }
+
+Config.frames = {
+    menuPrincipal = {
+        imagemPath = "midia/frames/fundoMenu.png",
+        x = 0,
+        y = 0,
+        largura = 730,
+        altura = 611,
+    }
+}
+
 
 return Config
 
