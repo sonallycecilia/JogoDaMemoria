@@ -1,14 +1,5 @@
 local Config = {}
 
---metodos uteis
-local function hexToRGB(hex)
-    hex = hex:gsub("#", "")
-    local r = tonumber(hex:sub(1, 2), 16) / 255
-    local g = tonumber(hex:sub(3, 4), 16) / 255
-    local b = tonumber(hex:sub(5, 6), 16) / 255
-    return { r, g, b }
-end
-
 -- Configurações de janela
 Config.janela = {
     LARGURA_TELA = love.graphics.getWidth(),
@@ -24,10 +15,6 @@ Config.defaultErrorImage = "assets/erro.png"
 Config.botoes = {
     largura = 404,
     altura = 80,
-    coresBotao = {
-        normal = hexToRGB("#b66e54"),
-        hover = hexToRGB("#ce8f79"),
-    },
     imagemPath = {
         menuPrincipal ={
         iniciarJogo = "midia/botoes/menuPrincipal/iniciarJogo.png",

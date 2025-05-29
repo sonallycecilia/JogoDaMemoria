@@ -39,14 +39,22 @@ end
 function Botao:clicar()
     if self.mouseSobre and self.funcao then
         self.funcao()
-        love.graphics.setColor(1, 1, 1, 0.5)
     end
 end
 
 function Botao:draw()
+    local escalaX = self.scaleX
+    local escalaY = self.scaleY
+
+    -- Efeito visual ao passar o mouse ou clicar
+    if self.mouseSobre or self.selecionado then
+        escalaX = escalaX * 1.2
+        escalaY = escalaY * 1.2
+    end
+
     if self.imagem then
-        love.graphics.setColor(1, 1, 1) -- Resetar cor
-        love.graphics.draw(self.imagem, self.x, self.y, 0, self.scaleX, self.scaleY)
+        love.graphics.setColor(1, 1, 1)
+        love.graphics.draw(self.imagem, self.x, self.y, 0, escalaX, escalaY)
     elseif self.texto then
         love.graphics.setColor(1, 1, 1)
         love.graphics.rectangle("fill", self.x, self.y, self.width, self.height)
@@ -54,5 +62,6 @@ function Botao:draw()
         love.graphics.printf(self.texto, self.x, self.y + self.height / 2 - 8, self.width, "center")
     end
 end
+
 
 return Botao

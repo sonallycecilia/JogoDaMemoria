@@ -17,6 +17,7 @@ if os.getenv "LOCAL_LUA_DEBUGGER_VSCODE" == "1" then
 end
 
 local animacao
+local botoes = {}
 local botaoIniciarJogo, botaoConfiguracao, botaoConquistas, botaoCreditos, botaoSkins, botaoSair
 local imagemAtualFundo, imagemFundoPartida, imagemFundoTelaInicial
 
@@ -35,10 +36,10 @@ function love.load()
     --song:setLooping(true)
     --song:play()
 
-    --Botões
+        --Botões
     botaoIniciarJogo = Botao:new(Config,
                     Config.botoes.imagemPath.menuPrincipal.iniciarJogo,
-                    80, 540,
+                    80, 500,
                     0.5, 0.5,
                     function()
                         partida = Partida:new(Config.deck)
@@ -46,7 +47,7 @@ function love.load()
 
     botaoConfiguracao = Botao:new(Config,
                     Config.botoes.imagemPath.menuPrincipal.configuracoes,
-                    80, 590,
+                    80, 560,
                     0.5, 0.5,
                     function()
                         print("Configurações")
@@ -54,7 +55,7 @@ function love.load()
 
     botaoConquistas = Botao:new(Config,
                     Config.botoes.imagemPath.menuPrincipal.conquistas,
-                    80, 640,
+                    80, 620,
                     0.5, 0.5,
                     function()
                         print("Conquistas")
@@ -62,7 +63,7 @@ function love.load()
 
     botaoCreditos = Botao:new(Config,
                     Config.botoes.imagemPath.menuPrincipal.creditos,
-                    80, 690,
+                    80, 680,
                     0.5, 0.5,
                     function()
                         print("Créditos")
@@ -78,11 +79,18 @@ function love.load()
 
     botaoSair = Botao:new(Config,
                     Config.botoes.imagemPath.menuPrincipal.sair,
-                    1400, 790,
+                    1400, 740,
                     0.5, 0.5,
                     function()
                         love.event.quit()
     end)
+
+    table.insert(botoes, botaoIniciarJogo)
+    table.insert(botoes, botaoConfiguracao)
+    table.insert(botoes, botaoConquistas)
+    table.insert(botoes, botaoCreditos)
+    table.insert(botoes, botaoSkins)
+    table.insert(botoes, botaoSair)
 
 end
 
@@ -90,10 +98,19 @@ function love.update(dt)
     animacao:update(dt)
 end
 
-function love.mousepressed(x, y)
-   --menuPrincipal:mousepressed(x, y, button)
+function love.mousepressed(x, y, button)
+    if button == 1 then -- botão esquerdo
+        for _, botao in ipairs(botoes) do
+            botao:clicar()
+        end
+    end
 end
 
+function love.mousemoved(x, y, dx, dy)
+    for _, botao in ipairs(botoes) do
+        botao:update(x, y)
+    end
+end
 
 function love.keypressed(key)
     if key == "x" then
@@ -107,11 +124,10 @@ function love.draw()
     local escalaTelaY = Config.janela.ALTURA_TELA / imagemFundoTelaInicial:getHeight()
 
     love.graphics.draw(imagemFundoTelaInicial, 0, 0, 0, escalaTelaX, escalaTelaY)
-    botaoIniciarJogo:draw()
-    botaoConfiguracao:draw()
-    botaoConquistas:draw()
-    botaoCreditos:draw()
-    botaoSkins:draw()
-    botaoSair:draw()
+    
+    -- desenhando botoes
+    for _, botao in ipairs(botoes) do
+        botao:draw()
+    end
     --animacao:draw()
 end
