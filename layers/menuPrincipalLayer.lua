@@ -1,20 +1,22 @@
 -- MenuPrincipalLayer.lua
+local LayerManager = require("layers.layerManager")
 local Config = require("config")
 local Botao = require("interface.botao")
 
 local MenuPrincipalLayer = {}
 MenuPrincipalLayer.__index = MenuPrincipalLayer
 
+
 function MenuPrincipalLayer:new()
     local self = setmetatable({}, MenuPrincipalLayer)
-
+    self.manager = LayerManager:new()
     self.botoes = {
         iniciarJogo = Botao:new(Config,
                 Config.botoes.imagemPath.menuPrincipal.iniciarJogo,
                 80, 500,
                 0.5, 0.5,
                 function()
-                    print("Iniciar jogo")
+                    love.graphics.clear(1, 1, 1, 1)
         end),
 
         configuracoes = Botao:new(Config,

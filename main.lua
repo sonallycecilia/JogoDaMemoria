@@ -1,8 +1,7 @@
+local LayerManager = require("layers.layerManager")
 local Animacao = require("interface.animacao")
 local menuPrincipalLayer = require("layers.menuPrincipalLayer")
-local Frame = require("interface.frame")
-local Botao = require("interface.botao")
-local Partida = require("classes.partida")
+
 
 local Config = require("config")
 
@@ -16,9 +15,10 @@ if os.getenv "LOCAL_LUA_DEBUGGER_VSCODE" == "1" then
     end
 end
 
+local manager = LayerManager:new()
+
 local animacao
 local menuPrincipal
-local imagemAtualFundo, imagemFundoPartida, imagemFundoTelaInicial
 
 local partida
 local song
@@ -28,6 +28,7 @@ function love.load()
     animacao:setPosicao(850, 0)
 
     menuPrincipal = menuPrincipalLayer:new()
+    manager:setLayer(menuPrincipal)
 
     --song = love.audio.newSource("midia/audio/loop-8-28783.mp3", "stream")
     --song:setLooping(true)
@@ -55,6 +56,6 @@ end
 
 function love.draw()
     -- desenhando botoes
-    menuPrincipal:draw()
+    manager:draw()
     --animacao:draw()
 end
