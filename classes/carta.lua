@@ -60,4 +60,10 @@ function Carta:drawImagem(imagem)
     end
 end
 
+function Carta:poder()
+    if self.id == 1 then
+        -- Poder es
+    end
+end
+
 return Carta
