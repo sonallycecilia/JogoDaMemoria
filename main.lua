@@ -38,14 +38,23 @@ end
 
 function love.update(dt)
     animacao:update(dt)
+    manager:update(dt)
+
+    local layerAtual = manager.currentLayer  -- corrigido aqui
+    if layerAtual and layerAtual.proximaLayer then
+        manager:setLayer(layerAtual.proximaLayer)
+        layerAtual.proximaLayer = nil
+    end
 end
 
+
+
 function love.mousepressed(x, y, button)
-    menuPrincipal:mousepressed(x, y, button)
+    manager:mousepressed(x, y, button)
 end
 
 function love.mousemoved(x, y, dx, dy)
-    menuPrincipal:mousemoved(x, y, dx, dy)
+    manager:mousemoved(x, y, dx, dy)
 end
 
 function love.keypressed(key)
@@ -55,7 +64,6 @@ function love.keypressed(key)
 end
 
 function love.draw()
-    -- desenhando botoes
     manager:draw()
     --animacao:draw()
 end

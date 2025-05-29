@@ -10,14 +10,20 @@ MenuPrincipalLayer.__index = MenuPrincipalLayer
 function MenuPrincipalLayer:new()
     local self = setmetatable({}, MenuPrincipalLayer)
     self.manager = LayerManager:new()
+    self.proximaLayer = nil
+
     self.botoes = {
         iniciarJogo = Botao:new(Config,
-                Config.botoes.imagemPath.menuPrincipal.iniciarJogo,
-                80, 500,
-                0.5, 0.5,
-                function()
-                    love.graphics.clear(1, 1, 1, 1)
-        end),
+                    Config.botoes.imagemPath.menuPrincipal.iniciarJogo,
+                    80, 500,
+                    0.5, 0.5,
+                    function ()
+                        print("Iniciar Jogo")
+                        local MenuJogoLayer = require("layers.menuJogoLayer")
+                        self.proximaLayer = MenuJogoLayer:new()
+                        self.proximaLayer:draw()
+                        print("proximaLayer setada", self.proximaLayer)
+                    end),
 
         configuracoes = Botao:new(Config,
                     Config.botoes.imagemPath.menuPrincipal.configuracoes,
