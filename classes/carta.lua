@@ -9,10 +9,6 @@ local VERSO = "midia/images/verso.png"
 function Carta:new(id, caminhoImagemFrente)
     local novaCarta = {
         id = id,
-<<<<<<< HEAD
-        revelada = true,  -- Estado da carta (revelada ou não)
-=======
->>>>>>> main
         largura = LARGURA,
         altura = ALTURA,
         pathImagem = caminhoImagemFrente, --precisa ficar pois pegamos o caminho da imagem
