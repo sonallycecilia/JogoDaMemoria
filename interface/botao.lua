@@ -42,11 +42,17 @@ function Botao:clicar()
     end
 end
 
+function Botao:mousepressed(x, y, button)
+    if button == 1 then
+        self:update(x, y)
+        self:clicar()
+    end
+end
+
 function Botao:draw()
     local escalaX = self.scaleX
     local escalaY = self.scaleY
 
-    -- Efeito visual ao passar o mouse ou clicar
     if self.mouseSobre or self.selecionado then
         escalaX = escalaX * 1.2
         escalaY = escalaY * 1.2
@@ -62,6 +68,5 @@ function Botao:draw()
         love.graphics.printf(self.texto, self.x, self.y + self.height / 2 - 8, self.width, "center")
     end
 end
-
 
 return Botao

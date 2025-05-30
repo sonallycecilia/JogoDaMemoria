@@ -23,6 +23,12 @@ Config.botoes = {
         creditos = "midia/botoes/menuPrincipal/creditos.png",
         skins = "midia/botoes/menuPrincipal/skins.png",
         sair = "midia/botoes/menuPrincipal/sair.png",
+        },
+        menuJogo = {
+            competitivo = "midia/botoes/menuJogo/competitivo.png",
+            cooperativo = "midia/botoes/menuJogo/cooperativo.png",
+            solo = "midia/botoes/menuJogo/solo.png",
+            voltar = "midia/botoes/menuJogo/voltar.png",
         }
     }
 }
@@ -43,12 +49,9 @@ Config.deck = {
 }
 
 Config.frames = {
-    menuPrincipal = {
+    menu = {
         imagemPath = "midia/frames/fundoMenu.png",
-        x = 0,
-        y = 0,
-        largura = 730,
-        altura = 611,
+        
     }
 }
 
