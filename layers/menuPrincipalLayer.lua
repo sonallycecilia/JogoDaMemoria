@@ -1,5 +1,4 @@
 -- MenuPrincipalLayer.lua
-local LayerManager = require("layers.layerManager")
 local Config = require("config")
 local Botao = require("interface.botao")
 
@@ -7,17 +6,19 @@ local MenuPrincipalLayer = {}
 MenuPrincipalLayer.__index = MenuPrincipalLayer
 
 
-function MenuPrincipalLayer:new()
+function MenuPrincipalLayer:new(manager)
     local self = setmetatable({}, MenuPrincipalLayer)
-    self.manager = LayerManager:new()
+    self.manager = manager
+    self.proximaLayer = nil
+
     self.botoes = {
         iniciarJogo = Botao:new(Config,
-                Config.botoes.imagemPath.menuPrincipal.iniciarJogo,
-                80, 500,
-                0.5, 0.5,
-                function()
-                    love.graphics.clear(1, 1, 1, 1)
-        end),
+                    Config.botoes.imagemPath.menuPrincipal.iniciarJogo,
+                    80, 500,
+                    0.5, 0.5,
+                    function ()
+                        self.proximaLayer = "menuJogo"
+                    end),
 
         configuracoes = Botao:new(Config,
                     Config.botoes.imagemPath.menuPrincipal.configuracoes,
@@ -73,7 +74,15 @@ end
 function MenuPrincipalLayer:draw()
     love.graphics.clear(1, 1, 1, 1)
     local imagemFundo = love.graphics.newImage(Config.janela.IMAGEM_TELA_INICIAL)
-    love.graphics.draw(imagemFundo, 0, 0, 0)
+    -- Centraliza imagemFundo na tela
+    local larguraTela = love.graphics.getWidth()
+    local alturaTela = love.graphics.getHeight()
+    local larguraImagemFundo = imagemFundo:getWidth()
+    local alturaImagemFundo = imagemFundo:getHeight()
+    local xFundo = (larguraTela - larguraImagemFundo) / 2
+    local yFundo = (alturaTela - alturaImagemFundo) / 2
+    
+    love.graphics.draw(imagemFundo, xFundo, yFundo)
     -- Desenhar os botões
     for _, botao in pairs(self.botoes) do
         botao:draw()
