@@ -1,0 +1,4 @@
+require("")
+
+local adversario = {memoria = {}, }
+
