@@ -11,79 +11,76 @@ function MenuJogo:new(manager)
     self.anteriorLayer = nil
 
     self.botoes = {
-        cooperativo = Botao:new(Config,
-                    Config.botoes.imagemPath.menuJogo.cooperativo,
-                    80, 500,
-                    1, 1,
-                    function()
-                        print("Modo Cooperativo")
-                    end),
+    Botao:new(Config, Config.botoes.imagemPath.menuJogo.cooperativo, 80, 500, 0.8, 0.8, function()
+        --configurar
+    end),
 
-        competitivo = Botao:new(Config,
-                    Config.botoes.imagemPath.menuJogo.competitivo,
-                    80, 560,
-                    1, 1,
-                    function()
-                        print("Modo Competitivo")
-                    end),
+    Botao:new(Config, Config.botoes.imagemPath.menuJogo.competitivo, 80, 560, 0.8, 0.8, function()
+        --configurar
+    end),
 
-        solo = Botao:new(Config,
-                    Config.botoes.imagemPath.menuJogo.solo,
-                    80, 620,
-                    1, 1,
-                    function()
-                        print("Modo Solo")
-                    end),
+    Botao:new(Config, Config.botoes.imagemPath.menuJogo.solo, 80, 620, 0.8, 0.8, function()
+        --configurar
+    end),
 
-        voltar = Botao:new(Config,
-                    Config.botoes.imagemPath.menuJogo.voltar,
-                    80, 740,
-                    1, 1,
-                    function()
-                        self.proximaLayer = nil
-                        self.anteriorLayer = "menuPrincipal"
-                    end)
-    }
+    Botao:new(Config, Config.botoes.imagemPath.menuJogo.voltar, 80, 740, 0.8, 0.8, function()
+        --configurar
+    end)
+}
+
     return self
 end
 
-function MenuJogo:draw()
-    love.graphics.clear(1, 1, 1, 1)
 
-    local imagemFundo = love.graphics.newImage(Config.janela.IMAGEM_TELA_INICIAL)
-    local imagemFundoMenu = love.graphics.newImage(Config.frames.menu.imagemPath)
+function MenuJogo:draw()
+    love.graphics.clear(0, 0, 0, 1)
 
     local larguraTela = love.graphics.getWidth()
     local alturaTela = love.graphics.getHeight()
 
-    -- Centraliza imagemFundo (com opacidade)
-    local larguraImagemFundo = imagemFundo:getWidth()
-    local alturaImagemFundo = imagemFundo:getHeight()
-    local xFundo = (larguraTela - larguraImagemFundo) / 2
-    local yFundo = (alturaTela - alturaImagemFundo) / 2
-
-    love.graphics.setColor(1, 1, 1, 0.7)-- Opacidade do fundo: 30%
+    -- Fundo principal
+    local imagemFundo = love.graphics.newImage(Config.janela.IMAGEM_TELA_INICIAL)
+    local xFundo = (larguraTela - imagemFundo:getWidth()) / 2
+    local yFundo = (alturaTela - imagemFundo:getHeight()) / 2
+    love.graphics.setColor(1, 1, 1, 1)
     love.graphics.draw(imagemFundo, xFundo, yFundo)
 
-    -- Centraliza imagemFundoMenu
-    local larguraImagemFundoMenu = imagemFundoMenu:getWidth()
-    local alturaImagemFundoMenu = imagemFundoMenu:getHeight()
-    local xFundoMenu = (larguraTela - larguraImagemFundoMenu) / 2
-    local yFundoMenu = (alturaTela - alturaImagemFundoMenu) / 2
+    -- Camada preta translúcida
+    love.graphics.setColor(0, 0, 0, 0.8)
+    love.graphics.rectangle("fill", 0, 0, larguraTela, alturaTela)
 
-    love.graphics.setColor(1, 1, 1, 1)  -- Restaura cor/opacidade normal
-    love.graphics.draw(imagemFundoMenu, xFundoMenu, yFundoMenu)
+    -- Frame do menu com escala reduzida
+    local imagemFundoMenu = love.graphics.newImage(Config.frames.menu.imagemPath)
+    local menuScale = 0.8
+    local larguraMenu = imagemFundoMenu:getWidth() * menuScale
+    local alturaMenu = imagemFundoMenu:getHeight() * menuScale
+    local xFundoMenu = (larguraTela - larguraMenu) / 2
+    local yFundoMenu = (alturaTela - alturaMenu) / 2
 
-    local offsetY = 0
-    local espacamento = 100  -- espaço entre os botões
-    
-    for _, botao in pairs(self.botoes) do
-        botao.x = xFundoMenu + (larguraImagemFundoMenu - botao.width * botao.scaleX) / 2
-        botao.y = yFundoMenu + 150 + offsetY
-        botao:draw()
-        offsetY = offsetY + espacamento
+    love.graphics.setColor(1, 1, 1, 1)
+    love.graphics.draw(imagemFundoMenu, xFundoMenu, yFundoMenu, 0, menuScale, menuScale)
+
+    -- Calcula altura total real dos botões com espaçamento
+    local espacamento = 5  -- margem entre botões
+    local alturaTotal = 0
+    for _, botao in ipairs(self.botoes) do
+    alturaTotal = alturaTotal + (botao.height * botao.scaleY)
     end
+    alturaTotal = alturaTotal + espacamento * (#self.botoes - 1)
+
+    local yInicial = yFundoMenu + (alturaMenu - alturaTotal) / 2
+
+    -- Posiciona centralizado
+    local yAtual = yInicial
+    for _, botao in ipairs(self.botoes) do
+    botao.x = xFundoMenu + (larguraMenu - botao.width * botao.scaleX) / 2
+    botao.y = yAtual
+    botao:draw()
+    yAtual = yAtual + (botao.height * botao.scaleY) + espacamento
+    end
+
 end
+
 
 function MenuJogo:mousepressed(x, y, button)
     for _, botao in pairs(self.botoes) do

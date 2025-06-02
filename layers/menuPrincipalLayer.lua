@@ -14,48 +14,48 @@ function MenuPrincipalLayer:new(manager)
     self.botoes = {
         iniciarJogo = Botao:new(Config,
                     Config.botoes.imagemPath.menuPrincipal.iniciarJogo,
-                    80, 500,
-                    0.5, 0.5,
+                    50, 500,
+                    0.7, 0.7,
                     function ()
                         self.proximaLayer = "menuJogo"
                     end),
 
         configuracoes = Botao:new(Config,
                     Config.botoes.imagemPath.menuPrincipal.configuracoes,
-                    80, 560,
-                    0.5, 0.5,
+                    50, 560,
+                    0.7, 0.7,
                     function()
                         print("Configurações")
         end),
 
         conquistas = Botao:new(Config,
                     Config.botoes.imagemPath.menuPrincipal.conquistas,
-                    80, 620,
-                    0.5, 0.5,
+                    50, 620,
+                    0.7, 0.7,
                     function()
                         print("Conquistas")
         end),
 
         creditos = Botao:new(Config,
                     Config.botoes.imagemPath.menuPrincipal.creditos,
-                    80, 680,
-                    0.5, 0.5,
+                    50, 680,
+                    0.7, 0.7,
                     function()
                         print("Créditos")
         end),
 
         skins = Botao:new(Config,
                     Config.botoes.imagemPath.menuPrincipal.skins,
-                    80, 740,
-                    0.5, 0.5,
+                    50, 740,
+                    0.7, 0.7,
                     function()
                         print("Skins")
         end),
 
         sair = Botao:new(Config,
                         Config.botoes.imagemPath.menuPrincipal.sair,
-                        1400, 740,
-                        0.5, 0.5,
+                        1435, 740,
+                        0.7, 0.7,
                         function()
                             love.event.quit()
         end),
