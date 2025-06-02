@@ -19,26 +19,13 @@ function love.load()
     animacao = Animacao.nova("midia/sprites/heart_sprite.png", 64, 64, '1-7', 0.1)
     animacao:setPosicao(850, 0)
 
-    --carregando imagens das cartas
-    local cartas = {
-        Carta:new(1, "midia/images/cartas/fada.png"),
-        Carta:new(2, "midia/images/cartas/naly.png"),
-        Carta:new(3, "midia/images/cartas/elfa.png"),
-        Carta:new(4, "midia/images/cartas/draenei.png"),
-        Carta:new(5, "midia/images/cartas/borboleta.png"),
-        Carta:new(6, "midia/images/cartas/lua.png"),
-        Carta:new(7, "midia/images/cartas/coracao.png"),
-        Carta:new(8, "midia/images/cartas/draenei.png"),
-        Carta:new(9, "midia/images/cartas/flor.png"),
-        Carta:new(10, "midia/images/cartas/gato.png"),
-        Carta:new(11, "midia/images/cartas/pocao.png"),
-        Carta:new(12, "midia/images/cartas/planta.png"),
+    -- Passa o nome da layer (string), LayerManager cria a instância e associa o manager
+    manager:setLayer("menuPrincipal")
 
     -- Exemplo de música
     -- local song = love.audio.newSource("midia/audio/loop-8-28783.mp3", "stream")
     -- song:setLooping(true)
     -- song:play()
-    }
 end
 
 function love.update(dt)
