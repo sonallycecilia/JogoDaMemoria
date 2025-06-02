@@ -5,6 +5,7 @@ local ESPACAMENTO = 10
 local POS_X = 100
 local POS_Y = 50
 
+-- TODO: Alterar parâmetro dadosCartas para vetorCartas
 function Tabuleiro:new(nivel, dadosCartas)
     local novo = {
         nivel = nivel or 1,

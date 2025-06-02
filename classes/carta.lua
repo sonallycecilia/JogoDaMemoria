@@ -6,6 +6,7 @@ local LARGURA = 100
 local VERSO = "midia/images/verso.png"
 
 NAO_ENCONTRADA = -1
+NAO_POSICIONADA = -1
 
 -- CONSTRUTOR
 function Carta:new(id, caminhoImagemFrente)
@@ -17,8 +18,8 @@ function Carta:new(id, caminhoImagemFrente)
         imagemFrente = love.graphics.newImage(caminhoImagemFrente),
         imagemVerso = love.graphics.newImage(VERSO),
         revelada = true, -- se não for passado, assume false
-        posX = NAO_ENCONTRADA,
-        posY = NAO_ENCONTRADA,
+        posX = NAO_POSICIONADA,
+        posY = NAO_POSICIONADA,
         rodadaEncontrada = NAO_ENCONTRADA
 
     }
@@ -64,6 +65,10 @@ function Carta:drawImagem(imagem)
     if imagem then
         love.graphics.draw(imagem, self.x, self.y, 0, self.largura / imagem:getWidth(), self.altura / imagem:getHeight())
     end
+end
+
+for index, value in pairs(Carta:new(1, "midia/images/cartas/fada.png")) do
+    print(index, value)
 end
 
 return Carta
