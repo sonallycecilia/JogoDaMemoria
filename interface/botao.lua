@@ -6,18 +6,24 @@ local Botao_mt = { __index = Botao }
 function Botao:new(configTable, textoOrImagemPath, x, y, scaleX, scaleY, funcao, width, height)
     local imagem = nil
     local texto = nil
+    local realWidth = width
+    local realHeight = height
 
     if love.filesystem.getInfo(textoOrImagemPath) then
         imagem = love.graphics.newImage(textoOrImagemPath)
+        realWidth = imagem:getWidth()
+        realHeight = imagem:getHeight()
     else
         texto = textoOrImagemPath
+        realWidth = width or configTable.botoes.largura
+        realHeight = height or configTable.botoes.altura
     end
 
     local novoBotao = {
         x = x or 0,
         y = y or 0,
-        width = width or configTable.botoes.largura,
-        height = height or configTable.botoes.altura,
+        width = realWidth,
+        height = realHeight,
         texto = texto,
         imagem = imagem,
         funcao = funcao,
@@ -32,8 +38,8 @@ function Botao:new(configTable, textoOrImagemPath, x, y, scaleX, scaleY, funcao,
 end
 
 function Botao:update(mx, my)
-    self.mouseSobre = mx >= self.x and mx <= self.x + self.width and
-                      my >= self.y and my <= self.y + self.height
+    self.mouseSobre = mx >= self.x and mx <= self.x + self.width * self.scaleX and
+                      my >= self.y and my <= self.y + self.height * self.scaleY
 end
 
 function Botao:clicar()
@@ -54,18 +60,34 @@ function Botao:draw()
     local escalaY = self.scaleY
 
     if self.mouseSobre or self.selecionado then
-        escalaX = escalaX * 1.2
-        escalaY = escalaY * 1.2
+        escalaX = escalaX * 0.9
+        escalaY = escalaY * 0.9
     end
 
     if self.imagem then
         love.graphics.setColor(1, 1, 1)
-        love.graphics.draw(self.imagem, self.x, self.y, 0, escalaX, escalaY)
+        love.graphics.draw(
+            self.imagem,
+            self.x + (self.width * self.scaleX) / 2,
+            self.y + (self.height * self.scaleY) / 2,
+            0,
+            escalaX,
+            escalaY,
+            self.imagem:getWidth() / 2,
+            self.imagem:getHeight() / 2
+        )
     elseif self.texto then
         love.graphics.setColor(1, 1, 1)
-        love.graphics.rectangle("fill", self.x, self.y, self.width, self.height)
+        love.graphics.push()
+        love.graphics.translate(
+            self.x + (self.width * self.scaleX) / 2,
+            self.y + (self.height * self.scaleY) / 2
+        )
+        love.graphics.scale(escalaX, escalaY)
+        love.graphics.rectangle("fill", -self.width / 2, -self.height / 2, self.width, self.height)
         love.graphics.setColor(0, 0, 0)
-        love.graphics.printf(self.texto, self.x, self.y + self.height / 2 - 8, self.width, "center")
+        love.graphics.printf(self.texto, -self.width / 2, -8, self.width, "center")
+        love.graphics.pop()
     end
 end
 
