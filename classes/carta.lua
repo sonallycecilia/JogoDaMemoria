@@ -5,6 +5,8 @@ local ALTURA = 100
 local LARGURA = 100
 local VERSO = "midia/images/verso.png"
 
+NAO_ENCONTRADA = -1
+
 -- CONSTRUTOR
 function Carta:new(id, caminhoImagemFrente)
     local novaCarta = {
@@ -15,6 +17,10 @@ function Carta:new(id, caminhoImagemFrente)
         imagemFrente = love.graphics.newImage(caminhoImagemFrente),
         imagemVerso = love.graphics.newImage(VERSO),
         revelada = true, -- se não for passado, assume false
+        posX = NAO_ENCONTRADA,
+        posY = NAO_ENCONTRADA,
+        rodadaEncontrada = NAO_ENCONTRADA
+
     }
     setmetatable(novaCarta, Carta) --permite o uso de :, ligando a metatable de cima
     return novaCarta
