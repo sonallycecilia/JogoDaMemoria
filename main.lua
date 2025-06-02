@@ -48,7 +48,7 @@ function love.mousemoved(x, y, dx, dy)
 end
 
 function love.keypressed(key)
-    if key == "x" then
+    if (key == "escape") or (key == "q") then
         love.event.quit()
     end
 end
