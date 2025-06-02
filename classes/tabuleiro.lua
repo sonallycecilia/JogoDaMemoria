@@ -1,9 +1,9 @@
 Tabuleiro = {}
-Tabuleiro.__index = Tabuleiro
+Tabuleiro.__index = Tabuleiro --permite chamadas com self
 
 local ESPACAMENTO = 10
-local POS_X = 100
-local POS_Y = 50
+local POS_X = 150
+local POS_Y = 100
 
 -- TODO: Alterar parâmetro dadosCartas para vetorCartas
 function Tabuleiro:new(nivel, dadosCartas)
@@ -29,6 +29,9 @@ function Tabuleiro:new(nivel, dadosCartas)
 end
 
 function Tabuleiro:gerarCopiaDeCartas(dadosCartas)
+    if self.nivel == 1 or self.nivel == 3 then
+        table.insert(self.cartas, Carta:new(13, "midia/images/cartas/cogumelo.png")) -- Não gera cópias para os níveis 1 e 2
+    end
     -- Número de cópias de acordo com o nível (nível 1 = 2 cópias, nível 2 = 3 cópias, etc.)
     local numCopia = self.nivel + 1  -- Nível 1 gera 2 cópias, Nível 2 gera 3 cópias, etc.
 

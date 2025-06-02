@@ -67,8 +67,10 @@ function Carta:drawImagem(imagem)
     end
 end
 
-for index, value in pairs(Carta:new(1, "midia/images/cartas/fada.png")) do
-    print(index, value)
+function Carta:poder()
+    if self.id == 1 then
+        -- Poder es
+    end
 end
 
 return Carta
