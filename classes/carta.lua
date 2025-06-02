@@ -20,8 +20,8 @@ function Carta:new(id, caminhoImagemFrente)
         revelada = true, -- se não for passado, assume false
         posX = NAO_POSICIONADA,
         posY = NAO_POSICIONADA,
-        rodadaEncontrada = NAO_ENCONTRADA
-
+        rodadaEncontrada = NAO_ENCONTRADA,
+        probErro = 0
     }
     setmetatable(novaCarta, Carta) --permite o uso de :, ligando a metatable de cima
     return novaCarta
