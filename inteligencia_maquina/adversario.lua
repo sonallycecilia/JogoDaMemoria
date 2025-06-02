@@ -1,4 +1,4 @@
-require("")
+require(classes.Carta)
 
 local adversario = {memoria = {}}
 
@@ -16,7 +16,7 @@ end
 function adversario:exibirMemoria()
     for i = 1, #adversario.memoria, 1 do
         for j = 1, #adversario.memoria[i], 1 do
-            io.write(adversario[i][j], " ")
+            io.write(adversario.memoria[i][j], " ")
         end
         io.write("\n")
     end
@@ -28,6 +28,6 @@ end
 function adversario:buscarPar(memoriaJogador)
 end
 
-adversario:inicializarMemoria(  )
-adversario:inicializarMemoria()
+adversario:inicializarMemoria(5,5)
+adversario:exibirMemoria()
     
