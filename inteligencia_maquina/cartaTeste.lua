@@ -2,7 +2,11 @@ local ALTURA = 100
 local LARGURA = 100
 local NAO_ENCONTRADA = -1
 local NAO_POSICIONADA = -1
-CartaTeste = {}
+
+CartaTeste = {
+    VERSO = "midia/images/verso.png",
+    
+}
 CartaTeste.__index = CartaTeste
 
 
@@ -13,8 +17,8 @@ function CartaTeste:new(id, caminhoImagemFrente)
         largura = LARGURA,
         altura = ALTURA,
         pathImagem = caminhoImagemFrente, --precisa ficar pois pegamos o caminho da imagem
-        imagemFrente = "ImgFrent"..id,
-        imagemVerso = "ImgVerso",
+        imagemFrente = caminhoImagemFrente,
+        imagemVerso = "VERSO",
         revelada = false, -- se não for passado, assume false
         posX = NAO_POSICIONADA,
         posY = NAO_POSICIONADA,

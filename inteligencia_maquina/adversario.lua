@@ -1,4 +1,4 @@
-
+require("inteligencia_maquina.tabuleiro")
 
 math.randomseed(os.time())
 
