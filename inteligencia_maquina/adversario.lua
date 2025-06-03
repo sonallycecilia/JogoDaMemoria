@@ -1,5 +1,6 @@
-require("classes.tabuleiro")
-require("classes.carta")
+
+
+math.randomseed(os.time())
 
 local adversario = {memoria = {}}
 
@@ -24,10 +25,20 @@ function adversario:exibirMemoria()
 end
 
 function adversario:selecionarCarta()
+    local selectLin = math.random(1, 4) 
+    local selectCol = math.random(1, 6) 
+    print(selectLin, selectCol)
+    adversario.memoria[selectLin][selectCol] = 'O';
 end
 
-function adversario:buscarPar(memoriaJogador)
+function adversario:buscarCarta()
+    
+end
+
+function adversario:buscarPar(Carta, memoriaJogador)
 end
 
 adversario:inicializarMemoria(4,6)
+adversario:exibirMemoria()
+adversario:selecionarCarta()
 adversario:exibirMemoria()
