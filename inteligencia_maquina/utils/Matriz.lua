@@ -8,12 +8,10 @@ Matriz.__index = Matriz
 function Matriz:new(obj, linhas, colunas)
     obj = obj or {}
     linhas = linhas or #self
-    colunas = colunas or #self[1]
+    colunas = colunas or (#self[1] or 0)
 
-    obj = {
-        linhas = linhas,
-        colunas = colunas
-    }
+    obj.linhas = linhas
+    obj.colunas = colunas
 
     setmetatable(obj, Matriz)
 
@@ -22,15 +20,15 @@ end
 
 --TODO: Tratar matriz que possuem linhas com menos elementos que as outras
 --TODO: Tratar execeçoes, colocar uma quantidade de linhas ou colunas diferentes da do obj matriz
-function Matriz:exibir(nomeAtributo) 
+function Matriz:exibir() 
     -- if (header ~= true) and (header ~= false) then
     --     header = false 
     -- end
 
     -- Só funciona se o objeto chamado tiver atributos para linhas e colunas, ou for uma matriz
-    local instanciaMatriz = self
-    local linhas = instanciaMatriz.linhas or #self
-    local colunas = instanciaMatriz.colunas or #self[1]
+    -- local instanciaMatriz = self
+    -- local linhas = instanciaMatriz.linhas or #self
+    -- local colunas = instanciaMatriz.colunas or #self[1]
 
     -- TODO: Utilizar outro método para isso
     -- Encontrar a maior string de cada coluna e armazena num array
@@ -41,19 +39,32 @@ function Matriz:exibir(nomeAtributo)
     for j = 1, self.colunas, 1 do 
         local maxTam = 0
         for i = 1, self.linhas, 1 do
-            if (#tostring(self[i][j]) > maxTam) then
-                maxTam = #tostring(self[i][j])
+            if (self[i] == nil) and (self[i][j] == nil) then
+                --Evitar erro ao lidar com matrizes incompletas, valores nulos
+            else
+                if (#tostring(self[i][j]) > maxTam) then
+                    maxTam = #tostring(self[i][j])
+                end
             end
-        end
         maxTamColunas[j] = maxTam
+        end
     end
 
     --Exibir cada elemento da matriz adicionando o padding correto 
-    for i = 1, linhas, 1 do
-        for j = 1, colunas, 1 do
-            -- Calcular quando de espaço extra deve ser adicionando
-            local padding = maxTamColunas[j] - #tostring(self[i][j]) + 1
-            io.write(self[i][j], String.new(" ", padding), "|")
+    local padding = 0
+    local valorCelulaOriginal = ""
+    local valorCelulaExibido
+    for i = 1, self.linhas, 1 do
+        for j = 1, self.colunas, 1 do
+            valorCelulaOriginal = self[i] and self[i][j]
+
+            -- Poderia muito bem ser substituido por um if para facilitar a leitura
+            -- mas eu gosto da avaliação de curto-circuito de Lua :)
+            valorCelulaExibido = 
+            ((valorCelulaOriginal == nil or valorCelulaOriginal == "") and "NIL") or valorCelulaOriginal  
+
+            padding = maxTamColunas[j] - #tostring(valorCelulaExibido) + 1
+            io.write(valorCelulaExibido, String.new(" ", padding), "|")
         end
         io.write("\n")
 
@@ -62,22 +73,27 @@ function Matriz:exibir(nomeAtributo)
         --         io.write(String.new("-", maxTamColunas[k] + 1),"|")
         --     end
         --     io.write("\n")
-        -- end
-        
+        -- end 
     end
 end
-
-
-
 
 --{"Carlos", "35", "Sao Paulo", "Rua D"}
 local matriz = {
     {"Nome", "Idade", "Cidade", "Endereco"},
     {"Joao", "30", "Salvador", "Rua A"},
-    {"Maria", "25", "Rio de Janeiro", "Rua B"},
-    {"Pedro Silva", "42", "Sao Paulo", "Rua C"},
+    {"Maria", "25", "Rio de Janeiro", ""},
+    {"Pedro Silva", "42", "", "Rua C"},
 }
 
 matriz = Matriz:new(matriz, #matriz, #matriz[1])
 
-matriz:exibir("id")
+-- io.write(#matriz," ", #matriz[1], "\n")
+-- for i = 1, #matriz, 1 do
+--     for j = 1, #matriz[1], 1 do
+--         io.write(matriz[i][j], " ")
+--     end
+--     io.write("\n")
+-- end
+
+matriz:exibir()
+
