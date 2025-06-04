@@ -12,7 +12,7 @@ function MenuJogo:new(manager)
 
     self.botoes = {
     Botao:new(Config, Config.botoes.imagemPath.menuJogo.cooperativo, 80, 500, 0.8, 0.8, function()
-        --configurar
+        self.proximaLayer = "partida"
     end),
 
     Botao:new(Config, Config.botoes.imagemPath.menuJogo.competitivo, 80, 560, 0.8, 0.8, function()
@@ -73,10 +73,10 @@ function MenuJogo:draw()
     -- Posiciona centralizado
     local yAtual = yInicial
     for _, botao in ipairs(self.botoes) do
-    botao.x = xFundoMenu + (larguraMenu - botao.width * botao.scaleX) / 2
-    botao.y = yAtual
-    botao:draw()
-    yAtual = yAtual + (botao.height * botao.scaleY) + espacamento
+        botao.x = xFundoMenu + (larguraMenu - botao.width * botao.scaleX) / 2
+        botao.y = yAtual
+        botao:draw()
+        yAtual = yAtual + (botao.height * botao.scaleY) + espacamento
     end
 
 end

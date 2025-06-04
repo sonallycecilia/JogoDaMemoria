@@ -15,7 +15,13 @@ function LayerPartida:update(dt)
 end
 
 function LayerPartida:draw()
+    love.graphics.clear(0, 0, 0, 0)
+
+    local larguraTela = love.graphics.getWidth()
+    local alturaTela = love.graphics.getHeight()
+
     love.graphics.print("Layer: Partida", 100, 100)
+    
     -- Desenhar cartas, fundo, HUD etc.
 end
 
