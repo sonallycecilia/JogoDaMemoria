@@ -51,7 +51,6 @@ Config.deck = {
 Config.frames = {
     menu = {
         imagemPath = "midia/frames/fundoMenu.png",
-        
     }
 }
 
