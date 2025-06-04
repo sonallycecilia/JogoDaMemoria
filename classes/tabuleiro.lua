@@ -2,8 +2,8 @@ Tabuleiro = {}
 Tabuleiro.__index = Tabuleiro --permite chamadas com self
 
 local ESPACAMENTO = 10
-local POS_X = 150
-local POS_Y = 100
+local POS_X = 175
+local POS_Y = 145
 
 function Tabuleiro:new(nivel, dadosCartas)
     local novo = {
@@ -89,7 +89,7 @@ function Tabuleiro:draw()
 
             -- Desenhar a parte do tabuleiro
             love.graphics.setColor(1, 1, 1)
-            love.graphics.rectangle("fill", x, y, self.tamanhoCarta, self.tamanhoCarta)
+            love.graphics.rectangle("fill", x, y, self.tamanhoCarta, self.tamanhoCarta, 12, 12)
 
             -- Verificar e desenhar a carta na posição
             local indice = linha * self.colunas + coluna + 1

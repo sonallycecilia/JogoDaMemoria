@@ -2,6 +2,7 @@ local Partida = require("classes.partida")
 local Config = require("config")
 local Botao = require("interface.botao")
 -- layers/layerPartida.lua
+
 local LayerPartida = {}
 LayerPartida.__index = LayerPartida
 
@@ -36,20 +37,36 @@ function LayerPartida:draw()
     local larguraTela = love.graphics.getWidth()
     local alturaTela = love.graphics.getHeight()
 
+    -- Fundo centralizado
     local larguraImagem = self.imagemFundo:getWidth()
     local alturaImagem = self.imagemFundo:getHeight()
+    local xFundo = (larguraTela - larguraImagem) / 2
+    local yFundo = (alturaTela - alturaImagem) / 2
+    love.graphics.draw(self.imagemFundo, xFundo, yFundo)
 
-    -- Calcula as coordenadas para centralizar
-    local x = (larguraTela - larguraImagem) / 2
-    local y = (alturaTela - alturaImagem) / 2
+    -- ESCALAS ajustadas
+    local escalaTabuleiro = 0.9
+    local escalaScore = 0.8
+    local escalaCarta = 0.8
 
-    love.graphics.draw(self.imagemFundo, x, y)
-    love.graphics.draw(self.imagemTabuleiro, 45, 90)
-    love.graphics.draw(self.imagemScore, 1100, 90)
-    love.graphics.draw(self.imagemCarta, 1100, 350)
+    -- POSICIONAMENTO baseado na imagem
+    local xTabuleiro = 50
+    local yTabuleiro = 130
+
+    local xScore = 990
+    local yScore = 130
+
+    local xCarta = 990
+    local yCarta = 323
+
+    -- Desenhar frames com escalas proporcionais
+    love.graphics.draw(self.imagemTabuleiro, xTabuleiro, yTabuleiro, 0, escalaTabuleiro, escalaTabuleiro)
+    love.graphics.draw(self.imagemScore, xScore, yScore, 0, escalaScore, escalaScore)
+    love.graphics.draw(self.imagemCarta, xCarta, yCarta, 0, escalaCarta, escalaCarta)
+
+    -- Desenhar tabuleiro do jogo (internamente deve respeitar o novo layout)
     self.partida.tabuleiro:draw()
 end
-
 
 function LayerPartida:mousepressed(x, y, button)
     -- Tratar cliques nas cartas
