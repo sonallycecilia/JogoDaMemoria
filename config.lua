@@ -56,7 +56,12 @@ Config.deck = {
 
 Config.frames = {
     menu = {
-        imagemPath = "midia/frames/fundoMenu.png",
+        imagemPath = "midia/frames/menu.png",
+    },
+    partida = {
+        carta = "midia/frames/carta.png",
+        tabuleiro = "midia/frames/tabuleiro.png",
+        score = "midia/frames/score.png",
     }
 }
 

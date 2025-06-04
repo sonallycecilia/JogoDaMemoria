@@ -34,10 +34,4 @@ function Partida:carregarCartas()
     return cartas
 end
 
-
-function Partida:atualizarTelaFundo()
-    love.graphics.draw(Config.janela.IMAGEM_TELA_PARTIDA, 0, 0, 0)
-end
-
-
 return Partida

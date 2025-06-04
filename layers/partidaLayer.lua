@@ -1,3 +1,6 @@
+local Partida = require("classes.partida")
+local Config = require("config")
+local Botao = require("interface.botao")
 -- layers/layerPartida.lua
 local LayerPartida = {}
 LayerPartida.__index = LayerPartida
@@ -7,11 +10,24 @@ function LayerPartida:new(manager)
     self.manager = manager
     self.proximaLayer = nil
     -- Inicialize o estado do jogo da memória aqui (cartas, seleção, etc.)
+    self.partida = Partida:new("cooperativo", 2)
+    self:load()
+    -- Exemplo de modo de jogo e nível
     return self
 end
 
 function LayerPartida:update(dt)
     -- Atualizações da partida, como animações ou tempo
+end
+
+function LayerPartida:load()
+    -- Carregue a imagem apenas uma vez
+    self.imagemFundo = love.graphics.newImage(Config.janela.IMAGEM_TELA_PARTIDA)
+    
+    -- frames de imagens
+    self.imagemTabuleiro = love.graphics.newImage(Config.frames.partida.tabuleiro)
+    self.imagemCarta = love.graphics.newImage(Config.frames.partida.carta)
+    self.imagemScore = love.graphics.newImage(Config.frames.partida.score)
 end
 
 function LayerPartida:draw()
@@ -20,10 +36,20 @@ function LayerPartida:draw()
     local larguraTela = love.graphics.getWidth()
     local alturaTela = love.graphics.getHeight()
 
-    love.graphics.print("Layer: Partida", 100, 100)
-    
-    -- Desenhar cartas, fundo, HUD etc.
+    local larguraImagem = self.imagemFundo:getWidth()
+    local alturaImagem = self.imagemFundo:getHeight()
+
+    -- Calcula as coordenadas para centralizar
+    local x = (larguraTela - larguraImagem) / 2
+    local y = (alturaTela - alturaImagem) / 2
+
+    love.graphics.draw(self.imagemFundo, x, y)
+    love.graphics.draw(self.imagemTabuleiro, 45, 90)
+    love.graphics.draw(self.imagemScore, 1100, 90)
+    love.graphics.draw(self.imagemCarta, 1100, 350)
+    self.partida.tabuleiro:draw()
 end
+
 
 function LayerPartida:mousepressed(x, y, button)
     -- Tratar cliques nas cartas
