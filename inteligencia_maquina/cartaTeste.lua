@@ -5,11 +5,28 @@ local NAO_POSICIONADA = -1
 
 CartaTeste = {
     VERSO = "midia/images/verso.png",
-    
+    largura = LARGURA,
+    altura = ALTURA,
+    imagemVerso = "VERSO",
+    revelada = false, -- se não for passado, assume false
+    posX = NAO_POSICIONADA,
+    posY = NAO_POSICIONADA,
+    rodadaEncontrada = NAO_ENCONTRADA,
+    probErro = 0;
 }
 CartaTeste.__index = CartaTeste
+CartaTeste.__tostring = CartaTeste
 
+function CartaTeste:imagemExibida()
+    local img
+    if self.revelada then
+        img = self.imagemFrente
+    else
+        img = self.imagemVerso
+    end
 
+    return img
+end
 
 function CartaTeste:new(id, caminhoImagemFrente)
     local novaCarta = {
@@ -29,3 +46,6 @@ function CartaTeste:new(id, caminhoImagemFrente)
     return novaCarta
 end
 
+function CartaTeste:virar()
+    self.revelada = not self.revelada
+end
