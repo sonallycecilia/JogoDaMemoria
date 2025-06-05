@@ -15,7 +15,7 @@ CartaTeste = {
     probErro = 0;
 }
 CartaTeste.__index = CartaTeste
-CartaTeste.__tostring = CartaTeste
+CartaTeste.__tostring = CartaTeste:imagemExibida()
 
 function CartaTeste:imagemExibida()
     local img
