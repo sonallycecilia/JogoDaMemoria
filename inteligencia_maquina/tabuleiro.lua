@@ -53,7 +53,7 @@ function Tabuleiro:exibir()
         for j = 1, self.colunas, 1 do
             local imagemExibida = "NIL"
             local padding = #imagemExibida
-            local espacador = " |"
+            local espacador = "|"
             local elemento = self:verificaSeCartaExiste(i, j)
             if type(elemento) == "table" then
                 imagemExibida = tostring(elemento:imagemExibida())
