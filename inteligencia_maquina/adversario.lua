@@ -46,16 +46,18 @@ function adversario:exibirMemoria()
     end
 end
 
--- TODO: adicionar verificação para não entrar em looping infinito quando acabarem as cartas a serem selecionadas
-function adversario:selecionarPrimeiraCarta(tabuleiro, rodadaEncontrada)
+function adversario:selecionarPrimeiraCarta(tabuleiro, rodadaEncontrada, rodadaAtual)
     local lin, col
+    local contQtdSorteios = 0
     repeat
         lin = math.random(1, 4) 
         col = math.random(1, 6) 
+        contQtdSorteios = contQtdSorteios + 1
         io.write("posLin: ",lin," posCol: ", col, "\n")
         -- Colocar um temporizador de 1 segundo entre as chamadas de math.random()
-        print(adversario.memoria[lin][col])
-    until not adversario:estaNaMemoria(lin, col)   
+        print("Elemento na memoria", adversario.memoria[lin][col])
+        io.write("Quantidade de Sorteios: ", contQtdSorteios, "\n")
+    until (not adversario:estaNaMemoria(lin, col)) or (contQtdSorteios > 2 ) 
 
     adversario.memoria[lin][col] = tabuleiro[lin][col];
     adversario.memoria[lin][col].rodadaEncontrada = rodadaEncontrada
