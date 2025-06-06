@@ -1,4 +1,4 @@
-Tabuleiro = {}
+local Tabuleiro = {}
 Tabuleiro.__index = Tabuleiro --permite chamadas com self
 
 local ESPACAMENTO = 10

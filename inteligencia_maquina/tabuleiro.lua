@@ -1,68 +1,98 @@
 require("inteligencia_maquina.cartaTeste")
 require("inteligencia_maquina.utils.String")
+require("inteligencia_maquina.utils.Array")
 
-local Tabuleiro = {
+Tabuleiro = {
     cartas = {}, 
     nivel = 1, 
     linhas = 4, 
-    colunas = 6
+    colunas = 6,
 }
 Tabuleiro.__index = Tabuleiro
 
-function Tabuleiro:new(lin, col, vetorCartas) 
+function Tabuleiro:new(lin, col, cartas) 
     lin = 4 -- Fixa o numero de linhas 
     col = 6 -- Fixa o tamaho de colunas
     local novoTabuleiro = {
-        cartas = {},
-        nivel = 1,
         linhas = lin, 
-        colunas = col
+        colunas = col,
+        mapPares = {}
     }
-    novoTabuleiro.cartas = vetorCartas
+    setmetatable(novoTabuleiro, Tabuleiro)
+    novoTabuleiro.cartas = cartas
 
     local linha = {}
     local indiceCarta = 1
     for i = 1, lin, 1 do
+        linha = {}
         for j = 1, col, 1 do
-            linha[j] = vetorCartas[indiceCarta]
-            indiceCarta = indiceCarta + 1
+            if cartas[indiceCarta] then 
+                cartas[indiceCarta].posX = i
+                cartas[indiceCarta].posY = j
+                linha[j] = cartas[indiceCarta]
+                indiceCarta = indiceCarta + 1
+            else
+                local cartaVazia = CartaTeste:new(0, "semCarta")
+                cartaVazia.imagemVerso = "Vazio"
+                cartaVazia.imagemFrente = "Vazio"
+                linha[j] =  cartaVazia
+            end
         end
         novoTabuleiro[i] = linha
-        linha = {}
     end
-    setmetatable(novoTabuleiro, Tabuleiro)
+
+    novoTabuleiro.mapPares = novoTabuleiro:gerarMapPares()
 
     return novoTabuleiro
 end
 
-function Tabuleiro:exibir(nomeAtributo) 
-    nomeAtributo = nomeAtributo or "id"
-    local maxTamColunas = self:getMaxStringColunas(nomeAtributo) 
+function Tabuleiro:exibir() 
+    local maxTamColunas = {} 
     --Exibir cada elemento da matriz adicionando o padding correto 
+    maxTamColunas = self:getMaxStringColunas("imagemExibida")
+    -- for i = 1, #maxTamColunas, 1 do
+    --     io.write(maxTamColunas[i], " ")
+    -- end
+    -- print()
     for i = 1, self.linhas, 1 do
         for j = 1, self.colunas, 1 do
             -- Calcular quando de espaço extra deve ser adicionando
-            local padding = maxTamColunas[j] - #tostring(self[i][j][nomeAtributo]) + 1
-            io.write(self[i][j][nomeAtributo], String.new(" ", padding), "|")
+            if self[i] and self[i][j] then
+                local padding = maxTamColunas[j] - #tostring(self[i][j]:imagemExibida()) + 1
+                io.write(tostring(self[i][j]:imagemExibida()), String.new(" ", padding), "|")
+            else
+                io.write("NIL ", String.new(" ", 5), "|")
+            end
         end
         io.write("\n")
     end
+    print("-----------------------------------------------------------")
 end
 
-function Tabuleiro:getMaxStringColunas(nomeAtributo)
-    -- Cada indice do array se refere a uma coluna
+function Tabuleiro:getMaxStringColunas(nomeIndice)
     local maxTamColunas = {}
-        -- Para cada coluna, percorrer todas as linhas
-    for j = 1, self.colunas, 1 do 
+    for j = 1, self.colunas, 1 do
         local maxTam = 0
+
         for i = 1, self.linhas, 1 do
-            if (#tostring((self[i][j])[nomeAtributo]) > maxTam) then
-                maxTam = #tostring((self[i][j])[nomeAtributo])
+            local cartaObjeto, valorAtributo = self:verificaSeCartaExiste(i, j, nomeIndice)
+
+            if valorAtributo then
+                local atributoString
+
+                if type(valorAtributo) == "function" then
+                    atributoString = tostring(valorAtributo(cartaObjeto)) -- CartaTeste.exibirCarta(cartaTeste)
+                else
+                    atributoString = tostring(valorAtributo)
+                end
+
+                if (#atributoString > maxTam) then
+                    maxTam = #atributoString
+                end
             end
         end
         maxTamColunas[j] = maxTam
     end
-
     return maxTamColunas
 end
 
@@ -83,33 +113,43 @@ function Tabuleiro:gerarCopiaUnica(cartaOriginal)
     return CartaTeste:new(cartaOriginal.id, cartaOriginal.pathImagem)
 end
 
-local vetorCartas = {
-    CartaTeste:new(1,"bomba"),
-    CartaTeste:new(2,"borboleta"),
-    CartaTeste:new(3,"cogumelo"),
-    CartaTeste:new(4,"coracao"),
-    CartaTeste:new(5,"draenei"),
-    CartaTeste:new(6,"elfa"),
-    CartaTeste:new(7,"fada"),
-    CartaTeste:new(8,"flor"),
-    CartaTeste:new(9,"gato"),
-    CartaTeste:new(10,"lua"),
-    CartaTeste:new(11,"nally"),
-    CartaTeste:new(12,"planta"),
-    CartaTeste:new(1,"bomba"),
-    CartaTeste:new(2,"borboleta"),
-    CartaTeste:new(3,"cogumelo"),
-    CartaTeste:new(4,"coracao"),
-    CartaTeste:new(5,"draenei"),
-    CartaTeste:new(6,"elfa"),
-    CartaTeste:new(7,"fada"),
-    CartaTeste:new(8,"flor"),
-    CartaTeste:new(9,"gato"),
-    CartaTeste:new(10,"lua"),
-    CartaTeste:new(11,"nally"),
-    CartaTeste:new(12,"planta")
-}
+function Tabuleiro:gerarMapPares()
+    local nomeParesAdicionados = {}
+    local map = {}
+    for i = 1, #self.cartas, 1 do
+        for j = 1, #self.cartas, 1 do
+            if (self.cartas[i].id ~= self.cartas[j].id) 
+            and (self.cartas[i].imagemFrente == self.cartas[j].imagemFrente)
+            and (not Array.exist(nomeParesAdicionados, self.cartas[i].imagemFrente)) then
+                map[self.cartas[i]] = self.cartas[j]
+                map[self.cartas[j]] = self.cartas[i]
+                table.insert(nomeParesAdicionados, self.cartas.imagemFrente)
+                io.write(self.cartas[i].imagemFrente,self.cartas[i].id, " ", self.cartas[j].imagemFrente,self.cartas[j].id, "\n")
+                --io.write(tostring(map[self.cartas[i]]), " ", tostring(map[self.cartas[j]]), "\n")
+            end
+        end
+    end
 
-local tab1 = Tabuleiro:new(4,6,vetorCartas)
---Matriz.exibir(tab1)
-tab1:exibir("imagemVerso")
+    return map
+end
+
+function Tabuleiro:verificaSeCartaExiste(i, j, nomeAtributo)
+    nomeAtributo = nomeAtributo or "id"
+    local valorAtributo
+    local carta
+    if self[i] and self[i][j] then
+        carta = self[i][j]
+        valorAtributo = carta[nomeAtributo]
+    end
+
+    return carta, valorAtributo
+end
+
+function Tabuleiro:revelarCarta(posX, posY)
+    self[posX][posY]:virar()
+end
+
+-- for key, value in pairs(tab1.mapPares) do
+--     io.write("Pares: ", key.imagemFrente, " ", value.imagemFrente, "\n")
+-- end 
+

@@ -4,6 +4,7 @@ local NAO_ENCONTRADA = -1
 local NAO_POSICIONADA = -1
 
 CartaTeste = {
+    id = 0,
     VERSO = "midia/images/verso.png",
     largura = LARGURA,
     altura = ALTURA,
@@ -15,18 +16,6 @@ CartaTeste = {
     probErro = 0;
 }
 CartaTeste.__index = CartaTeste
-CartaTeste.__tostring = CartaTeste:imagemExibida()
-
-function CartaTeste:imagemExibida()
-    local img
-    if self.revelada then
-        img = self.imagemFrente
-    else
-        img = self.imagemVerso
-    end
-
-    return img
-end
 
 function CartaTeste:new(id, caminhoImagemFrente)
     local novaCarta = {
@@ -40,10 +29,21 @@ function CartaTeste:new(id, caminhoImagemFrente)
         posX = NAO_POSICIONADA,
         posY = NAO_POSICIONADA,
         rodadaEncontrada = NAO_ENCONTRADA,
-        probErro = 0;
+        probErro = 0,
     }
-    setmetatable(novaCarta, CartaTeste) --permite o uso de :, ligando a metatable de cima
+    setmetatable(novaCarta, CartaTeste) 
     return novaCarta
+end
+
+function CartaTeste:imagemExibida()
+    local img
+    if self.revelada then
+        img = self.imagemFrente
+    else
+        img = self.imagemVerso
+    end
+
+    return img
 end
 
 function CartaTeste:virar()

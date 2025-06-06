@@ -8,3 +8,13 @@ function Array.soma(arr)
     end
     return soma
 end
+
+function Array.exist(arr, elemento)
+    local result = false
+    for i = 1, #arr, 1 do
+        if(arr[i] == elemento) then
+            result = true
+        end
+    end
+    return result
+end
