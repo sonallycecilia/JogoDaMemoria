@@ -2,9 +2,6 @@ local Tabuleiro = require("classes.tabuleiro")
 local Carta = require("classes.carta")
 local Config = require("config")
 
-local LARGURA_TELA = love.graphics.getWidth()
-local ALTURA_TELA = love.graphics.getHeight()
-
 local Partida = {}
 Partida.__index = Partida
 

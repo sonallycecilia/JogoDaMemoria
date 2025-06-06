@@ -1,0 +1,137 @@
+-- classes/database_manager.lua
+local lsqlite3 = require("lsqlite3") -- Certifique-se de ter este binding (ou adaptar para TXT)
+local Config = require("config") -- Para acessar configurações como nomes de modo/nível para o ranking
+
+local DbManager = {}
+
+local DB_NAME = "memory_game_scores.db" -- Nome do arquivo do banco de dados SQLite
+local db = nil -- Variável para a conexão com o banco de dados
+
+-- Inicializa a conexão com o banco de dados e cria a tabela 'scores' se ela não existir.
+function DbManager.init_db()
+    -- Tenta abrir/criar o banco de dados SQLite
+    db = lsqlite3.open(DB_NAME)
+    if not db then
+        print("Erro ao abrir/criar o banco de dados: " .. lsqlite3.errmsg(db))
+        return false
+    end
+
+    -- SQL para criar a tabela 'scores' se ela ainda não existir
+    local createTableSql = [[
+        CREATE TABLE IF NOT EXISTS scores (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            name TEXT NOT NULL,
+            mode TEXT NOT NULL,
+            level TEXT NOT NULL,
+            score INTEGER NOT NULL,
+            time REAL NOT NULL,
+            date_time TEXT NOT NULL
+        );
+    ]]
+    local rc = db:exec(createTableSql) -- Executa o comando SQL
+    if rc ~= lsqlite3.OK then
+        print("Erro ao criar tabela de scores: " .. db:errmsg())
+        return false
+    end
+    print("Banco de dados e tabela 'scores' inicializados com sucesso.")
+    return true
+end
+
+-- Salva uma nova pontuação no banco de dados.
+-- scoreData é uma tabela com: { name, mode, level, score, time, date_time }
+function DbManager.save_score(scoreData)
+    if not db then
+        print("Banco de dados não inicializado. Não foi possível salvar a pontuação.")
+        return false
+    end
+
+    -- Prepara o comando SQL de inserção com os dados fornecidos
+    -- Usamos string.format para construir a query de forma segura (mas cuidado com SQL Injection em apps reais!)
+    local insertSql = string.format(
+        "INSERT INTO scores (name, mode, level, score, time, date_time) VALUES ('%s', '%s', '%s', %d, %f, '%s');",
+        scoreData.name,
+        scoreData.mode,
+        scoreData.level,
+        scoreData.score,
+        scoreData.time,
+        scoreData.date_time
+    )
+    local rc = db:exec(insertSql) -- Executa a inserção
+    if rc ~= lsqlite3.OK then
+        print("Erro ao salvar pontuação: " .. db:errmsg())
+        return false
+    end
+    print("Pontuação salva com sucesso!")
+
+    -- Após salvar, garante que o Top 5 seja mantido, removendo scores excedentes.
+    DbManager.manage_top5()
+    return true
+end
+
+-- Gerencia o Top 5, removendo a pontuação mais baixa se houver mais de 5 entradas.
+function DbManager.manage_top5()
+    if not db then return end
+
+    -- Conta o número total de entradas na tabela
+    local count = 0
+    db:exec("SELECT COUNT(*) FROM scores;", function(data)
+        count = data[1] -- O resultado da COUNT é o primeiro (e único) campo
+    end)
+
+    -- Se houver mais de 5 entradas, remove a menor pontuação.
+    -- Critérios de desempate: menor score, maior tempo (para o desempate, tempo maior significa pior), data mais antiga.
+    if count > 5 then
+        local deleteSql = "DELETE FROM scores WHERE id IN (SELECT id FROM scores ORDER BY score ASC, time DESC, date_time ASC LIMIT 1);"
+        local rc = db:exec(deleteSql)
+        if rc ~= lsqlite3.OK then
+            print("Erro ao gerenciar Top5: " .. db:errmsg())
+        end
+    end
+end
+
+-- Recupera as pontuações do Top 5, ordenadas.
+-- Retorna uma tabela de tabelas, onde cada tabela interna é uma pontuação.
+function DbManager.get_top5_scores()
+    if not db then
+        print("Banco de dados não inicializado. Não foi possível obter o Top5.")
+        return {}
+    end
+
+    local scores = {}
+    -- Seleciona as 5 melhores pontuações, ordenadas por:
+    -- 1. Pontuação (DESC): Maior pontuação primeiro.
+    -- 2. Tempo (ASC): Para pontuações iguais, menor tempo é melhor (para o desempate).
+    -- 3. Data/Hora (ASC): Para empates perfeitos, a partida mais antiga fica abaixo.
+    local selectSql = "SELECT name, mode, level, score, time, date_time FROM scores ORDER BY score DESC, time ASC, date_time ASC LIMIT 5;"
+    
+    -- O db:exec com uma função de callback itera sobre cada linha do resultado
+    db:exec(selectSql, function(data)
+        table.insert(scores, {
+            name = data[1],
+            mode = data[2],
+            level = data[3],
+            score = data[4],
+            time = data[5],
+            date_time = data[6]
+        })
+    end)
+    return scores
+end
+
+-- Fecha a conexão com o banco de dados.
+-- Importante chamar esta função quando o jogo for encerrado (ex: em love.quit()).
+function DbManager.close_db()
+    if db then
+        db:close()
+        db = nil
+        print("Banco de dados fechado.")
+    end
+end
+
+-- Garante que o banco de dados seja fechado ao sair do LÖVE2D.
+-- love.quit é um callback do LÖVE2D, similar a love.load e love.update.
+function love.quit()
+    DbManager.close_db()
+end
+
+return DbManager

@@ -102,4 +102,7 @@ function Tabuleiro:draw()
     end
 end
 
+function Tabuleiro:verificarCartas(cartasViradas)
+    
+end    
 return Tabuleiro
