@@ -48,27 +48,20 @@ end
 
 function Tabuleiro:exibir() 
     local maxTamColunas = {} 
-    --Exibir cada elemento da matriz adicionando o padding correto 
     maxTamColunas = self:getMaxStringColunas("imagemExibida")
-    -- for i = 1, #maxTamColunas, 1 do
-    --     io.write(maxTamColunas[i], " ")
-    -- end
-    -- print()
     for i = 1, self.linhas, 1 do
         for j = 1, self.colunas, 1 do
-            -- Calcular quando de espaço extra deve ser adicionando
             local imagemExibida = "NIL"
             local padding = #imagemExibida
             local espacador = " |"
-            if self[i] and self[i][j] then
-                if type(self[i][j]) == "table" then
-                    imagemExibida = tostring(self[i][j]:imagemExibida())
-                    padding = maxTamColunas[j] - #imagemExibida + #espacador
-                end
-                if type(self[i][j]) == "string" then
-                    imagemExibida = self[i][j]
-                    padding = maxTamColunas[j] - #imagemExibida + #espacador
-                end
+            local elemento = self:verificaSeCartaExiste(i, j)
+            if type(elemento) == "table" then
+                imagemExibida = tostring(elemento:imagemExibida())
+                padding = maxTamColunas[j] - #imagemExibida + #espacador
+            end
+            if type(elemento) == "string" then
+                imagemExibida = elemento
+                padding = maxTamColunas[j] - #imagemExibida + #espacador
             end
             io.write(imagemExibida, String.new(" ", padding), espacador)
         end
@@ -81,22 +74,20 @@ function Tabuleiro:getMaxStringColunas(nomeIndice)
     local maxTamColunas = {}
     for j = 1, self.colunas, 1 do
         local maxTam = 0
-
         for i = 1, self.linhas, 1 do
             local cartaObjeto, valorAtributo = self:verificaSeCartaExiste(i, j, nomeIndice)
-
-            if valorAtributo then
-                local atributoString
-
-                if type(valorAtributo) == "function" then
-                    atributoString = tostring(valorAtributo(cartaObjeto)) -- CartaTeste.exibirCarta(cartaTeste)
-                else
-                    atributoString = tostring(valorAtributo)
-                end
-
-                if (#atributoString > maxTam) then
-                    maxTam = #atributoString
-                end
+            local atributoString
+            if type(valorAtributo) == "function" then
+                atributoString = tostring(valorAtributo(cartaObjeto)) -- CartaTeste.exibirCarta(cartaTeste)
+            end
+            if type(valorAtributo) == "string" then
+            atributoString = valorAtributo
+            end
+            if type(valorAtributo) == "nil" then
+                atributoString = "NIL"
+            end
+            if (#atributoString > maxTam) then
+                maxTam = #atributoString
             end
         end
         maxTamColunas[j] = maxTam
