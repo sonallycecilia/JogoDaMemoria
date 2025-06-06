@@ -5,7 +5,7 @@ Config.janela = {
     LARGURA_TELA = love.graphics.getWidth(),
     ALTURA_TELA = love.graphics.getHeight(),
     IMAGEM_TELA_INICIAL = "midia/images/telaInicial.png" ,
-    IMAGEM_TELA_PARTIDA = "midia/images/telaPartida.png",
+    IMAGEM_TELA_PARTIDA = "midia/images/telaPartida.jpg",
 }
 
 Config.scaleX = 0.5
@@ -29,6 +29,12 @@ Config.botoes = {
             cooperativo = "midia/botoes/menuJogo/cooperativo.png",
             solo = "midia/botoes/menuJogo/solo.png",
             voltar = "midia/botoes/menuJogo/voltar.png",
+        },
+        partida = {
+            configuracoes = "midia/botoes/partida/configuracoes.png",
+            encerrar = "midia/botoes/partida/encerrar.png",
+            guia = "midia/botoes/partida/guia.png",
+            pausar = "midia/botoes/partida/pausar.png",
         }
     }
 }
@@ -50,8 +56,12 @@ Config.deck = {
 
 Config.frames = {
     menu = {
-        imagemPath = "midia/frames/fundoMenu.png",
-        
+        imagemPath = "midia/frames/menu.png",
+    },
+    partida = {
+        carta = "midia/frames/carta.png",
+        tabuleiro = "midia/frames/tabuleiro.png",
+        score = "midia/frames/score.png",
     }
 }
 
