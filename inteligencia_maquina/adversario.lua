@@ -46,40 +46,52 @@ function adversario:exibirMemoria()
     end
 end
 
-function adversario:selecionarPrimeiraCarta(tabuleiro, rodadaEncontrada, rodadaAtual)
+function adversario:selecionarPrimeiraCarta(tabuleiro, rodadaAtual)
     local lin, col
     local contQtdSorteios = 0
+    
     repeat
-        lin = math.random(1, 4) 
-        col = math.random(1, 6) 
+        lin, col = self:sortearPosicao(tabuleiro.linhas, tabuleiro.colunas)
         contQtdSorteios = contQtdSorteios + 1
-        io.write("posLin: ",lin," posCol: ", col, "\n")
+        io.write("posLin: ", lin, " posCol: ", col, "\n")
         -- Colocar um temporizador de 1 segundo entre as chamadas de math.random()
         print("Elemento na memoria", adversario.memoria[lin][col])
         io.write("Quantidade de Sorteios: ", contQtdSorteios, "\n")
     until (not adversario:estaNaMemoria(lin, col)) or (contQtdSorteios > 2 ) 
-
-    adversario.memoria[lin][col] = tabuleiro[lin][col];
-    adversario.memoria[lin][col].rodadaEncontrada = rodadaEncontrada
+    adversario:adicionarCartaMemoria(lin, col,tabuleiro[lin][col], rodadaAtual)
     io.write("cartaSelecionada: ", adversario.memoria[lin][col].imagemFrente," ", adversario.memoria[lin][col].id, "\n")
     return adversario.memoria[lin][col]
 end
 
--- TODO: adicionar verificação para não entrar em looping infinito quando acabarem as cartas a serem selecionadas
-function adversario:selecionarSegundaCarta(tabuleiro, carta)
+function adversario:selecionarSegundaCarta(rodadaAtual, tabuleiro, primeiraCarta)
+    if self:buscarPar(primeiraCarta) then
+        
+    end
+    
+
+    local ehPrimeiraCarta
     local lin, col
     repeat
-        lin = math.random(1, 4) 
-        col = math.random(1, 6) 
-        io.write("posLin: ",lin," posCol: ", col, "\n")
-        -- Colocar um temporizador de 1 segundo entre as chamadas de math.random()
-        print(adversario.memoria[lin][col])
+        
     until not adversario:estaNaMemoria(lin, col)  
 
-    adversario.memoria[lin][col] = tabuleiro[lin][col];
-    adversario.memoria[lin][col].rodadaEncontrada = carta.rodadaEncontrada
+    self:adicionarCartaMemoria(lin, col, tabuleiro[lin][col], rodadaAtual)
+
     io.write("cartaSelecionada: ", adversario.memoria[lin][col].imagemFrente," ", adversario.memoria[lin][col].id, "\n")
     return adversario.memoria[lin][col]
+end
+
+-- Os métodos de memória deveriam estar em outra classe
+function adversario:adicionarCartaMemoria(lin, col, carta, rodadaAtual)
+    carta.rodadaEncontrada = rodadaAtual
+    adversario.memoria[lin][col] = carta
+end
+
+function adversario:sortearPosicao(linhasMatriz, colunasMatriz)
+    local lin, col
+    lin = math.random(1, linhasMatriz) 
+    col = math.random(1, colunasMatriz) 
+    return lin, col
 end
 
 function adversario:estaNaMemoria(posX, posY)
