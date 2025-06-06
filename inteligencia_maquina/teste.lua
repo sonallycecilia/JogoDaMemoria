@@ -40,7 +40,7 @@ repeat
 
     if continuar == "S" then
         tabuleiro:exibir()
-        local cartaSelecionada = adversario:selecionarCarta(tabuleiro, 1)
+        local cartaSelecionada = adversario:selecionarPrimeiraCarta(tabuleiro, 1)
         tabuleiro:revelarCarta(cartaSelecionada.posX, cartaSelecionada.posY)
         tabuleiro:exibir()
         tabuleiro:revelarCarta(cartaSelecionada.posX, cartaSelecionada.posY)

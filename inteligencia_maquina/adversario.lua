@@ -55,7 +55,7 @@ function adversario:selecionarPrimeiraCarta(tabuleiro, rodadaEncontrada)
         io.write("posLin: ",lin," posCol: ", col, "\n")
         -- Colocar um temporizador de 1 segundo entre as chamadas de math.random()
         print(adversario.memoria[lin][col])
-    until not adversario:estaNaMemoria(lin, col)  
+    until not adversario:estaNaMemoria(lin, col)   
 
     adversario.memoria[lin][col] = tabuleiro[lin][col];
     adversario.memoria[lin][col].rodadaEncontrada = rodadaEncontrada

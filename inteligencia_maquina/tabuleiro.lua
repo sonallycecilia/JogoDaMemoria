@@ -57,12 +57,20 @@ function Tabuleiro:exibir()
     for i = 1, self.linhas, 1 do
         for j = 1, self.colunas, 1 do
             -- Calcular quando de espaço extra deve ser adicionando
+            local imagemExibida = "NIL"
+            local padding = #imagemExibida
+            local espacador = " |"
             if self[i] and self[i][j] then
-                local padding = maxTamColunas[j] - #tostring(self[i][j]:imagemExibida()) + 1
-                io.write(tostring(self[i][j]:imagemExibida()), String.new(" ", padding), "|")
-            else
-                io.write("NIL ", String.new(" ", 5), "|")
+                if type(self[i][j]) == "table" then
+                    imagemExibida = tostring(self[i][j]:imagemExibida())
+                    padding = maxTamColunas[j] - #imagemExibida + #espacador
+                end
+                if type(self[i][j]) == "string" then
+                    imagemExibida = self[i][j]
+                    padding = maxTamColunas[j] - #imagemExibida + #espacador
+                end
             end
+            io.write(imagemExibida, String.new(" ", padding), espacador)
         end
         io.write("\n")
     end
