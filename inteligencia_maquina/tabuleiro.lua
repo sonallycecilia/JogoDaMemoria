@@ -10,13 +10,24 @@ Tabuleiro = {
 }
 Tabuleiro.__index = Tabuleiro
 
-function Tabuleiro:new(lin, col, cartas) 
+function Tabuleiro:new(lin, col, cartas, nivel) 
+    nivel = 1
     lin = 4 -- Fixa o numero de linhas 
     col = 6 -- Fixa o tamaho de colunas
     local novoTabuleiro = {
         linhas = lin, 
         colunas = col,
-        mapPares = {}
+        mapPares = {},
+
+        -- Balancear os erros depois (caso dê tempo)
+        erroBaseNivel1 = 60,
+        taxaErroNivel1 = 20,
+
+        erroBaseNivel2 = 40,
+        taxaErroNivel2 = 15,
+        
+        erroBaseNivel3 = 30,
+        taxaErroNivel3 = 10
     }
     setmetatable(novoTabuleiro, Tabuleiro)
     novoTabuleiro.cartas = cartas
