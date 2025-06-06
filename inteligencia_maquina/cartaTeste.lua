@@ -49,3 +49,11 @@ end
 function CartaTeste:virar()
     self.revelada = not self.revelada
 end
+
+function CartaTeste:equals(carta)
+    local result = false
+    if self.id == carta.id then
+        result = true
+    end
+    return result 
+end
