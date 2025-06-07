@@ -85,12 +85,14 @@ function Adversario:selecionarCartaAleatoria(tabuleiro, cartaAnterior)
 end
 
 function Adversario:selecionarSegundaCarta(tabuleiro, rodadaAtual, primeiraCarta)
-    local cartaPar = self:buscarPar(primeiraCarta)
+    print("primeiraCarta passada para selecionarSegundaCarta: ", primeiraCarta.imagemFrente, primeiraCarta.id)
+    local cartaPar = self:buscarPar(tabuleiro, primeiraCarta)
+    print("CartaParNaMemoria: ", cartaPar)
     local parExiste = false
     local acertou = false
-    local lin, col
     local cartaSelecionada
     local parFoiEncontrado = false
+    local lin, col
     
     if cartaPar then
         print("Carta Par existe: ", cartaPar)
@@ -104,21 +106,22 @@ function Adversario:selecionarSegundaCarta(tabuleiro, rodadaAtual, primeiraCarta
         print("cartaSelecionada: ", cartaSelecionada, " ", cartaSelecionada.imagemFrente)
     else
         cartaSelecionada = Adversario:selecionarCartaAleatoria(tabuleiro, primeiraCarta)
-        print("Par não Existe Seleciona Carta Par")
-        print("cartaSelecionada: ", cartaSelecionada, " ", cartaSelecionada.imagemFrente)
+        print("Par nao Existe")
+        print("cartaSelecionada: ", cartaSelecionada, " ", cartaSelecionada.imagemFrente, cartaSelecionada.id)
     end
 
     if acertou then
-        --self:contaParesEncontrados()
-        --parFoiEncontrado = true
+        print("Acertou!")
+        self:contaParesEncontrados()
+        parFoiEncontrado = true
+        tabuleiro:removerParEncontrado(primeiraCarta, cartaSelecionada)
     end
     
     Adversario:adicionarCartaMemoria(cartaSelecionada, rodadaAtual)
     lin, col = cartaSelecionada.posX, cartaSelecionada.posY
 
-    io.write("posLinCartaSelecionada: ", lin, " posColCartaSelecionada: ", col, "\n")
     io.write("cartaSelecionada: ", cartaSelecionada.imagemFrente," ", cartaSelecionada.id, "\n")
-    io.write("Par encontrado: ", parFoiEncontrado, "\n")
+    io.write("Par encontrado: ", tostring(parFoiEncontrado), "\n")
     io.write("Pares totais: ", self.paresEncontrados, "\n")
 
     return cartaSelecionada, parFoiEncontrado
@@ -129,9 +132,9 @@ function Adversario:contaParesEncontrados()
 end
 
 function Adversario:verificaAcerto(carta)
-    local erro = math.random(1,100)
+    local chance = math.random(1,100)
     local acertou = false
-    if erro < carta.probErro then
+    if chance > carta.probErro then
         acertou = true
     end
     
@@ -199,13 +202,13 @@ function Adversario:estaNaMemoria(posX, posY)
 end
 
 function Adversario:buscarPar(tabuleiro, carta)
-    for i = 1, #self.memoria, 1 do
-        for j = 1, #self.memoria[i], 1 do
-            if tabuleiro.mapPares[carta] == self.memoria[i][j] then
-                return self.memoria[i][j]
-            end
-        end
+    local par = tabuleiro.mapPares[carta]
+    print("Buscando o par de", carta.imagemFrente, carta.id)
+    print("Par :", par.imagemFrente, par.id)
+    if not self:estaNaMemoria(par.posX, par.posY) then
+        par = nil
     end
+    return par
 end
 
 return Adversario

@@ -35,51 +35,50 @@ local primeiraCartaSele = {}
 local segundaCartaSele = {}
 
 io.write("Map Pares: ")
-tabuleiro:gerarMapPares()
 os.execute("pause")
 os.execute("cls")
 
 adversario:inicializarMemoria(tabuleiro.linhas, tabuleiro.colunas)
-repeat
-    print("Avancar? (S ou N) ")
-    local continuar = io.read()
+while tabuleiro.cartasRestantes > 0 do
+    print("Avancar?")
+    tabuleiro:exibir()
+    io.write("PRIMEIRA CARTA: ")
+    os.execute("pause")
+    os.execute("cls")
 
-    if continuar == "S" then
-        tabuleiro:exibir()
-        io.write("PRIMEIRA CARTA: ")
-        os.execute("pause")
-        os.execute("cls")
+    primeiraCartaSele = adversario:selecionarPrimeiraCarta(tabuleiro, rodadaAtual)
 
-        primeiraCartaSele = adversario:selecionarPrimeiraCarta(tabuleiro, rodadaAtual)
+    tabuleiro:virarCarta(primeiraCartaSele.posX, primeiraCartaSele.posY)
+    tabuleiro:exibir()
+    os.execute("pause")
+    os.execute("cls")
+    
+    
+    print("Memoria adversario: ")
+    adversario:exibirMemoria()
+    os.execute("pause")
+    os.execute("cls")
+    
+    io.write("SEGUNDA CARTA ")
+    os.execute("pause")
+    os.execute("cls")
+    
+    print("Primeira Carta Selecionada em teste.lua : ",primeiraCartaSele.imagemFrente,primeiraCartaSele.id)
+    segundaCartaSele = adversario:selecionarSegundaCarta(tabuleiro, rodadaAtual, primeiraCartaSele)
+    
+    tabuleiro:virarCarta(segundaCartaSele.posX, segundaCartaSele.posY)
+    tabuleiro:exibir()
+    
+    tabuleiro:virarCarta(primeiraCartaSele.posX, primeiraCartaSele.posY)
+    tabuleiro:virarCarta(segundaCartaSele.posX, segundaCartaSele.posY)
+    os.execute("pause")
+    os.execute("cls")
 
-        tabuleiro:virarCarta(primeiraCartaSele.posX, primeiraCartaSele.posY)
-        tabuleiro:exibir()
-        os.execute("pause")
-        os.execute("cls")
-        
-
-        print("Memoria adversario: ")
-        adversario:exibirMemoria()
-        os.execute("pause")
-        os.execute("cls")
-        
-        io.write("SEGUNDA CARTA ")
-        os.execute("pause")
-        os.execute("cls")
-
-        segundaCartaSele = adversario:selecionarSegundaCarta(tabuleiro, rodadaAtual, primeiraCartaSele)
-
-        tabuleiro:virarCarta(segundaCartaSele.posX, segundaCartaSele.posY)
-        tabuleiro:exibir()
-        os.execute("pause")
-        os.execute("cls")
-
-        print("Memoria adversario: ")
-        adversario:exibirMemoria()
-        os.execute("pause")
-        os.execute("cls")
-    end
+    print("Memoria adversario: ")
+    adversario:exibirMemoria()
+    os.execute("pause")
+    os.execute("cls")
     rodadaAtual = rodadaAtual + 1
-until continuar == "N"   
+end
 
 

@@ -24,7 +24,7 @@ function CartaTeste:new(id, caminhoImagemFrente)
         altura = ALTURA,
         pathImagem = caminhoImagemFrente, --precisa ficar pois pegamos o caminho da imagem
         imagemFrente = caminhoImagemFrente,
-        imagemVerso = "VERSO",
+        imagemVerso = "X",
         revelada = false, -- se não for passado, assume false
         posX = NAO_POSICIONADA,
         posY = NAO_POSICIONADA,
@@ -58,3 +58,11 @@ function CartaTeste:equals(carta)
     return result 
 end
 
+function CartaTeste:ehPar(possivelPar)
+    local ehPar = false 
+    if possivelPar.imagemFrente == self.imagemFrente then
+        ehPar = true
+    end
+
+    return ehPar
+end

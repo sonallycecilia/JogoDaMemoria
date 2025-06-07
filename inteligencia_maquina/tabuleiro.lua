@@ -4,9 +4,12 @@ require("inteligencia_maquina.utils.Array")
 
 Tabuleiro = {
     cartas = {}, 
+    mapPares = {},
     nivel = 1, 
     linhas = 4, 
     colunas = 6,
+    cartasTotais = 0,
+    cartasRestantes = 0,
 }
 Tabuleiro.__index = Tabuleiro
 
@@ -19,7 +22,6 @@ function Tabuleiro:new(lin, col, cartas, nivel)
         linhas = lin, 
         colunas = col,
         mapPares = {},
-
         -- Balancear os erros depois (caso dê tempo)
         erroBaseNivel1 = 60,
         taxaErroNivel1 = 20,
@@ -54,6 +56,8 @@ function Tabuleiro:new(lin, col, cartas, nivel)
     end
 
     novoTabuleiro.mapPares = novoTabuleiro:gerarMapPares()
+    novoTabuleiro.cartasTotais = #cartas --Considerando que o vetor de cartas terá o seus respectivos pares
+    novoTabuleiro.cartasRestantes = novoTabuleiro.cartasTotais
 
     return novoTabuleiro
 end
@@ -64,8 +68,8 @@ function Tabuleiro:exibir()
     for i = 1, self.linhas, 1 do
         for j = 1, self.colunas, 1 do
             local imagemExibida = "NIL"
-            local padding = #imagemExibida
             local espacador = "|"
+            local padding = maxTamColunas[j] - #imagemExibida + #espacador
             local elemento = self:verificaSeCartaExiste(i, j)
             if type(elemento) == "table" then
                 imagemExibida = tostring(elemento:imagemExibida())
@@ -127,15 +131,20 @@ end
 function Tabuleiro:gerarMapPares()
     local nomeParesAdicionados = {}
     local map = {}
+    local contPares = 0
     for i = 1, #self.cartas, 1 do
-        for j = 1, #self.cartas, 1 do
+        for j = i, #self.cartas, 1 do
             if (self.cartas[i].id ~= self.cartas[j].id) 
             and (self.cartas[i].imagemFrente == self.cartas[j].imagemFrente)
             and (not Array.exist(nomeParesAdicionados, self.cartas[i].imagemFrente)) then
+
                 map[self.cartas[i]] = self.cartas[j]
                 map[self.cartas[j]] = self.cartas[i]
+                contPares = contPares + 1
                 table.insert(nomeParesAdicionados, self.cartas.imagemFrente)
-                io.write(self.cartas[i].imagemFrente,self.cartas[i].id, " ", self.cartas[j].imagemFrente,self.cartas[j].id, "\n")
+                io.write("Pares Encontrados: ", contPares, "\n")
+                io.write(map[self.cartas[i]].imagemFrente,map[self.cartas[i]].id, " ", map[self.cartas[j]].imagemFrente,map[self.cartas[j]].id, "\n")
+                io.write(map[self.cartas[j]].imagemFrente,map[self.cartas[j]].id, " ", map[self.cartas[i]].imagemFrente,map[self.cartas[i]].id, "\n")
                 --io.write(tostring(map[self.cartas[i]]), " ", tostring(map[self.cartas[j]]), "\n")
             end
         end
@@ -185,10 +194,22 @@ function Tabuleiro:verificaListaPosicao(listaTuplaPosicoes)
 end
 
 function Tabuleiro:virarCarta(posX, posY)
-    self[posX][posY]:virar()
+    local posicaoExiste = self:verificaPosicao(posX, posY)
+    if posicaoExiste then
+        self[posX][posY]:virar()
+    end
 end
 
--- for key, value in pairs(tab1.mapPares) do
---     io.write("Pares: ", key.imagemFrente, " ", value.imagemFrente, "\n")
--- end 
+function Tabuleiro:removerParEncontrado(carta1, carta2)
+    local ehNil = true
+    if carta1 and carta2 then
+        ehNil = false
+    end
+    
+    if (not ehNil) and (self.mapPares[carta1] == carta2) then
+        self.cartasRestantes = self.cartasRestantes - 2
+        self[carta1.posX][carta1.posY] = nil
+        self[carta2.posX][carta2.posY] = nil
+    end
 
+end
