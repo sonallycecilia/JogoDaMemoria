@@ -10,6 +10,7 @@ Tabuleiro = {
 }
 Tabuleiro.__index = Tabuleiro
 
+--TODO: Adicionar a probabilidade de Erro as cartas
 function Tabuleiro:new(lin, col, cartas, nivel) 
     nivel = 1
     lin = 4 -- Fixa o numero de linhas 
@@ -155,7 +156,35 @@ function Tabuleiro:verificaSeCartaExiste(i, j, nomeAtributo)
     return carta, valorAtributo
 end
 
-function Tabuleiro:revelarCarta(posX, posY)
+-- NECESSITA DE TESTES
+-- Retorna verdadeiro caso a posicao self[posX][posY] seja diferente de nil ou false, caso contrário retorna true 
+function Tabuleiro:verificaPosicao(posX, posY)
+    local posExiste = false
+    if self[posX] and self[posX][posY] then
+        posExiste = true
+    end
+
+    return posExiste
+end
+
+-- NECESSITA DE TESTES
+-- Retorna uma nova lista de posicoes não nil
+function Tabuleiro:verificaListaPosicao(listaTuplaPosicoes)
+    local listaPosicaoValida = {}
+    local posicaoExiste = false
+    local tuplaAtual = {}
+    for i = 1, #listaTuplaPosicoes, 1 do
+        tuplaAtual = listaTuplaPosicoes[i]
+        posicaoExiste = self:verificaPosicao(tuplaAtual[1], tuplaAtual[2])
+        if posicaoExiste then
+            table.insert(listaPosicaoValida, tuplaAtual)
+        end
+    end
+
+    return listaPosicaoValida
+end
+
+function Tabuleiro:virarCarta(posX, posY)
     self[posX][posY]:virar()
 end
 

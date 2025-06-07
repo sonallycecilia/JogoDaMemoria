@@ -30,8 +30,14 @@ local cartas = {
 }
 
 local tabuleiro = Tabuleiro:new(4, 6, cartas)
+local rodadaAtual = 0
+local primeiraCartaSele = {}
+local segundaCartaSele = {}
 
+io.write("Map Pares: ")
 tabuleiro:gerarMapPares()
+os.execute("pause")
+os.execute("cls")
 
 adversario:inicializarMemoria(tabuleiro.linhas, tabuleiro.colunas)
 repeat
@@ -40,16 +46,40 @@ repeat
 
     if continuar == "S" then
         tabuleiro:exibir()
-        local cartaSelecionada = adversario:selecionarPrimeiraCarta(tabuleiro, 1)
-        tabuleiro:revelarCarta(cartaSelecionada.posX, cartaSelecionada.posY)
+        io.write("PRIMEIRA CARTA: ")
+        os.execute("pause")
+        os.execute("cls")
+
+        primeiraCartaSele = adversario:selecionarPrimeiraCarta(tabuleiro, rodadaAtual)
+
+        tabuleiro:virarCarta(primeiraCartaSele.posX, primeiraCartaSele.posY)
         tabuleiro:exibir()
-        tabuleiro:revelarCarta(cartaSelecionada.posX, cartaSelecionada.posY)
-        tabuleiro:exibir()
-        --adversario:exibirMemoria()
+        os.execute("pause")
+        os.execute("cls")
+        
+
         print("Memoria adversario: ")
         adversario:exibirMemoria()
+        os.execute("pause")
+        os.execute("cls")
+        
+        io.write("SEGUNDA CARTA ")
+        os.execute("pause")
+        os.execute("cls")
+
+        segundaCartaSele = adversario:selecionarSegundaCarta(tabuleiro, rodadaAtual, primeiraCartaSele)
+
+        tabuleiro:virarCarta(segundaCartaSele.posX, segundaCartaSele.posY)
+        tabuleiro:exibir()
+        os.execute("pause")
+        os.execute("cls")
+
+        print("Memoria adversario: ")
+        adversario:exibirMemoria()
+        os.execute("pause")
+        os.execute("cls")
     end
-    
+    rodadaAtual = rodadaAtual + 1
 until continuar == "N"   
 
 

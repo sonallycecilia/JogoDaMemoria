@@ -57,3 +57,4 @@ function CartaTeste:equals(carta)
     end
     return result 
 end
+
