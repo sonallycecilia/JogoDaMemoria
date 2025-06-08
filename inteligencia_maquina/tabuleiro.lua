@@ -1,6 +1,7 @@
 require("inteligencia_maquina.cartaTeste")
 require("inteligencia_maquina.utils.String")
 require("inteligencia_maquina.utils.Array")
+require("inteligencia_maquina.nivelEnum")
 
 Tabuleiro = {
     cartas = {}, 
@@ -10,39 +11,34 @@ Tabuleiro = {
     colunas = 6,
     cartasTotais = 0,
     cartasRestantes = 0,
+    taxaErroBase = 30,
+    erroBase = 30,
 }
 Tabuleiro.__index = Tabuleiro
 
---TODO: Adicionar a probabilidade de Erro as cartas
 function Tabuleiro:new(lin, col, cartas, nivel) 
-    nivel = 1
-    lin = 4 -- Fixa o numero de linhas 
-    col = 6 -- Fixa o tamaho de colunas
     local novoTabuleiro = {
-        linhas = lin, 
-        colunas = col,
+        --nivel = nivel,
+        --linhas = lin, 
+        --colunas = col,
         mapPares = {},
-        -- Balancear os erros depois (caso dê tempo)
-        erroBaseNivel1 = 60,
-        taxaErroNivel1 = 20,
-
-        erroBaseNivel2 = 40,
-        taxaErroNivel2 = 15,
-        
-        erroBaseNivel3 = 30,
-        taxaErroNivel3 = 10
     }
+    -- Balancear os erros depois (caso dê tempo)
+    
     setmetatable(novoTabuleiro, Tabuleiro)
     novoTabuleiro.cartas = cartas
 
+    novoTabuleiro:calculaProbErro()
+
     local linha = {}
     local indiceCarta = 1
-    for i = 1, lin, 1 do
+    for i = 1, self.linhas, 1 do
         linha = {}
-        for j = 1, col, 1 do
+        for j = 1, self.colunas, 1 do
             if cartas[indiceCarta] then 
                 cartas[indiceCarta].posX = i
                 cartas[indiceCarta].posY = j
+                cartas[indiceCarta].probErro = novoTabuleiro.erroBase
                 linha[j] = cartas[indiceCarta]
                 indiceCarta = indiceCarta + 1
             else
@@ -129,6 +125,7 @@ function Tabuleiro:gerarCopiaUnica(cartaOriginal)
 end
 
 function Tabuleiro:gerarMapPares()
+    io.write("Map Pares:\n")
     local nomeParesAdicionados = {}
     local map = {}
     local contPares = 0
@@ -144,7 +141,7 @@ function Tabuleiro:gerarMapPares()
                 table.insert(nomeParesAdicionados, self.cartas.imagemFrente)
                 io.write("Pares Encontrados: ", contPares, "\n")
                 io.write(map[self.cartas[i]].imagemFrente,map[self.cartas[i]].id, " ", map[self.cartas[j]].imagemFrente,map[self.cartas[j]].id, "\n")
-                io.write(map[self.cartas[j]].imagemFrente,map[self.cartas[j]].id, " ", map[self.cartas[i]].imagemFrente,map[self.cartas[i]].id, "\n")
+                io.write(map[self.cartas[j]].imagemFrente,map[self.cartas[j]].id, " ", map[self.cartas[i]].imagemFrente,map[self.cartas[i]].id, "\n\n")
                 --io.write(tostring(map[self.cartas[i]]), " ", tostring(map[self.cartas[j]]), "\n")
             end
         end
@@ -212,4 +209,26 @@ function Tabuleiro:removerParEncontrado(carta1, carta2)
         self[carta2.posX][carta2.posY] = nil
     end
 
+end
+
+function Tabuleiro:calculaProbErro(nivel)
+    if FACIL then
+        self.erroBase = 40
+        self.taxaErroBase = 20
+    end
+
+    if MEDIO then
+        self.erroBase = 35
+        self.taxaErroBase = 15
+    end
+
+    if DIFICIL then
+        self.erroBase = 30
+        self.taxaErroBase = 10
+    end
+
+    if EXTREMO then
+        self.erroBase = 25
+        self.taxaErroBase = 5
+    end
 end

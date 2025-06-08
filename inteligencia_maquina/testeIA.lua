@@ -34,7 +34,6 @@ local rodadaAtual = 0
 local primeiraCartaSele = {}
 local segundaCartaSele = {}
 
-io.write("Map Pares: ")
 os.execute("pause")
 os.execute("cls")
 
@@ -58,7 +57,6 @@ while tabuleiro.cartasRestantes > 0 do
     adversario:exibirMemoria()
     os.execute("pause")
     os.execute("cls")
-    
     io.write("SEGUNDA CARTA ")
     os.execute("pause")
     os.execute("cls")

@@ -211,4 +211,6 @@ function Adversario:buscarPar(tabuleiro, carta)
     return par
 end
 
+--TODO: Método para partida, toda vez que passar para a próxima rodada, atualiza a probabilidade de erro de todas as cartas na memória da IA
+
 return Adversario
