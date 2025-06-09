@@ -1,10 +1,11 @@
-Tabuleiro = {}
+local Tabuleiro = {}
 Tabuleiro.__index = Tabuleiro --permite chamadas com self
 
 local ESPACAMENTO = 10
 local POS_X = 175
 local POS_Y = 145
 
+-- TODO: Alterar parâmetro dadosCartas para vetorCartas
 function Tabuleiro:new(nivel, dadosCartas)
     local novo = {
         nivel = nivel or 1,

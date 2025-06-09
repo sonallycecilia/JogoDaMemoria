@@ -1,2 +1,4 @@
-.vscode/
-*.sql
+.vscode
+.sql
+backup_bd.sql
+tempCodeRunnerFile.lua
