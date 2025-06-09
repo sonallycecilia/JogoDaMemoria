@@ -101,7 +101,7 @@ function Adversario:selecionarSegundaCarta(tabuleiro, rodadaAtual, primeiraCarta
     
     if parExiste then
         cartaSelecionada = cartaPar
-        acertou = self:verificaAcerto(cartaPar)
+        acertou = self:verificaAcerto(tabuleiro, cartaPar)
         print("Par Existe na Memoria")
         print("cartaSelecionada: ", cartaSelecionada, " ", cartaSelecionada.imagemFrente)
     else
@@ -135,12 +135,14 @@ function Adversario:contaParesEncontrados()
     self.paresEncontrados = self.paresEncontrados + 1
 end
 
-function Adversario:verificaAcerto(carta)
+function Adversario:verificaAcerto(tabuleiro, carta)
     io.write("ProbErro de ", carta.imagemFrente, carta.id, " = ", carta.probErro, "\n")
     local chance = math.random(1,100)
     local acertou = false
     io.write("Erro sorteado: ", chance, "\n")
-    if chance > carta.probErro then
+
+    -- Se sobrar apenas um par, acerta independente da possibilidade de erro 
+    if chance > carta.probErro or tabuleiro.cartasRestantes <= 2 then
         acertou = true
     end
     
