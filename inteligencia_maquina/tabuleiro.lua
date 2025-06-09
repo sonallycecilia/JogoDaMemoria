@@ -175,14 +175,14 @@ end
 
 -- NECESSITA DE TESTES
 -- Retorna uma nova lista de posicoes não nil
-function Tabuleiro:verificaListaPosicao(listaTuplaPosicoes)
+function Tabuleiro:verificaListaPosicao(listaTuplaPosicoes, primeiraCarta)
     local listaPosicaoValida = {}
     local posicaoExiste = false
     local tuplaAtual = {}
     for i = 1, #listaTuplaPosicoes, 1 do
         tuplaAtual = listaTuplaPosicoes[i]
         posicaoExiste = self:verificaPosicao(tuplaAtual[1], tuplaAtual[2])
-        if posicaoExiste then
+        if posicaoExiste and (tuplaAtual[1] ~= primeiraCarta.posX) and (tuplaAtual[2] ~= primeiraCarta.posY)then
             table.insert(listaPosicaoValida, tuplaAtual)
         end
     end
@@ -211,23 +211,23 @@ function Tabuleiro:removerParEncontrado(carta1, carta2)
 
 end
 
-function Tabuleiro:calculaProbErro(nivel)
-    if FACIL then
+function Tabuleiro:calculaProbErro()
+    if self.nivel == FACIL then
         self.erroBase = 40
         self.taxaErroBase = 20
     end
 
-    if MEDIO then
+    if self.nivel == MEDIO then
         self.erroBase = 35
         self.taxaErroBase = 15
     end
 
-    if DIFICIL then
+    if self.nivel == DIFICIL then
         self.erroBase = 30
         self.taxaErroBase = 10
     end
 
-    if EXTREMO then
+    if self.nivel == EXTREMO then
         self.erroBase = 25
         self.taxaErroBase = 5
     end

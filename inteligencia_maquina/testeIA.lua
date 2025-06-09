@@ -37,6 +37,10 @@ local segundaCartaSele = {}
 os.execute("pause")
 os.execute("cls")
 
+for i = 1, #tabuleiro.cartas, 1 do
+    print("Erro Carta: ", tabuleiro.cartas[i].probErro)
+end
+
 adversario:inicializarMemoria(tabuleiro.linhas, tabuleiro.colunas)
 while tabuleiro.cartasRestantes > 0 do
     print("Avancar?")

@@ -76,7 +76,7 @@ function Adversario:selecionarCartaAleatoria(tabuleiro, cartaAnterior)
         io.write("Quantidade de Sorteios: ", contQtdSorteios, "\n")
         ehCartaAnterior = tabuleiro[lin][col] == cartaAnterior -- Ao selecionar a segunda carta, esta não pode ser igual a primeira carta
     
-    until ((not self:estaNaMemoria(lin, col)) or (contQtdSorteios > 2 )) and (not ehCartaAnterior)
+    until ((not self:estaNaMemoria(lin, col)) or (contQtdSorteios > 2 )) and (not ehCartaAnterior) and (tabuleiro[lin] and tabuleiro[lin][col])
 
 
     cartaSelecionada = tabuleiro[lin][col]
@@ -95,7 +95,7 @@ function Adversario:selecionarSegundaCarta(tabuleiro, rodadaAtual, primeiraCarta
     local lin, col
     
     if cartaPar then
-        print("Carta Par existe: ", cartaPar)
+        print("Carta Par existe: ", cartaPar.imagemFrente,cartaPar.id)
         parExiste = true
     end
     
@@ -105,16 +105,20 @@ function Adversario:selecionarSegundaCarta(tabuleiro, rodadaAtual, primeiraCarta
         print("Par Existe na Memoria")
         print("cartaSelecionada: ", cartaSelecionada, " ", cartaSelecionada.imagemFrente)
     else
-        cartaSelecionada = Adversario:selecionarCartaAleatoria(tabuleiro, primeiraCarta)
+        cartaSelecionada = self:selecionarCartaAleatoria(tabuleiro, primeiraCarta)
         print("Par nao Existe")
-        print("cartaSelecionada: ", cartaSelecionada, " ", cartaSelecionada.imagemFrente, cartaSelecionada.id)
+        print("cartaSelecionada: ", cartaSelecionada, " ")
     end
 
-    if acertou then
-        print("Acertou!")
+    if parExiste and acertou then
+        print("Acertou! o par")
         self:contaParesEncontrados()
         parFoiEncontrado = true
         tabuleiro:removerParEncontrado(primeiraCarta, cartaSelecionada)
+    end
+    if parExiste and (not acertou) then
+        print("Errou! o par")
+        cartaSelecionada = self:erroAoSelecionarSegundaCarta(tabuleiro, primeiraCarta, cartaPar)
     end
     
     Adversario:adicionarCartaMemoria(cartaSelecionada, rodadaAtual)
@@ -132,8 +136,10 @@ function Adversario:contaParesEncontrados()
 end
 
 function Adversario:verificaAcerto(carta)
+    io.write("ProbErro de ", carta.imagemFrente, carta.id, " = ", carta.probErro, "\n")
     local chance = math.random(1,100)
     local acertou = false
+    io.write("Erro sorteado: ", chance, "\n")
     if chance > carta.probErro then
         acertou = true
     end
@@ -143,7 +149,7 @@ end
 
 -- TODO: Implementar selecionar cartar nas posições vizinhas
 -- TODO: Printar posLinOutraCarta e posColOutraCarta
-function Adversario:erroAoSelecionarSegundaCarta(tabuleiro, cartaPar)
+function Adversario:erroAoSelecionarSegundaCarta(tabuleiro, primeiraCarta, cartaPar)
     local listaTuplaPosCandidata = {}
     local listaTuplaPosValida = {}
     local cartaSele
@@ -160,13 +166,22 @@ function Adversario:erroAoSelecionarSegundaCarta(tabuleiro, cartaPar)
     local baixoEsquerda, baixoDireita = {linCartaPar + 1, colCartaPar - 1}, {linCartaPar + 1, colCartaPar + 1}
 
     listaTuplaPosCandidata = {cima, baixo, esquerda, direta, cimaEsquerda, cimaDireita, baixoEsquerda, baixoDireita}
-    listaTuplaPosValida = tabuleiro:verificaListaPosicao(listaTuplaPosCandidata)
+    listaTuplaPosValida = tabuleiro:verificaListaPosicao(listaTuplaPosCandidata, primeiraCarta)
 
     indiceListaTuplaSelec = self:sortearIndiceLista(listaTuplaPosValida)
-    tuplaSele = listaTuplaPosCandidata[indiceListaTuplaSelec]
-    linSele, colSele = tuplaSele[1], tuplaSele[2]
+    tuplaSele = listaTuplaPosValida[indiceListaTuplaSelec]    
 
-    cartaSele = tabuleiro[linSele][colSele]
+    if tuplaSele then
+        linSele, colSele = tuplaSele[1], tuplaSele[2]
+    end
+
+    -- Não existem mais cartas adjacentes para serem selecionadas 
+    if #listaTuplaPosValida < 1 then
+        cartaSele = cartaPar
+    else
+        print("linColCartaSelecionadaErro: ",linSele, colSele)
+        cartaSele = tabuleiro[linSele][colSele]
+    end
 
     return cartaSele;
 end
@@ -188,7 +203,9 @@ end
 function Adversario:sortearIndiceLista(listaPosicao)
     listaPosicao = listaPosicao or {} 
     local posicao
-    posicao = math.random(1, #listaPosicao)
+    if #listaPosicao ~= 0 then
+        posicao = math.random(1, #listaPosicao)     
+    end
     return posicao
 end
 
