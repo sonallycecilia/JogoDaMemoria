@@ -1,7 +1,7 @@
 require("inteligencia_maquina.cartaTeste")
 require("inteligencia_maquina.utils.String")
 require("inteligencia_maquina.utils.Array")
-require("inteligencia_maquina.utils.nivelEnum")
+require("classes.niveldeJogo")
 
 Tabuleiro = {
     cartas = {}, 
