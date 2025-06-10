@@ -1,22 +1,31 @@
 local Partida = require("classes.partida")
 local Config = require("config")
 local Botao = require("interface.botao")
+local DataHora = require("classes.utils.dataHora")
+local datahora = DataHora:new()
 -- layers/layerPartida.lua
 
 local LayerPartida = {}
 LayerPartida.__index = LayerPartida
 
-function LayerPartida:new(manager, modoDeJogo, nivel, nomeJogador)
+-- Essas variáveis realmente deveriam estar aqui no Layer, ou apenas em partida? e o Layer possuir uma instância de partida que armazena o que é necessário
+function LayerPartida:new(manager, modoDeJogo, nivel)
     local self = setmetatable({}, LayerPartida)
     self.manager = manager
     self.proximaLayer = nil
-    self.nomeJogador = nomeJogador or "usuario1" --Nome do jogador será informado ao final da partida
+    self.nomeJogador = "convidado" --Nome do jogador será informado ao final da partida
     self.partida = Partida:new(modoDeJogo, nivel)
     
+    datahora:atualizar()
+    self.dataInicio =  datahora:formatarData()
+    self.horaInicio = datahora:formatarHora()
+    self.dataFinal = nil
+    self.horaFinal = nil
+
     self.cartasViradasNoTurno = {} 
     self.jogadorAtual = "jogador" | "maquina"--Jogador ou Máquina, jogador sempre começa jogando
-    self.tempoParaVirarCarta = 1
-    self.timerCartasViradas = 0 -- Pra que serve isso?
+    self.tempoParaVirarDeVolta = 1
+    self.timerCartasViradas = 0 
     self.partidaFinalizada = false
 
     self.adversarioIA = require("inteligencia_maquina.adversario")
@@ -127,12 +136,96 @@ function LayerPartida:draw()
     self.partida.tabuleiro:draw()
 end
 
+-- Talvez esse método seja muito lento
 function LayerPartida:mousepressed(x, y, button)
+    local indice, carta
     -- Tratar cliques nas cartas
+    -- button == 1 é o botão esquerdo do mouse 
+    if button == 1 and self.jogadorAtual == "humano" and #self.cartasViradasNoTurno < self.partida.maximoTentativas then
+        for linha = 1, 10, 1 do
+            for coluna = 1, 10, 1 do
+                -- Itera sobre um vetor como se fosse uma matriz 
+                indice = (linha-1) * self.partida.tabuleiro.colunas + coluna
+                carta = self.partida.tabuleiro.cartas[indice]
+                if carta and not carta.revelada and carta:clicada(x,y) then
+                    carta:alternarLado()
+                    table.insert(self.cartasViradasNoTurno, carta)
+                    self.adversarioIA:adicionarCartaMemoria(carta, self.partida.rodadaAtual)
+
+                    if #self.cartasViradasNoTurno == self.partida.maximoTentativas then
+                        self:verificaGrupoCartas()
+                    end
+                    return -- Sai após a carta clicada ter sido encontrada, é melhor tratar isso com um while, refatorar depois
+                end
+            end
+        end
+    end
+end
+
+function LayerPartida:verificaGrupoCartas()
+    local grupoFormado = true -- É mais fácil verificar a condição de não serem um grupo
+    local imgPrimeiraCarta = self.cartasViradasNoTurno[1].imagemFrente
+
+    for i = 2, #self.cartasViradasNoTurno, 1 do
+        if self.cartasViradasNoTurno[i].imagemFrente ~= imgPrimeiraCarta then
+            grupoFormado = false
+            break; -- Clean code? Pra que? O importante é funcionar, laço "bonito" é preciosismo 
+        end
+    end
+
+    -- Transferir essa responsabilidade para um método validaGrupoFormado()
+    if grupoFormado then
+        -- ACERTOU
+        self.partida.score = self.partida.score + #self.cartasViradasNoTurno * 100 -- Cada carta vale 100 pontos
+        for _, carta in ipairs(self.cartasViradasNoTurno) do
+            self.partida.tabuleiro:removerGrupoEncontrado(self.cartasViradasNoTurno)
+        end
+        self.cartasViradasNoTurno = {}
+    else
+        -- ERROU
+        self.timerCartasViradas = self.tempoParaVirarDeVolta -- Timer para desvirar
+    end
+
+    -- Troca de turno se errou, ou se o humano já jogou e acertou
+    if not grupoFormado or self.partida.modoDeJogo == "competitivo" then
+        if #self.cartasViradasNoTurno == 0 then
+            self:trocaJogadorAtual()
+        end
+    end
+end
+
+function LayerPartida:trocaJogadorAtual()
+    if self.jogadorAtual == "jogador" then
+        self.jogadorAtual = "maquina"
+    end
+    if self.jogadorAtual == "maquina" then
+        self.jogadorAtual = "jogador"
+    end
+end
+
+function LayerPartida:finalizarPartida()
+    print("Partida finalizada!") -- debug
+    local modoDeJogo = self.partida.modoDeJogo
+    local dificuldade = self.partida.nivel -- Substituir 1, 2, 3, 4 por FACIL, MEDIO, DIFICIL, EXTREMO. Utilizar a classe nivelDeJogo
+    local pontuacao = self.partida.score
+    local dataInicio = self.dataInicio
+    local horaInicio = self.horaInicio
+    local dataFinal = datahora:formatarData()
+    local horaFinal = dataHora:formatarHora()
+    
+    local nomeJogador = nil
+    -- Abrir Nova janela para o jogador adicionar o nome
+    -- local nomejogador = self.manager:setLayar("telaNomeJogador"):inputNome()
+    
+    -- TODO: dar merge com o que foi feito no BD 
+    Ranking:adicionarResultado(nomeJogador, dataInicio, horaInicio, dataFinal, horaFinal, pontuacao, dificuldade, modoDeJogo )
+
+    -- TODO: criar rankingLayer e adiconar ao layersMap
+    self.manager:setLayer("rankingLayer")
 end
 
 function LayerPartida:mousemoved(x, y, dx, dy)
-    -- Se quiser hover ou efeitos de destaque
+    -- Se quiser hover ou efeitos de destaque. Sem tempo pra isso, vai ter não
 end
 
 return LayerPartida
