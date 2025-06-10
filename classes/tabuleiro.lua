@@ -7,13 +7,13 @@ local POS_Y = 145
 
 -- TODO: Alterar parâmetro dadosCartas para vetorCartas
 function Tabuleiro:new(nivel, dadosCartas)
-    local novo = {
+    local novoTabuleiro = {
         nivel = nivel or 1,
         largura = 800,
         altura = 600,
         cartas = {},
-        tamanhoCarta = 100,
         mapPares = {},
+        tamanhoCarta = 100,
         linhas = 4, -- Definido pelo nível, mas provavelmente será fixo em 24
         colunas = 6, -- Definido pelo nível, mas provavelmente será fixo em 24
         cartasTotais = 0,
@@ -21,26 +21,34 @@ function Tabuleiro:new(nivel, dadosCartas)
         taxaErroBase = 30,
         erroBase = 30,
     }
-    setmetatable(novo, Tabuleiro)
+    setmetatable(novoTabuleiro, Tabuleiro)
 
     -- Gerar as cópias das cartas conforme o nível
-    novo:gerarCopiaDeCartas(dadosCartas)
+    novoTabuleiro:gerarCopiaDeCartas(dadosCartas)
+
+    -- Adicionar método para adicionar a posX e poxY de cada carta 
+    -- após os pares serem gerados, sem isso a IA não funciona
 
     -- Embaralha as cartas depois de criadas
-    novo:embaralhar()
+    novoTabuleiro:embaralhar()
 
     -- Define o layout do tabuleiro
-    novo:definirLayout()
+    novoTabuleiro:definirLayout()
 
-    return novo
+    return novoTabuleiro
 end
 
+-- Testar para saber se o método está funcionando corretamente
 function Tabuleiro:gerarCopiaDeCartas(dadosCartas)
-    if self.nivel == 1 or self.nivel == 3 then
-        table.insert(self.cartas, Carta:new(13, "midia/images/cartas/cogumelo.png")) -- Não gera cópias para os níveis 1 e 2
-    end
     -- Número de cópias de acordo com o nível (nível 1 = 2 cópias, nível 2 = 3 cópias, etc.)
-    local numCopia = self.nivel + 1  -- Nível 1 gera 2 cópias, Nível 2 gera 3 cópias, etc.
+    local numCopia  
+    if nivel >= FACIL and nivel <= DIFICIL then
+        numCopia = self.nivel + 1
+    end
+    if nivel == EXTREMO then
+        -- TODO: Criar uma função para calcular o numéro de cópias aleatória de cada carta
+        numCopia = {} -- A quantidade de cópias de cada carta é variável, cara índice representa uma carta e o valor a sua respectiva quantidade de cópias
+    end
 
     -- Para cada carta recebida, gera o número adequado de cópias
     for _, carta in ipairs(dadosCartas) do
@@ -108,6 +116,11 @@ function Tabuleiro:draw()
             end
         end
     end
+end
+
+-- TODO: Adaptar a implementação de inteligencia_maquina\tabuleiroTeste.lua para grupos
+function Tabuleiro:removerGrupoEncontrado(listaGrupo)
+    
 end
 
 return Tabuleiro
