@@ -1,8 +1,10 @@
 require("classes.niveldeJogo")
 local Partida = require("classes.partida")
 local Config = require("config")
-local DataHora = require("classes.utils.dataHora")
 -- layers/layerPartida.lua
+
+local LARGURA_TELA = love.graphics.getWidth()
+local ALTURA_TELA = love.graphics.getHeight()
 
 local LayerPartida = {}
 LayerPartida.__index = LayerPartida
@@ -12,24 +14,10 @@ function LayerPartida:new(manager, modoDeJogo, nivel)
     local self = setmetatable({}, LayerPartida)
     self.manager = manager
     self.proximaLayer = nil
-    self.nomeJogador = "convidado" --Nome do jogador será informado ao final da partida
     self.partida = Partida:new(modoDeJogo, nivel)
-    
-    DataHora = DataHora:new()
-    DataHora:atualizar()
-    self.dataInicio =  DataHora:formatarData()
-    self.horaInicio = DataHora:formatarHora()
-    self.dataFinal = nil
-    self.horaFinal = nil
 
-    self.cartasViradasNoTurno = {} 
-    self.jogadorAtual = "jogador" or "maquina"--Jogador ou Máquina, jogador sempre começa jogando
     self.tempoParaVirarDeVolta = 1
     self.timerCartasViradas = 0 
-    self.partidaFinalizada = false
-
-    self.adversarioIA = require("inteligencia_maquina.adversario")
-    self.adversarioIA:inicializarMemoria(self.partida.tabuleiro.linhas, self.partida.tabuleiro.colunas)
 
     self:load()
     return self
@@ -160,68 +148,6 @@ function LayerPartida:mousepressed(x, y, button)
             end
         end
     end
-end
-
-function LayerPartida:verificaGrupoCartas()
-    local grupoFormado = true -- É mais fácil verificar a condição de não serem um grupo
-    local imgPrimeiraCarta = self.cartasViradasNoTurno[1].imagemFrente
-
-    for i = 2, #self.cartasViradasNoTurno, 1 do
-        if self.cartasViradasNoTurno[i].imagemFrente ~= imgPrimeiraCarta then
-            grupoFormado = false
-            break; -- Clean code? Pra que? O importante é funcionar, laço "bonito" é preciosismo 
-        end
-    end
-
-    -- Transferir essa responsabilidade para um método validaGrupoFormado()
-    if grupoFormado then
-        -- ACERTOU
-        self.partida.score = self.partida.score + #self.cartasViradasNoTurno * 100 -- Cada carta vale 100 pontos
-        for _, carta in ipairs(self.cartasViradasNoTurno) do
-            self.partida.tabuleiro:removerGrupoEncontrado(self.cartasViradasNoTurno)
-        end
-        self.cartasViradasNoTurno = {}
-    else
-        -- ERROU
-        self.timerCartasViradas = self.tempoParaVirarDeVolta -- Timer para desvirar
-    end
-
-    -- Troca de turno se errou, ou se o humano já jogou e acertou
-    if not grupoFormado or self.partida.modoDeJogo == "competitivo" then
-        if #self.cartasViradasNoTurno == 0 then
-            self:trocaJogadorAtual()
-        end
-    end
-end
-
-function LayerPartida:trocaJogadorAtual()
-    if self.jogadorAtual == "jogador" then
-        self.jogadorAtual = "maquina"
-    end
-    if self.jogadorAtual == "maquina" then
-        self.jogadorAtual = "jogador"
-    end
-end
-
-function LayerPartida:finalizarPartida()
-    print("Partida finalizada!") -- debug
-    local modoDeJogo = self.partida.modoDeJogo
-    local dificuldade = self.partida.nivel -- Substituir 1, 2, 3, 4 por FACIL, MEDIO, DIFICIL, EXTREMO. Utilizar a classe nivelDeJogo
-    local pontuacao = self.partida.score
-    local dataInicio = self.dataInicio
-    local horaInicio = self.horaInicio
-    local dataFinal = DataHora:formatarData()
-    local horaFinal = DataHora:formatarHora()
-    
-    local nomeJogador = nil
-    -- Abrir Nova janela para o jogador adicionar o nome
-    -- local nomejogador = self.manager:setLayar("telaNomeJogador"):inputNome()
-    
-    -- TODO: dar merge com o que foi feito no BD 
-    Ranking:adicionarResultado(nomeJogador, dataInicio, horaInicio, dataFinal, horaFinal, pontuacao, dificuldade, modoDeJogo )
-
-    -- TODO: criar rankingLayer e adiconar ao layersMap
-    self.manager:setLayer("rankingLayer")
 end
 
 function LayerPartida:mousemoved(x, y, dx, dy)
