@@ -19,8 +19,11 @@ function Partida:new(modoDeJogo, nivel)
         maximoTentativas = 2,
         tentativasRestantes = 2,
         tabuleiro = Tabuleiro:new(nivel, cartas),
+        rodadaAtual = 1,
     }
     setmetatable(novaPartida, self)
+
+    --TODO: definir máximo de tentativos com base no nível, 2, 3, ou 4
 
     return novaPartida
 end
