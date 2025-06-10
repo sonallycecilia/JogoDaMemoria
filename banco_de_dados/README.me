@@ -1,0 +1,19 @@
+# ATENÇÃO. 
+
+Para acessar o banco de dados utilizando o luasql.mysql, caso esteja utilizando o MySql serve 8.0+ é necessário que algum usuário do seu banco de dados tenha o padrão de autenticação nativo do mysql. O driver do luasql não suporta versões superiores.
+
+Recomendo que execute o seguinte comando no terminal do MySql para cria um novo usuário chamado "luauser" com o padrão de autenticação nativo
+
+'''sql
+CREATE USER 'luauser'@'localhost' IDENTIFIED WITH mysql_native_password BY '';
+GRANT ALL PRIVILEGES ON sistema_pontuacao.* TO 'luauser'@'localhost';
+FLUSH PRIVILEGES;
+'''
+
+Após ter criado o usuário, crie o banco de dados para armazenar as pontuações dos jogadores:
+
+'''sql
+CREATE SCHEMA IF NOT EXISTS sistema_pontuacao;
+'''
+
+Feito isso, o programa deve iniciar sem problemas 
