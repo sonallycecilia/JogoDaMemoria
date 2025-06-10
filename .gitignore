@@ -1,5 +1,5 @@
 .vscode
-.sql
+*.sql
 backup_bd.sql
 tempCodeRunnerFile.lua
 testeCalculoIndiceArray.lua
