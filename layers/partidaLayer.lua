@@ -2,7 +2,6 @@ require("classes.niveldeJogo")
 local Partida = require("classes.partida")
 local Config = require("config")
 local DataHora = require("classes.utils.dataHora")
-local datahora = DataHora:new()
 -- layers/layerPartida.lua
 
 local LayerPartida = {}
@@ -16,9 +15,10 @@ function LayerPartida:new(manager, modoDeJogo, nivel)
     self.nomeJogador = "convidado" --Nome do jogador será informado ao final da partida
     self.partida = Partida:new(modoDeJogo, nivel)
     
-    datahora:atualizar()
-    self.dataInicio =  datahora:formatarData()
-    self.horaInicio = datahora:formatarHora()
+    DataHora = DataHora:new()
+    DataHora:atualizar()
+    self.dataInicio =  DataHora:formatarData()
+    self.horaInicio = DataHora:formatarHora()
     self.dataFinal = nil
     self.horaFinal = nil
 
@@ -210,8 +210,8 @@ function LayerPartida:finalizarPartida()
     local pontuacao = self.partida.score
     local dataInicio = self.dataInicio
     local horaInicio = self.horaInicio
-    local dataFinal = datahora:formatarData()
-    local horaFinal = dataHora:formatarHora()
+    local dataFinal = DataHora:formatarData()
+    local horaFinal = DataHora:formatarHora()
     
     local nomeJogador = nil
     -- Abrir Nova janela para o jogador adicionar o nome
