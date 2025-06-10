@@ -23,7 +23,7 @@ function LayerPartida:new(manager, modoDeJogo, nivel)
     self.horaFinal = nil
 
     self.cartasViradasNoTurno = {} 
-    self.jogadorAtual = "jogador" | "maquina"--Jogador ou Máquina, jogador sempre começa jogando
+    self.jogadorAtual = "jogador" or "maquina"--Jogador ou Máquina, jogador sempre começa jogando
     self.tempoParaVirarDeVolta = 1
     self.timerCartasViradas = 0 
     self.partidaFinalizada = false
