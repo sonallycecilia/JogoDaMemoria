@@ -1,6 +1,5 @@
 local Partida = require("classes.partida")
 local Config = require("config")
-local Botao = require("interface.botao")
 local DataHora = require("classes.utils.dataHora")
 local datahora = DataHora:new()
 -- layers/layerPartida.lua
