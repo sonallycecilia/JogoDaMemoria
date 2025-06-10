@@ -9,6 +9,7 @@ NAO_ENCONTRADA = -1
 NAO_POSICIONADA = -1
 
 -- CONSTRUTOR
+-- Talvez seja interessante utilizar um id para o grupo que a carta pertence, os pares, trincas ou quadras vão possuir o mesmo idGrupo
 function Carta:new(id, caminhoImagemFrente)
     local novaCarta = {
         id = id,
@@ -45,11 +46,11 @@ function Carta:clicada(mx, my)
            my >= self.y and my <= self.y + self.altura
 end
 
-function Carta:onClick(mx, my)
-    if self:clicada(mx, my) then
-        self:alternarLado()
-    end
-end
+-- function Carta:onClick(mx, my)
+--     if self:clicada(mx, my) then
+--         self:alternarLado()
+--     end
+-- end
 
 -- Função para desenhar a carta (exibe a frente ou o verso dependendo do estado)
 function Carta:draw()
