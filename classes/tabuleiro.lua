@@ -42,10 +42,10 @@ end
 function Tabuleiro:gerarCopiaDeCartas(dadosCartas)
     -- Número de cópias de acordo com o nível (nível 1 = 2 cópias, nível 2 = 3 cópias, etc.)
     local numCopia  
-    if nivel >= FACIL and nivel <= DIFICIL then
+    if self.nivel >= FACIL and self.nivel <= DIFICIL then
         numCopia = self.nivel + 1
     end
-    if nivel == EXTREMO then
+    if self.nivel == EXTREMO then
         -- TODO: Criar uma função para calcular o numéro de cópias aleatória de cada carta
         numCopia = {} -- A quantidade de cópias de cada carta é variável, cara índice representa uma carta e o valor a sua respectiva quantidade de cópias
     end
