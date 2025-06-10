@@ -2,3 +2,4 @@
 .sql
 backup_bd.sql
 tempCodeRunnerFile.lua
+classes\utils\testeCalculoIndiceArray.lua
