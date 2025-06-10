@@ -1,3 +1,4 @@
+require("classes.niveldeJogo")
 local Partida = require("classes.partida")
 local Config = require("config")
 local DataHora = require("classes.utils.dataHora")
