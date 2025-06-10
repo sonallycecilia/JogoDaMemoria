@@ -12,7 +12,14 @@ function Tabuleiro:new(nivel, dadosCartas)
         largura = 800,
         altura = 600,
         cartas = {},
-        tamanhoCarta = 100
+        tamanhoCarta = 100,
+        mapPares = {},
+        linhas = 4, -- Definido pelo nível, mas provavelmente será fixo em 24
+        colunas = 6, -- Definido pelo nível, mas provavelmente será fixo em 24
+        cartasTotais = 0,
+        cartasRestantes = 0,
+        taxaErroBase = 30,
+        erroBase = 30,
     }
     setmetatable(novo, Tabuleiro)
 

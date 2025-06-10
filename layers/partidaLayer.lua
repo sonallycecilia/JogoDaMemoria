@@ -6,19 +6,78 @@ local Botao = require("interface.botao")
 local LayerPartida = {}
 LayerPartida.__index = LayerPartida
 
-function LayerPartida:new(manager)
+function LayerPartida:new(manager, modoDeJogo, nivel, nomeJogador)
     local self = setmetatable({}, LayerPartida)
     self.manager = manager
     self.proximaLayer = nil
-    -- Inicialize o estado do jogo da memória aqui (cartas, seleção, etc.)
-    self.partida = Partida:new("cooperativo", 2)
+    self.nomeJogador = nomeJogador or "usuario1" --Nome do jogador será informado ao final da partida
+    self.partida = Partida:new(modoDeJogo, nivel)
+    
+    self.cartasViradasNoTurno = {} 
+    self.jogadorAtual = "jogador" | "maquina"--Jogador ou Máquina, jogador sempre começa jogando
+    self.tempoParaVirarCarta = 1
+    self.timerCartasViradas = 0 -- Pra que serve isso?
+    self.partidaFinalizada = false
+
+    self.adversarioIA = require("inteligencia_maquina.adversario")
+    self.adversarioIA:inicializarMemoria(self.partida.tabuleiro.linhas, self.partida.tabuleiro.colunas)
+
     self:load()
-    -- Exemplo de modo de jogo e nível
     return self
 end
 
 function LayerPartida:update(dt)
     -- Atualizações da partida, como animações ou tempo
+    
+    -- Lógica de tempo para o modo cooperativo
+    if self.partida.modoDeJogo == "cooperativo" and not self.partidaFinalizada then
+        self.partida.tempoRestante = self.partida.tempoRestante - dt
+        if self.partida.tempoRestante <= 0 then -- Adicionar verificar para saber se todo os pares foram encontrados
+            self.partidaFinalizada = true
+            -- Lógica de fim de jogo por tempo
+            self:finalizarPartida()
+        end
+    end
+
+    -- Lógica de tempo para o modo competitivo
+    if self.modoDeJogo == "competitivo" and not self.partidaFinalizada then
+        self.partida.tempoRestante = self.partida.tempoRestante - dt
+        if self.partida.tempoRestante <= 0 then -- Adicionar verificar para saber se todo os pares foram encontrados
+            self.partidaFinalizada = true
+            -- Lógica de fim de jogo por tempo
+            self:finalizarPartida()
+        end
+    end
+
+    -- Lógica para desvirar as cartas após errar o par
+    if #self.cartasViradasNoTurno > 0 and self.timerCartasViradas > 0 then
+        self.timerCartasViradas = self.timerCartasViradas - dt
+        if self.timerCartasViradas <= 0 then
+            for _, carta in ipairs(self.cartasViradasNoTurno) do
+                if carta.revelada then -- Desvira apenas se estiver revelada
+                    carta:alternarLado()
+                end
+            end
+            self.cartasViradasNoTurno = {}
+            -- Troca de turno após o erro
+            if self.jogadorAtual == "humano" then
+                self.jogadorAtual = "maquina"
+            else
+                self.jogadorAtual = "humano"
+            end
+        end
+    end
+
+    -- Lógica para a jogada da máquina
+    if self.jogadorAtual == "maquina" and not self.partidaFinalizada and #self.cartasViradasNoTurno == 0 then
+        self:jogadaMaquina() -- TODO: implementar método que realiza as duas jogadas da máquina 
+    end
+
+    -- Verifica se todos os pares foram encontrados
+    if self.partida.tabuleiro.cartasRestantes == 0 and not self.partidaFinalizada then
+        self.partidaFinalizada = true
+        self:finalizarPartida() -- TODO: implementar método de finalização, mostrar o ranking, colocar o nome do jogador...
+    end
 end
 
 function LayerPartida:load()

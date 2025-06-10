@@ -20,7 +20,7 @@ function love.load()
     animacao:setPosicao(850, 0)
 
     -- Passa o nome da layer (string), LayerManager cria a instância e associa o manager
-    manager:setLayer("menuPrincipal")
+    manager:setLayer("partida")
 
     -- Exemplo de música
     -- local song = love.audio.newSource("midia/audio/loop-8-28783.mp3", "stream")

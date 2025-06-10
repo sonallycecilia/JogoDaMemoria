@@ -149,8 +149,6 @@ function Adversario:verificaAcerto(tabuleiro, carta)
     return acertou
 end
 
--- TODO: Implementar selecionar cartar nas posições vizinhas
--- TODO: Printar posLinOutraCarta e posColOutraCarta
 function Adversario:erroAoSelecionarSegundaCarta(tabuleiro, primeiraCarta, cartaPar)
     local listaTuplaPosCandidata = {}
     local listaTuplaPosValida = {}

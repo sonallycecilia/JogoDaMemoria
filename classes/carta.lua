@@ -17,7 +17,7 @@ function Carta:new(id, caminhoImagemFrente)
         pathImagem = caminhoImagemFrente, --precisa ficar pois pegamos o caminho da imagem
         imagemFrente = love.graphics.newImage(caminhoImagemFrente),
         imagemVerso = love.graphics.newImage(VERSO),
-        revelada = true, -- se não for passado, assume false
+        revelada = false, -- se não for passado, assume false
         posX = NAO_POSICIONADA,
         posY = NAO_POSICIONADA,
         rodadaEncontrada = NAO_ENCONTRADA,
