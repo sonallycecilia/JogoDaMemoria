@@ -1,0 +1,153 @@
+-- classes/tabuleiro.lua (ATUALIZADO PARA 4x6)
+local Tabuleiro = {}
+Tabuleiro.__index = Tabuleiro
+
+local ESPACAMENTO = 10
+local Carta = require("classes.carta")
+
+function Tabuleiro:new(nivel, dadosCartas)
+    local self = setmetatable({}, Tabuleiro)
+
+    self.nivel = nivel or 1
+    self.cartas = {}
+    self.linhas = 4
+    self.colunas = 6
+    self.cartasRestantes = 0
+
+    self:definirLayout()
+    self:ajustarTamanhoCarta()
+    self:gerarCopiaDeCartas(dadosCartas)
+    self:embaralhar()
+
+    return self
+end
+
+function Tabuleiro:definirLayout()
+    if self.nivel == 1 then
+        self.colunas = 6
+        self.linhas = 4
+        -- 4x6 = 24 cartas = 12 pares perfeito!
+    elseif self.nivel == 2 then
+        self.colunas = 6
+        self.linhas = 6
+        -- 6x6 = 36 cartas = 18 pares
+    elseif self.nivel == 3 then
+        self.colunas = 7
+        self.linhas = 7
+        -- 7x7 = 49 cartas = 24 pares + 1 extra
+    else
+        self.colunas = 8
+        self.linhas = 8
+        -- 8x8 = 64 cartas = 32 pares (extremo)
+    end
+    
+    print("[Tabuleiro] Nível " .. self.nivel .. ": " .. self.linhas .. "x" .. self.colunas .. " = " .. (self.linhas * self.colunas) .. " posições")
+end
+
+function Tabuleiro:ajustarTamanhoCarta()
+    local larguraTela = love.graphics.getWidth()
+    local alturaTela = love.graphics.getHeight()
+
+    local larguraDisponivel = larguraTela - ((self.colunas + 1) * ESPACAMENTO)
+    local alturaDisponivel = alturaTela - ((self.linhas + 1) * ESPACAMENTO)
+
+    local larguraCarta = math.floor(larguraDisponivel / self.colunas)
+    local alturaCarta = math.floor(alturaDisponivel / self.linhas)
+
+    self.tamanhoCarta = math.min(larguraCarta, alturaCarta)
+    
+    print("[Tabuleiro] Tamanho da carta: " .. self.tamanhoCarta .. "px")
+end
+
+function Tabuleiro:gerarCopiaDeCartas(dadosCartas)
+    local numCopia = self.nivel + 1  -- Nível 1 = 2 cópias
+    local totalCartasNecessarias = self.linhas * self.colunas
+    local cartasIndex = 1
+
+    print("[Tabuleiro] Gerando cartas - Preciso de " .. totalCartasNecessarias .. " cartas")
+    print("[Tabuleiro] Tenho " .. #dadosCartas .. " tipos diferentes")
+    print("[Tabuleiro] Fazendo " .. numCopia .. " cópias de cada")
+
+    while #self.cartas < totalCartasNecessarias do
+        local cartaOriginal = dadosCartas[cartasIndex]
+        for _ = 1, numCopia do
+            if #self.cartas < totalCartasNecessarias then
+                local copia = self:gerarCopiaUnica(cartaOriginal)
+                table.insert(self.cartas, copia)
+            end
+        end
+        cartasIndex = cartasIndex + 1
+        if cartasIndex > #dadosCartas then
+            cartasIndex = 1
+        end
+    end
+
+    self.cartasRestantes = #self.cartas
+    print("[Tabuleiro] Total de cartas criadas: " .. #self.cartas)
+end
+
+function Tabuleiro:gerarCopiaUnica(cartaOriginal)
+    return Carta:new(cartaOriginal.id, cartaOriginal.pathImagem)
+end
+
+function Tabuleiro:embaralhar()
+    for i = #self.cartas, 2, -1 do
+        local j = love.math.random(i)
+        self.cartas[i], self.cartas[j] = self.cartas[j], self.cartas[i]
+    end
+    print("[Tabuleiro] Cartas embaralhadas!")
+end
+
+function Tabuleiro:draw()
+    local totalLargura = self.colunas * (self.tamanhoCarta + ESPACAMENTO) - ESPACAMENTO
+    local totalAltura = self.linhas * (self.tamanhoCarta + ESPACAMENTO) - ESPACAMENTO
+
+    local xInicial = (love.graphics.getWidth() - totalLargura) / 2
+    local yInicial = (love.graphics.getHeight() - totalAltura) / 2
+
+    for linha = 0, self.linhas - 1 do
+        for coluna = 0, self.colunas - 1 do
+            local x = xInicial + coluna * (self.tamanhoCarta + ESPACAMENTO)
+            local y = yInicial + linha * (self.tamanhoCarta + ESPACAMENTO)
+
+            love.graphics.setColor(1, 1, 1)
+            love.graphics.rectangle("fill", x, y, self.tamanhoCarta, self.tamanhoCarta, 12, 12)
+
+            local indice = linha * self.colunas + coluna + 1
+            local carta = self.cartas[indice]
+            if carta then
+                carta:setPosicao(x, y)
+                carta.largura = self.tamanhoCarta
+                carta.altura = self.tamanhoCarta
+                carta:draw(self.tamanhoCarta, self.tamanhoCarta)
+            end
+        end
+    end
+end
+
+function Tabuleiro:allCardsFound()
+    for _, carta in ipairs(self.cartas) do
+        if not carta.encontrada then
+            return false
+        end
+    end
+    return true
+end
+
+function Tabuleiro:removerGrupoEncontrado(listaGrupo)
+    for _, carta in ipairs(listaGrupo) do
+        carta.revelada = true
+        carta.encontrada = true
+    end
+    self.cartasRestantes = self.cartasRestantes - #listaGrupo
+end
+
+function Tabuleiro:desvirarGrupo(listaGrupo)
+    for _, carta in ipairs(listaGrupo) do
+        if not carta.encontrada then
+            carta.revelada = false
+        end
+    end
+end
+
+return Tabuleiro
