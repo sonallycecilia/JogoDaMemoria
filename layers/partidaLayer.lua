@@ -9,12 +9,18 @@ local ALTURA_TELA = love.graphics.getHeight()
 local LayerPartida = {}
 LayerPartida.__index = LayerPartida
 
--- Essas variáveis realmente deveriam estar aqui no Layer, ou apenas em partida? e o Layer possuir uma instância de partida que armazena o que é necessário
 function LayerPartida:new(manager, modoDeJogo, nivel)
     local self = setmetatable({}, LayerPartida)
     self.manager = manager
     self.proximaLayer = nil
-    self.partida = Partida:new(modoDeJogo, nivel)
+    self.partida = function () 
+        if modoDeJogo == "competitivo" then 
+            return PartidaCompetitiva:new(modoDeJogo, nivel) 
+        end 
+        if modoDeJogo == "cooperativo" then
+            return PartidaCooperativa:new(modoDeJogo, nivel)
+        end
+    end
 
     self.tempoParaVirarDeVolta = 1
     self.timerCartasViradas = 0 
@@ -23,24 +29,22 @@ function LayerPartida:new(manager, modoDeJogo, nivel)
     return self
 end
 
+-- Atualizações da partida, como animações ou tempo
 function LayerPartida:update(dt)
-    -- Atualizações da partida, como animações ou tempo
-    
     -- Lógica de tempo para o modo cooperativo
-    if self.partida.modoDeJogo == "cooperativo" and not self.partidaFinalizada then
+    if self.partida.modoDeJogo == "cooperativo" and not self.partida.partidaFinalizada then
         self.partida.tempoRestante = self.partida.tempoRestante - dt
-        if self.partida.tempoRestante <= 0 then -- Adicionar verificar para saber se todo os pares foram encontrados
-            self.partidaFinalizada = true
-            -- Lógica de fim de jogo por tempo
-            self:finalizarPartida()
+        
+        if self.partida:finalizou() then
+            self.partida:finalizarPartida()
         end
     end
 
     -- Lógica de tempo para o modo competitivo
-    if self.modoDeJogo == "competitivo" and not self.partidaFinalizada then
+    if self.modoDeJogo == "competitivo" and not self.partida.partidaFinalizada then
         self.partida.tempoRestante = self.partida.tempoRestante - dt
         if self.partida.tempoRestante <= 0 then -- Adicionar verificar para saber se todo os pares foram encontrados
-            self.partidaFinalizada = true
+            self.partida.partidaFinalizada = true
             -- Lógica de fim de jogo por tempo
             self:finalizarPartida()
         end
@@ -66,13 +70,13 @@ function LayerPartida:update(dt)
     end
 
     -- Lógica para a jogada da máquina
-    if self.jogadorAtual == "maquina" and not self.partidaFinalizada and #self.cartasViradasNoTurno == 0 then
+    if self.jogadorAtual == "maquina" and not self.partida.partidaFinalizada and #self.cartasViradasNoTurno == 0 then
         self:jogadaMaquina() -- TODO: implementar método que realiza as duas jogadas da máquina 
     end
 
     -- Verifica se todos os pares foram encontrados
-    if self.partida.tabuleiro.cartasRestantes == 0 and not self.partidaFinalizada then
-        self.partidaFinalizada = true
+    if self.partida.tabuleiro.cartasRestantes == 0 and not self.partida.partidaFinalizada then
+        self.partida.partidaFinalizada = true
         self:finalizarPartida() -- TODO: implementar método de finalização, mostrar o ranking, colocar o nome do jogador...
     end
 end
