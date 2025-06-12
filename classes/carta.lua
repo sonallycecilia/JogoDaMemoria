@@ -1,3 +1,4 @@
+local cartaEspecial = require "cartaEspecial"
 Carta = {}
 Carta.__index = Carta --permite usar metodo com dois pontos
 
@@ -5,8 +6,7 @@ local ALTURA = 100
 local LARGURA = 100
 local VERSO = "midia/images/verso.png"
 
--- Talvez seja interessante utilizar um id para o grupo que a carta pertence, os pares, trincas ou quadras vão possuir o mesmo idGrupo
-function Carta:new(id, caminhoImagemFrente)
+function Carta:new(id, caminhoImagemFrente, ehEspecial, tipoEspecial)
     local novaCarta = {
         id = id,
         idGrupo = nil,
@@ -19,7 +19,10 @@ function Carta:new(id, caminhoImagemFrente)
         posX = nil,
         posY = nil,
         rodadaEncontrada = nil,
-        probErro = 0
+        probErro = 0,
+        ehEspecial = ehEspecial or false,
+        tipoEspecial = tipoEspecial,
+        taCongelada = false
     }
     setmetatable(novaCarta, Carta) --permite o uso de :, ligando a metatable de cima
     return novaCarta
@@ -39,8 +42,10 @@ end
 
 -- Função para verificar se a carta foi clicada (verificação de clique na area)
 function Carta:clicada(mx, my)
+   Carta.revelada = true
     return mx >= self.x and mx <= self.x + self.largura and
            my >= self.y and my <= self.y + self.altura
+
 end
 
 -- function Carta:onClick(mx, my)
@@ -53,6 +58,12 @@ end
 function Carta:draw()
     if self.revelada then
         self:drawImagem(self.imagemFrente)  -- Desenha a frente se revelada
+        if self.ehEspecial then
+            -- Desenha um brilho ou borda especial para cartas especiais reveladas
+            love.graphics.setColor(1, 0.8, 0, 1) -- Cor amarela/laranja para destaque
+            love.graphics.rectangle("line", self.x, self.y, self.largura, self.altura)
+            love.graphics.setColor(1, 1, 1, 1) -- Reseta a cor
+        end
     else
         self:drawImagem(self.imagemVerso)   -- Desenha o verso caso contrário
     end
@@ -65,10 +76,21 @@ function Carta:drawImagem(imagem)
     end
 end
 
-function Carta:poder()
-    if self.id == 1 then
-        -- Poder especial
+function Carta:poder(partidaInstance, tabuleiroInstance)
+    if self.ehEspecial and self.tipoEspecial then
+        if self.tipoEspecial == "Revelacao" then
+            return cartaEspecial.apply_revelation(partidaInstance, tabuleiroInstance)
+        elseif self.tipoEspecial == "Congelamento" then
+            -- O congelamento é um poder que requer input do jogador para selecionar a carta alvo
+            return cartaEspecial.activate_freeze_selection(partidaInstance, tabuleiroInstance)
+        elseif self.tipoEspecial == "Bomba" then
+            -- A bomba revela cartas ao redor dela, e a própria bomba é o ponto de referência
+            return cartaEspecial.apply_bomb(partidaInstance, tabuleiroInstance, self)
+        end
     end
+    return false -- Retorna falso se não ativou nenhum poder ou não é especial
 end
+
+
 
 return Carta

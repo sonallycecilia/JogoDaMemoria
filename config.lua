@@ -65,6 +65,12 @@ Config.frames = {
     }
 }
 
+Config.cartasEspeciais.tipos = {
+    "Revelacao",
+    "Congelamento",
+    "Bomba"
+}
+
 
 return Config
 
