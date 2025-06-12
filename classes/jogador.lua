@@ -1,18 +1,15 @@
-require("classes.utils.score")
-
-Jogador = {
-    nome = "Convidado",
-    paresEncontrados = 0,
-    score = Score:new(nivel)
-}
+local Score = require("classes.utils.score")
+Jogador = {}
 Jogador.__index = Jogador
 
 function Jogador:new(nivel)
-    local novoJogador ={
+    local novoJogador = {
+        nome = "Convidado",
+        paresEncontrados = 0,
         score = Score:new(nivel)
-    }    
-
+    }
     setmetatable(novoJogador, Jogador)
-
     return novoJogador
-end 
+end
+
+return Jogador

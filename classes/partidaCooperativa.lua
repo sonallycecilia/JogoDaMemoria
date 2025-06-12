@@ -9,7 +9,7 @@ function PartidaCooperativa:new(modoDeJogo, nivel)
     return Partida:new(modoDeJogo, nivel)
 end
 
-function PartidaCompetitiva:finalizou()
+function PartidaCooperativa:finalizou()
     local result = false
     if self.tempoRestante <= 0 or self.tabuleiro.cartasRestantes == 0 then
         self.partidaFinalizada = true

@@ -22,7 +22,7 @@ else
     print("Conexao a "..nomeDatabase.." falhou!")
 end
 
-function criarRanking()
+function CriarRanking()
     local declaracao = [[
         CREATE TABLE IF NOT EXISTS ranking (
             nome_jogador VARCHAR(50) NOT NULL,

@@ -4,7 +4,7 @@ local conn = require("banco_de_dados.conexao_db")
 
 print(conn)
 
-criarRanking()
+--criarRanking()
 
 -- CREATE 
 local function addRegistro(nome_jogador, data_inicio, hora_inicio, data_final, hora_final, pontuacao, dificuldade, modo)

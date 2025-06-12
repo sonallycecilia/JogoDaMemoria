@@ -193,14 +193,14 @@ function Partida:update(dt)
 end
 
 function Partida:adicionarAoScore()
-    local ehNil = ehNil(self.cartasViradasNoTurno)  
+    local ehNil = EhNil(self.cartasViradasNoTurno)  
     if not ehNil then
         self.score:pontuarGrupoEncontrado(self.cartasViradasNoTurno)
     end
 end
 
 function Partida:desvirarCartasDoTurno()
-    local ehNil = ehNil(self.cartasViradasNoTurno)
+    local ehNil = EhNil(self.cartasViradasNoTurno)
     if not ehNil then
         for _, carta in ipairs(self.cartasViradasNoTurno) do
             carta:alternarLado()
@@ -238,7 +238,7 @@ function Partida:finalizarPartida(vitoria)
         local tempoGasto = self.tempoLimite - self.tempoRestante
         local mensagem = self.modoDeJogo == "solo" and "VITÓRIA! Parabéns! Você completou" or "VITÓRIA! Parabéns! Vocês completaram"
         print(mensagem .. " em " .. string.format("%.1f", tempoGasto) .. " segundos!")
-        print("Pontuação final: " .. tostring(self.score) .. " pontos")
+        print("PonEhNilo final: " .. tostring(self.score) .. " pontos")
         
         -- Bonus por tempo restante
         local bonusTempo = math.floor(self.tempoRestante * 10)
