@@ -1,5 +1,6 @@
 -- layers/jogoCooperativo.lua
 local Partida = require("classes.partida")
+local Botao  = require("interface.botao")
 local Config = require("config")
 
 local JogoCooperativo = {}
@@ -11,7 +12,31 @@ function JogoCooperativo:new()
     self.proximaLayer = nil
     self.partida = nil
     self.pausado = false
-    
+    self.botoes = {
+        pausa = Botao:new(Config, Config.botoes.imagemPath.partida.pausar,
+            50, 50, 0.8, 0.8,
+            function() print("Pausa clicada") end),
+        guia = Botao:new(Config, Config.botoes.imagemPath.partida.guia,
+            200, 50, 0.8, 0.8,
+            function()
+                print("Guia clicada")
+            end
+        ),
+        encerrar = Botao:new(Config, Config.botoes.imagemPath.partida.encerrar,
+            825, 50, 0.8, 0.8,
+            function()
+                print("Encerrar clicado")
+                self.proximaLayer = "menuJogo"
+            end
+        ),
+        configuracoes = Botao:new(Config, Config.botoes.imagemPath.partida.configuracoes,
+            995, 50, 0.8, 0.8,
+            function()
+                print("Configurações clicadas")
+            end
+        ),
+    }
+
     return self
 end
 
@@ -33,6 +58,11 @@ end
 function JogoCooperativo:update(dt)
     if not self.pausado and self.partida then
         self.partida:update(dt)
+
+        local mx, my = love.mouse.getPosition()
+        for _, botao in pairs(self.botoes) do
+            botao:update(mx, my)
+        end
         
         -- Verifica se a partida terminou
         if self.partida.partidaFinalizada then
@@ -49,7 +79,7 @@ function JogoCooperativo:draw()
     if self.partida then
         -- DESENHA O FUNDO E FRAMES COMO NO PARTIDA LAYER
         self:drawFundo()
-        
+        self:drawBotoes()
         -- Desenha o tabuleiro
         self.partida.tabuleiro:draw()
         
@@ -94,6 +124,11 @@ function JogoCooperativo:drawFundo()
     love.graphics.draw(self.imagemCarta, 990, 323, 0, 0.8, 0.8)
 end
 
+function JogoCooperativo:drawBotoes()
+    for _, botao in pairs(self.botoes) do
+        botao:draw()
+    end
+end
 
 function JogoCooperativo:drawInterfaceCooperativo()
     if not self.partida then return end
@@ -101,14 +136,10 @@ function JogoCooperativo:drawInterfaceCooperativo()
     local largura = love.graphics.getWidth()
     local info = self.partida:getStatusInfo()
     
-    -- Painel de informações no canto superior direito
-    love.graphics.setColor(0, 0, 0, 0.7)
-    love.graphics.rectangle("fill", largura - 250, 10, 240, 120)
-    
     love.graphics.setColor(1, 1, 1)
-    love.graphics.setFont(love.graphics.newFont(16))
+    love.graphics.setFont(love.graphics.newFont(20))
     
-    local x, y = largura - 240, 20
+    local x, y = largura - 390, 150
     
     love.graphics.print("MODO COOPERATIVO", x, y)
     y = y + 20
@@ -149,28 +180,6 @@ function JogoCooperativo:drawInterfaceCooperativo()
     end
 end
 
-function JogoCooperativo:drawMenuPausa()
-    local largura = love.graphics.getWidth()
-    local altura = love.graphics.getHeight()
-    
-    -- Fundo escuro
-    love.graphics.setColor(0, 0, 0, 0.8)
-    love.graphics.rectangle("fill", 0, 0, largura, altura)
-    
-    -- Menu de pausa
-    love.graphics.setColor(1, 1, 1)
-    love.graphics.setFont(love.graphics.newFont(30))
-    
-    local opcoes = {"Continuar", "Reiniciar", "Menu Principal"}
-    local inicioY = altura/2 - (#opcoes * 25)
-    
-    for i, opcao in ipairs(opcoes) do
-        local y = inicioY + (i-1) * 50
-        local x = largura/2 - love.graphics.getFont():getWidth(opcao)/2
-        love.graphics.print(opcao, x, y)
-    end
-end
-
 function JogoCooperativo:mousepressed(x, y, button)
     if self.pausado then
         return self:cliquePausa(x, y, button)
@@ -178,6 +187,13 @@ function JogoCooperativo:mousepressed(x, y, button)
     
     if self.partida and not self.partida.partidaFinalizada then
         return self.partida:mousepressed(x, y, button)
+        
+    end
+
+    if button == 1 then
+        for _, botao in pairs(self.botoes) do
+            botao:clicar(x, y)
+        end
     end
     
     return false
