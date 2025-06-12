@@ -135,9 +135,11 @@ function JogoCooperativo:drawInterfaceCooperativo()
     
     local largura = love.graphics.getWidth()
     local info = self.partida:getStatusInfo()
+    local fonte = love.graphics.newFont("midia/fontes/PixelifySans-VariableFont_wght.ttf", 26)
+    
     
     love.graphics.setColor(1, 1, 1)
-    love.graphics.setFont(love.graphics.newFont(20))
+    love.graphics.setFont(fonte)
     
     local x, y = largura - 390, 150
     
