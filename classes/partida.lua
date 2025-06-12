@@ -1,4 +1,3 @@
--- classes/partida.lua (ATUALIZADA COM MODO SOLO)
 local Tabuleiro = require("classes.tabuleiro")
 local Carta = require("classes.carta")
 local Config = require("config")
@@ -6,106 +5,62 @@ local Score = require("classes.score")
 local Validacao = require("classes.utils.validacao")
 local DataHora = require("classes.utils.dataHora")
 local Cooperativo = require("classes.modos.cooperativo")
-local Solo = require("classes.modos.solo")  -- NOVO IMPORT
+local Solo = require("classes.modos.solo")
 
-local Partida = {
-    nivel = nil,
-    modoDeJogo = nil,
-    tempoLimite = 60, -- Tempo limite em segundos
-    tempoRestante = 60,
-    score = Score:new(),
-    maximoTentativas = 2,
-    tentativasRestantes = 2,
-    DataHora = nil,
-    dataInicio = nil, 
-    horaInicio = nil,
-    dataFinal = nil,
-    horaFinal = nil,
-    tabuleiro = nil,
-    rodadaAtual = 1,
-    cartasViradasNoTurno = {},
-    partidaFinalizada = false,
-    jogadorAtual = "humano" or "maquina", -- jogador sempre começa jogando
-    nomeJogador = "convidado",
-    cartas = nil,
-    adversarioIA = require("inteligencia_maquina.adversario"),
-}
+local Partida = {}
 Partida.__index = Partida
 
 function Partida:new(modoDeJogo, nivel)
     local self = setmetatable({}, Partida)
-    
+
     self.nivel = nivel
     self.modoDeJogo = modoDeJogo
     self.score = Score:new()
-    
-    -- TODO: Alterar depois, utilizar as subsClasses de partida para isso
-    -- Configuração de tempo por modo e nível (será sobrescrita pelos modos específicos)
-    if modoDeJogo == "cooperativo" then
-        if nivel == 1 then self.tempoLimite = 180        -- 3 minutos para fácil
-        elseif nivel == 2 then self.tempoLimite = 150    -- 2.5 min para médio
-        elseif nivel == 3 then self.tempoLimite = 120    -- 2 min para difícil
-        elseif nivel == 4 then self.tempoLimite = 90     -- 1.5 min para extremo
-        end
-    elseif modoDeJogo == "solo" then
-        -- Tempos iniciais para solo (serão sobrescritos pela classe Solo)
-        if nivel == 1 then self.tempoLimite = 300        -- 5 minutos para fácil
-        elseif nivel == 2 then self.tempoLimite = 360    -- 6 minutos para médio
-        elseif nivel == 3 then self.tempoLimite = 420    -- 7 minutos para difícil
-        elseif nivel == 4 then self.tempoLimite = 480    -- 8 minutos para extremo
-        end
-    else
-        self.tempoLimite = 180 -- Outros modos
-    end
-    
-    self.tempoRestante = self.tempoLimite
     self.maximoTentativas = 2
-    
-    -- Dados da partida
-    DataHora = DataHora:new()
-    DataHora:atualizar()
-    self.dataInicio = DataHora:formatarData()
-    self.horaInicio = DataHora:formatarHora()
-    -- Criação do tabuleiro
-    local cartas = self:carregarCartas()
-    self.tabuleiro = Tabuleiro:new(nivel, cartas)
-
-    -- Controle de estado
+    self.tentativasRestantes = 2
     self.cartasViradasNoTurno = {}
     self.partidaFinalizada = false
     self.vitoria = false
-    self.nomeJogador = nil
+    self.jogadorAtual = "humano"
+    self.nomeJogador = "convidado"
     self.rodadaAtual = 1
-    self.jogadorAtual = "humano" or "maquina" -- jogador sempre começa jogando
 
-    self.dataFinal = nil
-    self.horaFinal = nil
-    
+    if modoDeJogo == "cooperativo" then
+        self.tempoLimite = ({180, 150, 120, 90})[nivel] or 180
+    elseif modoDeJogo == "solo" then
+        self.tempoLimite = ({300, 360, 420, 480})[nivel] or 300
+    else
+        self.tempoLimite = 180
+    end
+    self.tempoRestante = self.tempoLimite
+
+    local dh = DataHora:new()
+    dh:atualizar()
+    self.dataInicio = dh:formatarData()
+    self.horaInicio = dh:formatarHora()
+
+    local cartas = self:carregarCartasInterno()
     self.tabuleiro = Tabuleiro:new(nivel, cartas)
 
-    local cartas = self:carregarCartas()
-
-    self.adversarioIA = self.adversarioIA:new()
+    self.adversarioIA = require("inteligencia_maquina.adversario"):new()
     self.adversarioIA:inicializarMemoria(self.tabuleiro.linhas, self.tabuleiro.colunas)
 
-    -- Inicializa modo de jogo específico
     if modoDeJogo == "cooperativo" then
-        print("=== INICIALIZANDO MODO COOPERATIVO ===")
         self.modoCooperativo = Cooperativo:new(self)
-        print("Modo cooperativo criado:", self.modoCooperativo ~= nil)
-    end
-    if modoDeJogo == "solo" then
-        print("=== INICIALIZANDO MODO SOLO ===")
+    elseif modoDeJogo == "solo" then
         self.modoSolo = Solo:new(self)
-        print("Modo solo criado:", self.modoSolo ~= nil)
-    else
-        print("Modo de jogo:", modoDeJogo, "- modo padrão")
     end
-    
-    print("Nova partida iniciada: " .. tostring(modoDeJogo) .. " - Nível " .. tostring(nivel))
-    print("Tempo limite: " .. tostring(self.tempoLimite) .. " segundos")
-    
+
     return self
+end
+
+function Partida:carregarCartasInterno()
+    local cartas = {}
+    for i = 1, 12 do
+        local carta = Carta:new(i, Config.deck[i])
+        table.insert(cartas, carta)
+    end
+    return cartas
 end
 
 function Partida:mousepressed(x, y, button)
