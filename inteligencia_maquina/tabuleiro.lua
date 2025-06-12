@@ -1,3 +1,4 @@
+local Carta = require("classes.carta")
 local Tabuleiro = {}
 Tabuleiro.__index = Tabuleiro
 

@@ -13,7 +13,7 @@ function Score:new(nivel)
 end
 
 function Score:getPontuacao()
-    return pontuacao
+    return self.pontuacao
 end
 
 function Score:pontuarGrupoEncontrado(tamGrupoCartas)

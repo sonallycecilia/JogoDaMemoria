@@ -1,6 +1,7 @@
 local adversario = require("inteligencia_maquina.adversario")
+local CartaTeste =  require("inteligencia_maquina.cartaTeste")
 require("inteligencia_maquina.cartaTeste")
-require("inteligencia_maquina.tabuleiro")
+local Tabuleiro = require("inteligencia_maquina.tabuleiro")
 
 local cartas = {
     CartaTeste:new(9,"gato"),
@@ -29,7 +30,7 @@ local cartas = {
     CartaTeste:new(6,"elfa")
 }
 
-local tabuleiro = Tabuleiro:new(4, 6, cartas)
+local tabuleiro = Tabuleiro:new(1, cartas)
 local rodadaAtual = 0
 local primeiraCartaSele = {}
 local segundaCartaSele = {}
