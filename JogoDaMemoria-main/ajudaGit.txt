@@ -1,1 +1,0 @@
-git commit --ammend -> Altera a mensagem do último commit
