@@ -38,10 +38,10 @@ Config.botoes = {
             pausar = "midia/botoes/partida/pausar.png",
         },
         menuSelecaoNivel = {
-            facil = "midia/botoes/selecaoNivel/botao_base_selecao_nivel.png",
-            medio = "midia/botoes/selecaoNivel/botao_base_selecao_nivel.png",
-            dificil = "midia/botoes/selecaoNivel/botao_base_selecao_nivel.png",
-            extremo = "midia/botoes/selecaoNivel/botao_base_selecao_nivel.png",
+            facil = "midia/botoes/niveisDeJogo/facil.png",
+            medio = "midia/botoes/niveisDeJogo/medio.png",
+            dificil = "midia/botoes/niveisDeJogo/dificil.png",
+            extremo = "midia/botoes/niveisDeJogo/extremo.png",
             voltar = "midia/botoes/menuJogo/voltar.png"
         }
     }
