@@ -184,4 +184,14 @@ function Tabuleiro:desvirarGrupo(listaGrupo)
     end
 end
 
+function Tabuleiro:carregarCartas()
+    local carta
+    for i = 1, 12 do
+        carta = Carta:new(i, Config.deck[i])
+        table.insert(self.cartas, carta)
+    end
+    
+    print("Carregadas " .. #self.cartas .. " tipos de cartas (IDs 1 a " .. (#self.cartas) .. ")")
+end
+
 return Tabuleiro

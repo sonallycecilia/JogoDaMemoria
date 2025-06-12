@@ -108,18 +108,6 @@ function Partida:new(modoDeJogo, nivel)
     return self
 end
 
-function Partida:carregarCartas()
-    local cartas = {}
-    local carta
-    for i = 1, 12 do
-        carta = Carta:new(i, Config.deck[i])
-        table.insert(cartas, carta)
-    end
-    
-    print("Carregadas " .. #cartas .. " tipos de cartas (IDs 1 a " .. (#carta) .. ")")
-    return cartas
-end
-
 function Partida:mousepressed(x, y, button)
     print("=== DEBUG CLIQUE ===")
     print("Posição:", x, y, "Botão:", button)
