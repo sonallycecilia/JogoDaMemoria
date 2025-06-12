@@ -6,6 +6,7 @@ local Validacao = require("classes.utils.validacao")
 local DataHora = require("classes.utils.dataHora")
 local Cooperativo = require("classes.modos.cooperativo")
 local Solo = require("classes.modos.solo")
+local EhNil = require("classes.utils.validacao")
 
 local Partida = {}
 Partida.__index = Partida

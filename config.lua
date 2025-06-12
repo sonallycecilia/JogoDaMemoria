@@ -55,12 +55,12 @@ Config.deck = {
     "midia/images/cartas/thales.png",
     "midia/images/cartas/lucy.png",
     "midia/images/cartas/fury.png",
-    "midia/images/cartas/fada.png",
-    "midia/images/cartas/naly.png",
-    "midia/images/cartas/draenei.png",
-    "midia/images/cartas/thales.png",
-    "midia/images/cartas/lucy.png",
-    "midia/images/cartas/fury.png",
+    "midia/images/cartas/bomba.png",
+    "midia/images/cartas/yule.png",
+    "midia/images/cartas/coracao.png",
+    "midia/images/cartas/borboleta.png",
+    "midia/images/cartas/flor.png",
+    "midia/images/cartas/lua.png",
 }
 
 -- Frames (MANTIDOS)
