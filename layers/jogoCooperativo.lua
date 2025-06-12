@@ -14,23 +14,27 @@ function JogoCooperativo:new()
     self.pausado = false
     self.botoes = {
         pausa = Botao:new(Config, Config.botoes.imagemPath.partida.pausar,
-            50, 50, 0.8, 0.8, function()
-            print("Pausa clicada")
-            self.pausado = not self.pausado
-        end),
+            50, 50, 0.8, 0.8,
+            function() print("Pausa clicada") end),
         guia = Botao:new(Config, Config.botoes.imagemPath.partida.guia,
-            200, 50, 0.8, 0.8, function()
-            print("Guia clicada")
-        end),
+            200, 50, 0.8, 0.8,
+            function()
+                print("Guia clicada")
+            end
+        ),
         encerrar = Botao:new(Config, Config.botoes.imagemPath.partida.encerrar,
-            825, 50, 0.8, 0.8, function()
-            print("Encerrar clicado")
-            self.proximaLayer = "menuJogo"
-        end),
+            825, 50, 0.8, 0.8,
+            function()
+                print("Encerrar clicado")
+                self.proximaLayer = "menuJogo"
+            end
+        ),
         configuracoes = Botao:new(Config, Config.botoes.imagemPath.partida.configuracoes,
-            995, 50, 0.8, 0.8, function()
-            print("Configurações clicadas")
-        end),
+            995, 50, 0.8, 0.8,
+            function()
+                print("Configurações clicadas")
+            end
+        ),
     }
 
     return self
@@ -54,6 +58,11 @@ end
 function JogoCooperativo:update(dt)
     if not self.pausado and self.partida then
         self.partida:update(dt)
+
+        local mx, my = love.mouse.getPosition()
+        for _, botao in pairs(self.botoes) do
+            botao:update(mx, my)
+        end
         
         -- Verifica se a partida terminou
         if self.partida.partidaFinalizada then
@@ -127,14 +136,10 @@ function JogoCooperativo:drawInterfaceCooperativo()
     local largura = love.graphics.getWidth()
     local info = self.partida:getStatusInfo()
     
-    -- Painel de informações no canto superior direito
-    love.graphics.setColor(0, 0, 0, 0.7)
-    love.graphics.rectangle("fill", largura - 250, 10, 240, 120)
-    
     love.graphics.setColor(1, 1, 1)
-    love.graphics.setFont(love.graphics.newFont(16))
+    love.graphics.setFont(love.graphics.newFont(20))
     
-    local x, y = largura - 240, 20
+    local x, y = largura - 390, 150
     
     love.graphics.print("MODO COOPERATIVO", x, y)
     y = y + 20
@@ -182,6 +187,13 @@ function JogoCooperativo:mousepressed(x, y, button)
     
     if self.partida and not self.partida.partidaFinalizada then
         return self.partida:mousepressed(x, y, button)
+        
+    end
+
+    if button == 1 then
+        for _, botao in pairs(self.botoes) do
+            botao:clicar(x, y)
+        end
     end
     
     return false
