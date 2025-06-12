@@ -1,5 +1,5 @@
-Carta = {}
-Carta.__index = Carta --permite usar metodo com dois pontos
+local Carta = {}
+Carta.__index = Carta
 
 local ALTURA = 100
 local LARGURA = 100
@@ -12,25 +12,26 @@ function Carta:new(id, caminhoImagemFrente)
         idGrupo = nil,
         largura = LARGURA,
         altura = ALTURA,
-        pathImagem = caminhoImagemFrente, --precisa ficar pois pegamos o caminho da imagem
+        pathImagem = caminhoImagemFrente,
         imagemFrente = love.graphics.newImage(caminhoImagemFrente),
         imagemVerso = love.graphics.newImage(VERSO),
         revelada = false, -- se não for passado, assume false
         posX = nil,
         posY = nil,
         rodadaEncontrada = nil,
-        probErro = 0
+        probErro = 0,
+        encontrada = false
     }
-    setmetatable(novaCarta, Carta) --permite o uso de :, ligando a metatable de cima
+    setmetatable(novaCarta, Carta)
     return novaCarta
 end
 
--- Função para alternar o estado de revelação da carta
 function Carta:alternarLado()
-    self.revelada = not self.revelada
+    if not self.encontrada then
+        self.revelada = not self.revelada
+    end
 end
 
--- Função para definir a posição da carta
 function Carta:setPosicao(x, y)
     self.x = x
     self.y = y
@@ -43,31 +44,19 @@ function Carta:clicada(mx, my)
            my >= self.y and my <= self.y + self.altura
 end
 
--- function Carta:onClick(mx, my)
---     if self:clicada(mx, my) then
---         self:alternarLado()
---     end
--- end
-
--- Função para desenhar a carta (exibe a frente ou o verso dependendo do estado)
-function Carta:draw()
-    if self.revelada then
-        self:drawImagem(self.imagemFrente)  -- Desenha a frente se revelada
-    else
-        self:drawImagem(self.imagemVerso)   -- Desenha o verso caso contrário
-    end
-end
-
--- Função auxiliar para desenhar a imagem da carta
-function Carta:drawImagem(imagem)
+function Carta:draw(largura, altura)
+    local imagem = (self.revelada or self.encontrada) and self.imagemFrente or self.imagemVerso
     if imagem then
-        love.graphics.draw(imagem, self.x, self.y, 0, self.largura / imagem:getWidth(), self.altura / imagem:getHeight())
+        love.graphics.draw(imagem, self.x, self.y, 0,
+            largura / imagem:getWidth(),
+            altura / imagem:getHeight()
+        )
     end
 end
 
 function Carta:poder()
     if self.id == 1 then
-        -- Poder especial
+        -- Poder especial aqui
     end
 end
 

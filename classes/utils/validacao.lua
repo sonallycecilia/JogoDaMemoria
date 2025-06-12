@@ -5,7 +5,7 @@ porém em outros evita if aninhados e torna a condição do if mais clara. Porta
 todos os tratamentos utilização esse método ]]--
 
 -- Retorna true se o elemento é nil ou false, retorna false caso contrário  
-function Validacao:ehNil(elemento)
+function ehNil(elemento)
     local ehNil = true
     if elemento then
         ehNil = false
@@ -13,5 +13,3 @@ function Validacao:ehNil(elemento)
 
     return ehNil
 end
-
-return Validacao
