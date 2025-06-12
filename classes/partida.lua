@@ -84,63 +84,33 @@ function Partida:mousepressed(x, y, button)
 end
 
 function Partida:cliqueModoCooperativo(x, y)
-    if not self.modoCooperativo then
-        return false
-    end
-    
-    local cartaClicada = nil
-    for i, carta in ipairs(self.tabuleiro.cartas) do
+    if not self.modoCooperativo then return false end
+    for _, carta in ipairs(self.tabuleiro.cartas) do
         if carta:clicada(x, y) then
-            cartaClicada = carta
-            break
+            return self.modoCooperativo:cliqueCarta(carta)
         end
     end
-    
-    if not cartaClicada then
-        return false
-    end
-    
-    return self.modoCooperativo:cliqueCarta(cartaClicada)
+    return false
 end
 
 function Partida:cliqueModoSolo(x, y)
-    if not self.modoSolo then
-        return false
-    end
-    
-    local cartaClicada = nil
-    for i, carta in ipairs(self.tabuleiro.cartas) do
+    if not self.modoSolo then return false end
+    for _, carta in ipairs(self.tabuleiro.cartas) do
         if carta:clicada(x, y) then
-            cartaClicada = carta
-            break
+            return self.modoSolo:cliqueCarta(carta)
         end
     end
-    
-    if not cartaClicada then
-        return false
-    end
-    
-    return self.modoSolo:cliqueCarta(cartaClicada)
+    return false
 end
 
 function Partida:cliqueModoCompetitivo(x, y)
-    if not self.modoCompetitivo then
-        return false
-    end
-    
-    local cartaClicada = nil
-    for i, carta in ipairs(self.tabuleiro.cartas) do
+    if not self.modoCompetitivo then return false end
+    for _, carta in ipairs(self.tabuleiro.cartas) do
         if carta:clicada(x, y) then
-            cartaClicada = carta
-            break
+            return self.modoCompetitivo:cliqueCarta(carta)
         end
     end
-    
-    if not cartaClicada then
-        return false
-    end
-    
-    return self.modoCompetitivo:cliqueCarta(cartaClicada)
+    return false
 end
 
 function Partida:cliqueGeral(x, y)
@@ -149,7 +119,6 @@ function Partida:cliqueGeral(x, y)
             if #self.cartasViradasNoTurno < 2 then
                 carta:alternarLado()
                 table.insert(self.cartasViradasNoTurno, carta)
-                
                 if #self.cartasViradasNoTurno == 2 then
                     self:verificaGrupoCartas()
                 end
@@ -162,60 +131,33 @@ end
 
 function Partida:verificaGrupoCartas()
     local grupoFormado = true
-    local imgPrimeiraCarta = self.cartasViradasNoTurno[1].imagemFrente
-    
+    local imgPrimeira = self.cartasViradasNoTurno[1].imagemFrente
     for i = 2, #self.cartasViradasNoTurno do
-        if self.cartasViradasNoTurno[i].imagemFrente ~= imgPrimeiraCarta then
+        if self.cartasViradasNoTurno[i].imagemFrente ~= imgPrimeira then
             grupoFormado = false
             break
         end
     end
-    
     if grupoFormado then
         self:adicionarAoScore()
-        self:removerCartasViradasNoTurno()
-    else
-        self.timerCartasViradas = self.tempoParaVirarDeVolta
-        self:desvirarCartasDoTurno()
+        for _, carta in ipairs(self.cartasViradasNoTurno) do carta.encontrada = true end
         self.cartasViradasNoTurno = {}
-        for _, carta in ipairs(self.cartasViradasNoTurno) do
-            carta.encontrada = true
-        end
+    else
+        self:desvirarCartasDoTurno()
     end
-    
-    if (not grupoFormado) or (self.modoDeJogo == "competitivo") then
-        if #self.cartasViradasNoTurno == 0 then
-            self:trocaJogadorAtual()
-        end
-    end
-end
-
-function Partida:update(dt)
-    if not self.partidaFinalizada then
-        self.tempoRestante = self.tempoRestante - dt
-        
-        if self.modoDeJogo == "cooperativo" and self.modoCooperativo then
-            self.modoCooperativo:update(dt)
-        elseif self.modoDeJogo == "solo" and self.modoSolo then
-            self.modoSolo:update(dt)
-        elseif self.modoDeJogo == "competitivo" and self.modoCompetitivo then
-            self.modoCompetitivo:update(dt)
-        end
-        
-        self:checkGameEnd()
+    if not grupoFormado or self.modoDeJogo == "competitivo" then
+        self:trocaJogadorAtual()
     end
 end
 
 function Partida:adicionarAoScore()
-    local ehNil = ehNil(self.cartasViradasNoTurno)  
-    if not ehNil then
+    if self.cartasViradasNoTurno and #self.cartasViradasNoTurno > 0 then
         self.score:pontuarGrupoEncontrado(self.cartasViradasNoTurno)
     end
 end
 
 function Partida:desvirarCartasDoTurno()
-    local ehNil = ehNil(self.cartasViradasNoTurno)
-    if not ehNil then
+    if self.cartasViradasNoTurno and #self.cartasViradasNoTurno > 0 then
         for _, carta in ipairs(self.cartasViradasNoTurno) do
             carta:alternarLado()
         end
@@ -224,25 +166,32 @@ function Partida:desvirarCartasDoTurno()
 end
 
 function Partida:trocaJogadorAtual()
-    if self.jogadorAtual == "humano" then
-        self.jogadorAtual = "maquina"
-    end
-    if self.jogadorAtual == "maquina" then
-        self.jogadorAtual = "humano"
+    self.jogadorAtual = (self.jogadorAtual == "humano") and "maquina" or "humano"
+end
+
+function Partida:update(dt)
+    if not self.partidaFinalizada then
+        self.tempoRestante = self.tempoRestante - dt
+        if self.modoCooperativo then self.modoCooperativo:update(dt) end
+        if self.modoSolo then self.modoSolo:update(dt) end
+        if self.modoCompetitivo then self.modoCompetitivo:update(dt) end
+        self:checkGameEnd()
     end
 end
 
 function Partida:finalizarPartida(vitoria)
     self.partidaFinalizada = true
     self.vitoria = vitoria
-    
-    local DataHora = require("classes.utils.dataHora")
-    DataHora = DataHora:new()
     DataHora:atualizar()
-    
     if vitoria then
+        local tempoGasto = self.tempoLimite - self.tempoRestante
+        print((self.modoDeJogo == "solo" and "VITÓRIA! Parabéns! Você completou" or "VITÓRIA! Parabéns! Vocês completaram") .. " em " .. string.format("%.1f", tempoGasto) .. " segundos!")
+        print("Pontuação final: " .. tostring(self.score))
         local bonusTempo = math.floor(self.tempoRestante * 10)
         self.score:adicionarAoScore(bonusTempo)
+    else
+        print("DERROTA! O tempo acabou!")
+        print("Pontuação final: " .. tostring(self.score))
     end
 end
 
@@ -260,157 +209,21 @@ function Partida:getStatusInfo()
         score = self.score,
         cartasRestantes = self.tabuleiro.cartasRestantes,
         partidaFinalizada = self.partidaFinalizada,
-        vitoria = self.vitoria
+        vitoria = self.vitoria,
+        jogadorAtual = self.jogadorAtual
     }
-    
-    if self.modoDeJogo == "cooperativo" and self.modoCooperativo then
-        local statusCooperativo = self.modoCooperativo:getStatus()
-        for k, v in pairs(statusCooperativo) do
-            info[k] = v
-        end
-    elseif self.modoDeJogo == "solo" and self.modoSolo then
-        local statusSolo = self.modoSolo:getStatus()
-        for k, v in pairs(statusSolo) do
-            info[k] = v
-        end
-    elseif self.modoDeJogo == "competitivo" and self.modoCompetitivo then
-        local statusCompetitivo = self.modoCompetitivo:getStatus()
-        for k, v in pairs(statusCompetitivo) do
-            info[k] = v
-        end
+
+    if self.modoCooperativo then
+        for k, v in pairs(self.modoCooperativo:getStatus()) do info[k] = v end
     end
-    
+    if self.modoSolo then
+        for k, v in pairs(self.modoSolo:getStatus()) do info[k] = v end
+    end
+    if self.modoCompetitivo then
+        for k, v in pairs(self.modoCompetitivo:getStatus()) do info[k] = v end
+    end
+
     return info
-end
-
-function Partida:draw()
-    self.tabuleiro:draw()
-
-    love.graphics.setColor(1, 1, 1)
-    love.graphics.setFont(love.graphics.newFont(20))
-
-    local info = self:getStatusInfo()
-    local y = 10
-
-    love.graphics.print("Tempo: " .. math.floor(info.tempo / 60) .. ":" .. string.format("%02d", info.tempo % 60), 10, y)
-    y = y + 25
-
-    if self.modoDeJogo == "competitivo" then
-        love.graphics.print("VOCÊ: " .. (info.scoreHumano or 0) .. " pts", 10, y)
-        y = y + 25
-        love.graphics.print("IA: " .. (info.scoreIA or 0) .. " pts", 10, y)
-        y = y + 25
-    else
-        love.graphics.print("Pontos: " .. tostring(info.score), 10, y)
-        y = y + 25
-    end
-
-    if self.modoDeJogo == "cooperativo" then
-        if info.multiplicador and info.multiplicador > 1 then
-            love.graphics.print("Multiplicador: " .. string.format("%.1f", info.multiplicador) .. "x", 10, y)
-            y = y + 25
-        end
-
-        if info.paresConsecutivos and info.paresConsecutivos > 1 then
-            love.graphics.print("Sequência: " .. tostring(info.paresConsecutivos) .. " pares", 10, y)
-            y = y + 25
-        end
-
-        if info.vezIA then
-            love.graphics.setColor(1, 1, 0)
-            love.graphics.print("IA pensando...", 10, y)
-            love.graphics.setColor(1, 1, 1)
-        end
-
-    elseif self.modoDeJogo == "solo" then
-        if info.multiplicador and info.multiplicador > 1 then
-            love.graphics.print("Multiplicador: " .. string.format("%.1f", info.multiplicador) .. "x", 10, y)
-            y = y + 25
-        end
-
-        if info.gruposConsecutivos and info.gruposConsecutivos > 1 then
-            love.graphics.print("Sequência: " .. tostring(info.gruposConsecutivos) .. " grupos", 10, y)
-            y = y + 25
-        end
-        
-    elseif self.modoDeJogo == "competitivo" then
-        if info.jogadorAtual == "HUMANO" then
-            love.graphics.setColor(0, 1, 0)
-            love.graphics.print("SUA VEZ!", 10, y)
-        else
-            love.graphics.setColor(1, 1, 0)
-            love.graphics.print("VEZ DA IA...", 10, y)
-        end
-        love.graphics.setColor(1, 1, 1)
-        y = y + 25
-        
-        love.graphics.print("Grupos: VOCÊ " .. (info.gruposHumano or 0) .. " x " .. (info.gruposIA or 0) .. " IA", 10, y)
-        y = y + 25
-        
-        if info.scoreHumano and info.scoreIA then
-            if info.scoreHumano > info.scoreIA then
-                love.graphics.setColor(0, 1, 0)
-                love.graphics.print("VOCÊ ESTÁ GANHANDO!", 10, y)
-            elseif info.scoreIA > info.scoreHumano then
-                love.graphics.setColor(1, 0, 0)
-                love.graphics.print("IA ESTÁ GANHANDO...", 10, y)
-            else
-                love.graphics.setColor(1, 1, 0)
-                love.graphics.print("EMPATE!", 10, y)
-            end
-            love.graphics.setColor(1, 1, 1)
-        end
-    end
-
-    if self.partidaFinalizada then
-        local largura = love.graphics.getWidth()
-        local altura = love.graphics.getHeight()
-
-        love.graphics.setColor(0, 0, 0, 0.7)
-        love.graphics.rectangle("fill", 0, 0, largura, altura)
-
-        love.graphics.setColor(1, 1, 1)
-        love.graphics.setFont(love.graphics.newFont(40))
-        
-        local texto
-        if self.modoDeJogo == "competitivo" and self.modoCompetitivo then
-            local resultado = self.modoCompetitivo:obterResultadoFinal()
-            if resultado.vencedor == "HUMANO" then
-                texto = "VITÓRIA!"
-                love.graphics.setColor(0, 1, 0)
-            elseif resultado.vencedor == "IA" then
-                texto = "DERROTA!"
-                love.graphics.setColor(1, 0, 0)
-            else
-                texto = "EMPATE!"
-                love.graphics.setColor(1, 1, 0)
-            end
-        else
-            texto = self.vitoria and "VITÓRIA!" or "DERROTA!"
-            if self.vitoria then
-                love.graphics.setColor(0, 1, 0)
-            else
-                love.graphics.setColor(1, 0, 0)
-            end
-        end
-        
-        local fonte = love.graphics.getFont()
-        local textoLargura = fonte:getWidth(texto)
-        love.graphics.print(texto, (largura - textoLargura) / 2, altura / 2 - 50)
-
-        love.graphics.setColor(1, 1, 1)
-        love.graphics.setFont(love.graphics.newFont(20))
-        
-        local pontuacao
-        if self.modoDeJogo == "competitivo" and info.scoreHumano and info.scoreIA then
-            pontuacao = "VOCÊ: " .. info.scoreHumano .. " pts | IA: " .. info.scoreIA .. " pts"
-        else
-            pontuacao = "Pontuação: " .. tostring(info.score)
-        end
-        
-        local pontuacaoLargura = love.graphics.getFont():getWidth(pontuacao)
-        love.graphics.print(pontuacao, (largura - pontuacaoLargura) / 2, altura / 2 + 10)
-    end
 end
 
 return Partida

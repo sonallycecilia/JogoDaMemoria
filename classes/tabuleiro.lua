@@ -1,5 +1,6 @@
 local ESPACAMENTO = 10
 local Carta = require("classes.carta")
+local Config = require("config")
 
 local Tabuleiro = {
     nivel = 1,
@@ -11,7 +12,7 @@ local Tabuleiro = {
     linhas = 4, -- Definido pelo nível, mas provavelmente será fixo em 24
     colunas = 6, -- Definido pelo nível, mas provavelmente será fixo em 24
     cartasTotais = nil,
-    cartasRestantes = cartasTotais,
+    cartasRestantes = nil,
     taxaErroBase = 30,
     erroBase = 30,
 }
@@ -37,6 +38,10 @@ function Tabuleiro:new(nivel, dadosCartas)
     -- após os pares serem gerados, sem isso a IA não funciona
     -- Embaralha as cartas depois de criadas
     return self
+end
+
+function Tabuleiro:atualizarCartasRestantes()
+    self.cartasRestantes = 0
 end
 
 function Tabuleiro:definirLayout()
