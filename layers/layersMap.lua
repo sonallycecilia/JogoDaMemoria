@@ -1,8 +1,8 @@
-local layerMap = {
+-- layers/layersMap.lua
+return {
     menuPrincipal = require("layers.menuPrincipalLayer"),
     menuJogo = require("layers.menuJogoLayer"),
+    selecaoNivel = require("layers.selecaoNivelLayer"),
     partida = require("layers.partidaLayer"),
-    -- outras layers aqui...
+    jogoCooperativo = require("layers.jogoCooperativo") -- ADICIONADO
 }
-
-return layerMap

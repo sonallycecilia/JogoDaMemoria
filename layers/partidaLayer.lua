@@ -1,161 +1,155 @@
-require("classes.niveldeJogo")
+local nivelDeJogo = require("classes.niveldeJogo")
 local Partida = require("classes.partida")
 local Config = require("config")
--- layers/layerPartida.lua
 
 local LARGURA_TELA = love.graphics.getWidth()
 local ALTURA_TELA = love.graphics.getHeight()
 
-local LayerPartida = {}
-LayerPartida.__index = LayerPartida
+local PartidaLayer = {}
+PartidaLayer.__index = PartidaLayer
 
-function LayerPartida:new(manager, modoDeJogo, nivel)
-    local self = setmetatable({}, LayerPartida)
+function PartidaLayer:new(manager, modoDeJogo, nivel)
+    local self = setmetatable({}, PartidaLayer)
     self.manager = manager
-    self.proximaLayer = nil
-    self.partida = function () 
-        if modoDeJogo == "competitivo" then 
-            return PartidaCompetitiva:new(modoDeJogo, nivel) 
-        end 
-        if modoDeJogo == "cooperativo" then
-            return PartidaCooperativa:new(modoDeJogo, nivel)
-        end
-    end
+    self.partida = Partida:new(modoDeJogo, nivel)
 
     self.tempoParaVirarDeVolta = 1
-    self.timerCartasViradas = 0 
+    self.timerCartasViradas = 0
+    self.partidaFinalizada = false
 
     self:load()
     return self
 end
 
--- Atualizações da partida, como animações ou tempo
-function LayerPartida:update(dt)
-    -- Lógica de tempo para o modo cooperativo
-    if self.partida.modoDeJogo == "cooperativo" and not self.partida.partidaFinalizada then
-        self.partida.tempoRestante = self.partida.tempoRestante - dt
-        
-        if self.partida:finalizou() then
-            self.partida:finalizarPartida()
-        end
-    end
+function PartidaLayer:update(dt)
+    if self.partidaFinalizada then return end
 
-    -- Lógica de tempo para o modo competitivo
-    if self.modoDeJogo == "competitivo" and not self.partida.partidaFinalizada then
-        self.partida.tempoRestante = self.partida.tempoRestante - dt
-        if self.partida.tempoRestante <= 0 then -- Adicionar verificar para saber se todo os pares foram encontrados
-            self.partida.partidaFinalizada = true
-            -- Lógica de fim de jogo por tempo
-            self:finalizarPartida()
-        end
-    end
+    self.partida:update(dt)
 
-    -- Lógica para desvirar as cartas após errar o par
-    if #self.cartasViradasNoTurno > 0 and self.timerCartasViradas > 0 then
+    if self.timerCartasViradas > 0 then
         self.timerCartasViradas = self.timerCartasViradas - dt
         if self.timerCartasViradas <= 0 then
-            for _, carta in ipairs(self.cartasViradasNoTurno) do
-                if carta.revelada then -- Desvira apenas se estiver revelada
+            for _, carta in ipairs(self.partida.cartasViradasNoTurno) do
+                if not carta.encontrada then
                     carta:alternarLado()
                 end
             end
-            self.cartasViradasNoTurno = {}
-            -- Troca de turno após o erro
-            if self.jogadorAtual == "humano" then
-                self.jogadorAtual = "maquina"
-            else
-                self.jogadorAtual = "humano"
-            end
+            self.partida.cartasViradasNoTurno = {}
+            self.partida:trocaJogadorAtual()
         end
+    elseif self.partida.jogadorAtual == "maquina" and #self.partida.cartasViradasNoTurno == 0 then
+        self:jogadaMaquina()
     end
 
-    -- Lógica para a jogada da máquina
-    if self.jogadorAtual == "maquina" and not self.partida.partidaFinalizada and #self.cartasViradasNoTurno == 0 then
-        self:jogadaMaquina() -- TODO: implementar método que realiza as duas jogadas da máquina 
-    end
-
-    -- Verifica se todos os pares foram encontrados
-    if self.partida.tabuleiro.cartasRestantes == 0 and not self.partida.partidaFinalizada then
-        self.partida.partidaFinalizada = true
-        self:finalizarPartida() -- TODO: implementar método de finalização, mostrar o ranking, colocar o nome do jogador...
+    if self.partida.tabuleiro.cartasRestantes == 0 or self.partida.tempoRestante <= 0 then
+        self.partidaFinalizada = true
+        self:finalizarPartida()
     end
 end
 
-function LayerPartida:load()
-    -- Carregue a imagem apenas uma vez
+function PartidaLayer:load()
     self.imagemFundo = love.graphics.newImage(Config.janela.IMAGEM_TELA_PARTIDA)
-    
-    -- frames de imagens
     self.imagemTabuleiro = love.graphics.newImage(Config.frames.partida.tabuleiro)
     self.imagemCarta = love.graphics.newImage(Config.frames.partida.carta)
     self.imagemScore = love.graphics.newImage(Config.frames.partida.score)
 end
 
-function LayerPartida:draw()
+function PartidaLayer:draw()
     love.graphics.clear(0, 0, 0, 0)
 
-    local larguraTela = love.graphics.getWidth()
-    local alturaTela = love.graphics.getHeight()
-
-    -- Fundo centralizado
     local larguraImagem = self.imagemFundo:getWidth()
     local alturaImagem = self.imagemFundo:getHeight()
-    local xFundo = (larguraTela - larguraImagem) / 2
-    local yFundo = (alturaTela - alturaImagem) / 2
+    local xFundo = (LARGURA_TELA - larguraImagem) / 2
+    local yFundo = (ALTURA_TELA - alturaImagem) / 2
     love.graphics.draw(self.imagemFundo, xFundo, yFundo)
 
-    -- ESCALAS ajustadas
-    local escalaTabuleiro = 0.9
-    local escalaScore = 0.8
-    local escalaCarta = 0.8
+    love.graphics.draw(self.imagemTabuleiro, 50, 130, 0, 0.9, 0.9)
+    love.graphics.draw(self.imagemScore, 990, 130, 0, 0.8, 0.8)
+    love.graphics.draw(self.imagemCarta, 990, 323, 0, 0.8, 0.8)
 
-    -- POSICIONAMENTO baseado na imagem
-    local xTabuleiro = 50
-    local yTabuleiro = 130
-
-    local xScore = 990
-    local yScore = 130
-
-    local xCarta = 990
-    local yCarta = 323
-
-    -- Desenhar frames com escalas proporcionais
-    love.graphics.draw(self.imagemTabuleiro, xTabuleiro, yTabuleiro, 0, escalaTabuleiro, escalaTabuleiro)
-    love.graphics.draw(self.imagemScore, xScore, yScore, 0, escalaScore, escalaScore)
-    love.graphics.draw(self.imagemCarta, xCarta, yCarta, 0, escalaCarta, escalaCarta)
-
-    -- Desenhar tabuleiro do jogo (internamente deve respeitar o novo layout)
     self.partida.tabuleiro:draw()
 end
 
--- Talvez esse método seja muito lento
-function LayerPartida:mousepressed(x, y, button)
-    local indice, carta
-    -- Tratar cliques nas cartas
-    -- button == 1 é o botão esquerdo do mouse 
-    if button == 1 and self.jogadorAtual == "humano" and #self.cartasViradasNoTurno < self.partida.maximoTentativas then
-        for linha = 1, 10, 1 do
-            for coluna = 1, 10, 1 do
-                -- Itera sobre um vetor como se fosse uma matriz 
-                indice = (linha-1) * self.partida.tabuleiro.colunas + coluna
-                carta = self.partida.tabuleiro.cartas[indice]
-                if carta and not carta.revelada and carta:clicada(x,y) then
-                    carta:alternarLado()
-                    table.insert(self.cartasViradasNoTurno, carta)
-                    self.adversarioIA:adicionarCartaMemoria(carta, self.partida.rodadaAtual)
+function PartidaLayer:mousepressed(x, y, button)
+    if button ~= 1 then return end
 
-                    if #self.cartasViradasNoTurno == self.partida.maximoTentativas then
-                        self:verificaGrupoCartas()
+    -- MODO SOLO
+    if self.partida.modoDeJogo == "solo" then
+        self.partida:mousepressed(x, y, button)
+        return
+    end
+
+    -- MODO COOPERATIVO
+    if self.partida.modoDeJogo == "cooperativo" then
+        if self.partida.jogadorAtual ~= "humano" then return end
+        if #self.partida.cartasViradasNoTurno >= self.partida.maximoTentativas then return end
+        if self.timerCartasViradas > 0 then return end
+
+        for linha = 1, self.partida.tabuleiro.linhas do
+            for coluna = 1, self.partida.tabuleiro.colunas do
+                local i = (linha - 1) * self.partida.tabuleiro.colunas + coluna
+                local carta = self.partida.tabuleiro.cartas[i]
+                if carta and not carta.revelada and not carta.encontrada and carta:clicada(x, y) then
+                    carta:alternarLado()
+                    table.insert(self.partida.cartasViradasNoTurno, carta)
+                    self.partida.adversarioIA:adicionarCartaMemoria(carta)
+
+                    if #self.partida.cartasViradasNoTurno == self.partida.maximoTentativas then
+                        local acertou = self.partida:verificaGrupoCartas()
+                        if not acertou then
+                            self.timerCartasViradas = self.tempoParaVirarDeVolta
+                        else
+                            for _, c in ipairs(self.partida.cartasViradasNoTurno) do
+                                c.encontrada = true
+                            end
+                            self.partida.cartasViradasNoTurno = {}
+                            self.partida:trocaJogadorAtual()
+                        end
                     end
-                    return -- Sai após a carta clicada ter sido encontrada, é melhor tratar isso com um while, refatorar depois
+                    return
                 end
             end
         end
     end
 end
 
-function LayerPartida:mousemoved(x, y, dx, dy)
-    -- Se quiser hover ou efeitos de destaque. Sem tempo pra isso, vai ter não
+
+function PartidaLayer:jogadaMaquina()
+    local carta1, carta2 = self.partida.adversarioIA:buscarParConhecido()
+
+    if not carta1 or not carta2 then
+        carta1 = self.partida.adversarioIA:selecionarCartaAleatoria(self.partida.tabuleiro)
+        if not carta1 then return end
+        carta2 = self.partida.adversarioIA:buscarPar(self.partida.tabuleiro, carta1)
+            or self.partida.adversarioIA:selecionarCartaAleatoria(self.partida.tabuleiro, carta1)
+    end
+
+    if not carta1 or not carta2 then return end
+
+    carta1:alternarLado()
+    table.insert(self.partida.cartasViradasNoTurno, carta1)
+    self.partida.adversarioIA:adicionarCartaMemoria(carta1)
+
+    carta2:alternarLado()
+    table.insert(self.partida.cartasViradasNoTurno, carta2)
+    self.partida.adversarioIA:adicionarCartaMemoria(carta2)
+
+    if carta1.id == carta2.id then
+        carta1.encontrada = true
+        carta2.encontrada = true
+        self.partida.score = self.partida.score + 200
+        self.partida.tabuleiro:removerGrupoEncontrado({carta1, carta2})
+        self.partida.cartasViradasNoTurno = {}
+        self.partida:trocaJogadorAtual()
+    else
+        self.timerCartasViradas = self.tempoParaVirarDeVolta
+    end
 end
 
-return LayerPartida
+function PartidaLayer:mousemoved(x, y, dx, dy) end
+
+function PartidaLayer:finalizarPartida()
+    print("Partida finalizada!")
+end
+
+return PartidaLayer
