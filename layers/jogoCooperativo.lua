@@ -1,5 +1,6 @@
 -- layers/jogoCooperativo.lua
 local Partida = require("classes.partida")
+local Botao  = require("interface.botao")
 local Config = require("config")
 
 local JogoCooperativo = {}
@@ -11,7 +12,27 @@ function JogoCooperativo:new()
     self.proximaLayer = nil
     self.partida = nil
     self.pausado = false
-    
+    self.botoes = {
+        pausa = Botao:new(Config, Config.botoes.imagemPath.partida.pausar,
+            50, 50, 0.8, 0.8, function()
+            print("Pausa clicada")
+            self.pausado = not self.pausado
+        end),
+        guia = Botao:new(Config, Config.botoes.imagemPath.partida.guia,
+            200, 50, 0.8, 0.8, function()
+            print("Guia clicada")
+        end),
+        encerrar = Botao:new(Config, Config.botoes.imagemPath.partida.encerrar,
+            825, 50, 0.8, 0.8, function()
+            print("Encerrar clicado")
+            self.proximaLayer = "menuJogo"
+        end),
+        configuracoes = Botao:new(Config, Config.botoes.imagemPath.partida.configuracoes,
+            995, 50, 0.8, 0.8, function()
+            print("Configurações clicadas")
+        end),
+    }
+
     return self
 end
 
@@ -49,7 +70,7 @@ function JogoCooperativo:draw()
     if self.partida then
         -- DESENHA O FUNDO E FRAMES COMO NO PARTIDA LAYER
         self:drawFundo()
-        
+        self:drawBotoes()
         -- Desenha o tabuleiro
         self.partida.tabuleiro:draw()
         
@@ -94,6 +115,11 @@ function JogoCooperativo:drawFundo()
     love.graphics.draw(self.imagemCarta, 990, 323, 0, 0.8, 0.8)
 end
 
+function JogoCooperativo:drawBotoes()
+    for _, botao in pairs(self.botoes) do
+        botao:draw()
+    end
+end
 
 function JogoCooperativo:drawInterfaceCooperativo()
     if not self.partida then return end
@@ -146,28 +172,6 @@ function JogoCooperativo:drawInterfaceCooperativo()
         love.graphics.setFont(love.graphics.newFont(18))
         love.graphics.print("TEMPO BAIXO!", largura/2 - 50, 50)
         love.graphics.setColor(1, 1, 1)
-    end
-end
-
-function JogoCooperativo:drawMenuPausa()
-    local largura = love.graphics.getWidth()
-    local altura = love.graphics.getHeight()
-    
-    -- Fundo escuro
-    love.graphics.setColor(0, 0, 0, 0.8)
-    love.graphics.rectangle("fill", 0, 0, largura, altura)
-    
-    -- Menu de pausa
-    love.graphics.setColor(1, 1, 1)
-    love.graphics.setFont(love.graphics.newFont(30))
-    
-    local opcoes = {"Continuar", "Reiniciar", "Menu Principal"}
-    local inicioY = altura/2 - (#opcoes * 25)
-    
-    for i, opcao in ipairs(opcoes) do
-        local y = inicioY + (i-1) * 50
-        local x = largura/2 - love.graphics.getFont():getWidth(opcao)/2
-        love.graphics.print(opcao, x, y)
     end
 end
 
