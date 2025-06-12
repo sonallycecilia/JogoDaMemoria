@@ -14,14 +14,6 @@ function PartidaLayer:new(manager, modoDeJogo, nivel)
     self.manager = manager
     self.proximaLayer = nil
     self.partida = Partida:new(modoDeJogo, nivel)
-    -- function () 
-    --     if self.modoDeJogo == "competitivo" then 
-    --         return PartidaCompetitiva:new(self.modoDeJogo, nivel) 
-    --     end 
-    --     if self.modoDeJogo == "cooperativo" then
-    --         return PartidaCooperativa:new(self.modoDeJogo, nivel)
-    --     end
-    -- end
 
     self.tempoParaVirarDeVolta = 1
     self.timerCartasViradas = 0
@@ -35,7 +27,7 @@ end
 function PartidaLayer:update(dt)
     if self.partidaFinalizada then return end
     
-    self.partida:update(dt) -- REVISAR ISSO AQUI, A classe partida não deveria ter relação com o framework
+    self.partida:update(dt)
 
     -- Lógica de tempo para o modo cooperativo
     if self.partida.modoDeJogo == "cooperativo" and not self.partida.partidaFinalizada then
@@ -46,16 +38,25 @@ function PartidaLayer:update(dt)
         end
     end
 
-    -- Lógica de tempo para o modo competitivo
-    if self.modoDeJogo == "competitivo" and not self.partida.partidaFinalizada then
+    -- ✅ CORRIGIDO: Lógica de tempo para o modo SOLO
+    if self.partida.modoDeJogo == "solo" and not self.partida.partidaFinalizada then
         self.partida.tempoRestante = self.partida.tempoRestante - dt
-        if self.partida.tempoRestante <= 0 then -- Adicionar verificar para saber se todo os pares foram encontrados
+        if self.partida.tempoRestante <= 0 then
             self.partida.partidaFinalizada = true
-            -- Lógica de fim de jogo por tempo
             self:finalizarPartida()
         end
     end
 
+    -- Lógica de tempo para o modo competitivo
+    if self.modoDeJogo == "competitivo" and not self.partida.partidaFinalizada then
+        self.partida.tempoRestante = self.partida.tempoRestante - dt
+        if self.partida.tempoRestante <= 0 then
+            self.partida.partidaFinalizada = true
+            self:finalizarPartida()
+        end
+    end
+
+    -- ✅ CORRIGIDO: Timer para cartas viradas (aplicável aos modos antigos)
     if self.timerCartasViradas > 0 then
         self.timerCartasViradas = self.timerCartasViradas - dt
         if self.timerCartasViradas <= 0 then
@@ -65,22 +66,18 @@ function PartidaLayer:update(dt)
                 end
             end
             self.partida.cartasViradasNoTurno = {}
-            self.partida:trocaJogadorAtual()
+            if self.partida.trocaJogadorAtual then
+                self.partida:trocaJogadorAtual()
+            end
         end
-        
     elseif self.partida.jogadorAtual == "maquina" and #self.partida.cartasViradasNoTurno == 0 then
         self:jogadaMaquina()
     end
-    
-    -- Lógica para a jogada da máquina
-    if self.jogadorAtual == "maquina" and not self.partida.partidaFinalizada and #self.cartasViradasNoTurno == 0 then
-        self:jogadaMaquina() -- TODO: implementar método que realiza as duas jogadas da máquina 
-    end
 
-    -- Verifica se todos os pares foram encontrados
+    -- Verifica se todos os grupos foram encontrados
     if self.partida.tabuleiro.cartasRestantes == 0 and not self.partida.partidaFinalizada then
         self.partida.partidaFinalizada = true
-        self:finalizarPartida() -- TODO: implementar método de finalização, mostrar o ranking, colocar o nome do jogador...
+        self:finalizarPartida()
     end
 end
 
@@ -105,18 +102,80 @@ function PartidaLayer:draw()
     love.graphics.draw(self.imagemCarta, 990, 323, 0, 0.8, 0.8)
 
     self.partida.tabuleiro:draw()
+    
+    -- ✅ ADICIONADO: Interface específica para modo solo
+    if self.partida.modoDeJogo == "solo" and self.partida.modoSolo then
+        self.partida.modoSolo:drawInterface()
+    end
+    
+    -- ✅ ADICIONADO: Interface específica para modo competitivo (se usar partidaLayer)
+    if self.partida.modoDeJogo == "competitivo" and self.partida.modoCompetitivo then
+        self:drawInterfaceCompetitivo()
+    end
+end
+
+-- ✅ NOVA FUNÇÃO: Interface para modo competitivo na partidaLayer
+function PartidaLayer:drawInterfaceCompetitivo()
+    if not self.partida.modoCompetitivo then return end
+    
+    local largura = love.graphics.getWidth()
+    local info = self.partida:getStatusInfo()
+    
+    -- Painel de informações no canto superior direito
+    love.graphics.setColor(0, 0, 0, 0.8)
+    love.graphics.rectangle("fill", largura - 280, 10, 270, 150)
+    
+    love.graphics.setColor(1, 1, 1)
+    love.graphics.setFont(love.graphics.newFont(16))
+    
+    local x, y = largura - 270, 20
+    
+    -- Título
+    love.graphics.setColor(1, 0.8, 0) -- Dourado para competitivo
+    love.graphics.print("MODO COMPETITIVO", x, y)
+    love.graphics.setColor(1, 1, 1)
+    y = y + 25
+    
+    -- Tempo
+    love.graphics.print("Tempo: " .. math.floor(info.tempo / 60) .. ":" .. string.format("%02d", info.tempo % 60), x, y)
+    y = y + 20
+    
+    -- Placar
+    love.graphics.setColor(0.2, 1, 0.2) -- Verde para humano
+    love.graphics.print("VOCÊ: " .. (info.scoreHumano or 0) .. " pts", x, y)
+    y = y + 20
+    
+    love.graphics.setColor(1, 0.2, 0.2) -- Vermelho para IA
+    love.graphics.print("IA: " .. (info.scoreIA or 0) .. " pts", x, y)
+    y = y + 20
+    
+    love.graphics.setColor(1, 1, 1)
+    
+    -- Vez do jogador
+    if info.jogadorAtual == "HUMANO" then
+        love.graphics.setColor(0.2, 1, 0.2)
+        love.graphics.print(">>> SUA VEZ! <<<", x, y)
+    else
+        love.graphics.setColor(0.2, 0.8, 1)
+        love.graphics.print(">>> VEZ DA IA <<<", x, y)
+    end
+    love.graphics.setColor(1, 1, 1)
 end
 
 function PartidaLayer:mousepressed(x, y, button)
     if button ~= 1 then return end
 
-    -- MODO SOLO
+    -- ✅ CORRIGIDO: MODO SOLO - Usar o sistema correto
     if self.partida.modoDeJogo == "solo" then
-        self.partida:mousepressed(x, y, button)
-        return
+        return self.partida:mousepressed(x, y, button)
     end
 
-    -- MODO COOPERATIVO
+    -- ✅ CORRIGIDO: MODO COMPETITIVO - Usar o sistema correto
+    if self.partida.modoDeJogo == "competitivo" then
+        return self.partida:mousepressed(x, y, button)
+    end
+
+    -- MODO COOPERATIVO - Sistema antigo mantido
     if self.partida.modoDeJogo == "cooperativo" then
         if self.partida.jogadorAtual ~= "humano" then return end
         if #self.partida.cartasViradasNoTurno >= self.partida.maximoTentativas then return end
@@ -150,7 +209,6 @@ function PartidaLayer:mousepressed(x, y, button)
     end
 end
 
-
 function PartidaLayer:jogadaMaquina()
     local carta1, carta2 = self.partida.adversarioIA:buscarParConhecido()
 
@@ -174,7 +232,12 @@ function PartidaLayer:jogadaMaquina()
     if carta1.id == carta2.id then
         carta1.encontrada = true
         carta2.encontrada = true
-        self.partida.score = self.partida.score + 200
+        -- ✅ CORRIGIDO: Usar método correto para adicionar score
+        if self.partida.score and self.partida.score.adicionarAoScore then
+            self.partida.score:adicionarAoScore(200)
+        else
+            self.partida.score = (self.partida.score or 0) + 200
+        end
         self.partida.tabuleiro:removerGrupoEncontrado({carta1, carta2})
         self.partida.cartasViradasNoTurno = {}
         self.partida:trocaJogadorAtual()
@@ -187,6 +250,31 @@ function PartidaLayer:mousemoved(x, y, dx, dy) end
 
 function PartidaLayer:finalizarPartida()
     print("Partida finalizada!")
+    
+    -- ✅ ADICIONADO: Lógica específica por modo
+    if self.partida.modoDeJogo == "solo" then
+        print("Modo Solo finalizado!")
+        local pontuacao = self.partida.score and self.partida.score.pontuacao or 0
+        print("Pontuação final: " .. pontuacao)
+    elseif self.partida.modoDeJogo == "competitivo" and self.partida.modoCompetitivo then
+        print("Modo Competitivo finalizado!")
+        local resultado = self.partida.modoCompetitivo:obterResultadoFinal()
+        print("Vencedor: " .. resultado.vencedor)
+        print("Placar: VOCÊ " .. resultado.scoreHumano .. " x " .. resultado.scoreIA .. " IA")
+    end
+    
+    -- Retorna ao menu após alguns segundos
+    self.tempoEspera = 0
+end
+
+-- ✅ ADICIONADO: Controla retorno ao menu
+function PartidaLayer:updateFinalizacao(dt)
+    if self.partidaFinalizada then
+        self.tempoEspera = (self.tempoEspera or 0) + dt
+        if self.tempoEspera > 3 then
+            self.proximaLayer = "menuPrincipal"
+        end
+    end
 end
 
 return PartidaLayer
