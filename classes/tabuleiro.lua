@@ -27,6 +27,7 @@ function Tabuleiro:new(nivel, dadosCartas)
         colunas = 6, -- Definido pelo nível, mas provavelmente será fixo em 24
         taxaErroBase = 30,
         erroBase = 30,
+        imagemTabuleiro = love.graphics.newImage(Config.frames.partida.tabuleiro),
     }
     setmetatable(self, Tabuleiro) 
 
@@ -67,11 +68,11 @@ function Tabuleiro:definirLayout()
 end
 
 function Tabuleiro:ajustarTamanhoCarta()
-    local larguraTela = love.graphics.getWidth()
-    local alturaTela = love.graphics.getHeight()
+    local larguraFrame = self.imagemTabuleiro:getWidth()
+    local alturaFrame = self.imagemTabuleiro:getHeight()
 
-    local larguraDisponivel = larguraTela - ((self.colunas + 1) * ESPACAMENTO)
-    local alturaDisponivel = alturaTela - ((self.linhas + 1) * ESPACAMENTO)
+    local larguraDisponivel = larguraFrame - ((self.colunas + 1) * ESPACAMENTO)
+    local alturaDisponivel = alturaFrame - ((self.linhas + 1) * ESPACAMENTO)
 
     local larguraCarta = math.floor(larguraDisponivel / self.colunas)
     local alturaCarta = math.floor(alturaDisponivel / self.linhas)
@@ -121,31 +122,48 @@ function Tabuleiro:embaralhar()
 end
 
 function Tabuleiro:draw()
+    local frameLargura = self.imagemTabuleiro:getWidth()
+    local frameAltura = self.imagemTabuleiro:getHeight()
+
+    local escala = 0.9
+    local posTabuleiroX, posTabuleiroY = 50, 130
+
+    -- Desenha o tabuleiro na posição fixa com escala
+    love.graphics.setColor(1, 1, 1)
+    love.graphics.draw(self.imagemTabuleiro, posTabuleiroX, posTabuleiroY, 0, escala, escala)
+
+    -- Calcula o total de espaço ocupado pelas cartas (sem escala)
     local totalLargura = self.colunas * (self.tamanhoCarta + ESPACAMENTO) - ESPACAMENTO
     local totalAltura = self.linhas * (self.tamanhoCarta + ESPACAMENTO) - ESPACAMENTO
 
-    local xInicial = (love.graphics.getWidth() - totalLargura) / 2
-    local yInicial = (love.graphics.getHeight() - totalAltura) / 2
+    -- As cartas começam exatamente no canto superior esquerdo do tabuleiro, ou seja:
+    -- posTabuleiroX e posTabuleiroY (a posição onde o tabuleiro foi desenhado)
+    local xInicial = posTabuleiroX
+    local yInicial = posTabuleiroY
 
     for linha = 0, self.linhas - 1 do
         for coluna = 0, self.colunas - 1 do
-            local x = xInicial + coluna * (self.tamanhoCarta + ESPACAMENTO)
-            local y = yInicial + linha * (self.tamanhoCarta + ESPACAMENTO)
+            -- A posição da carta deve levar em conta a escala, pois o tabuleiro está redimensionado
+            local x = xInicial + coluna * (self.tamanhoCarta + ESPACAMENTO) * escala
+            local y = yInicial + linha * (self.tamanhoCarta + ESPACAMENTO) * escala
 
             love.graphics.setColor(1, 1, 1)
-            love.graphics.rectangle("fill", x, y, self.tamanhoCarta, self.tamanhoCarta, 12, 12)
+            -- Desenha um retângulo de fundo para a carta, considerando escala
+            love.graphics.rectangle("fill", x, y, self.tamanhoCarta * escala, self.tamanhoCarta * escala, 12, 12)
 
             local indice = linha * self.colunas + coluna + 1
             local carta = self.cartas[indice]
             if carta then
+                -- Passa a posição real (sem escala) para o objeto carta, que pode precisar para lógica interna
                 carta:setPosicao(x, y)
-                carta.largura = self.tamanhoCarta
-                carta.altura = self.tamanhoCarta
-                carta:draw(self.tamanhoCarta, self.tamanhoCarta)
+                carta.largura = self.tamanhoCarta * escala
+                carta.altura = self.tamanhoCarta * escala
+                carta:draw(self.tamanhoCarta * escala, self.tamanhoCarta * escala)
             end
         end
     end
 end
+
 
 -- TODO: Adaptar a implementação de inteligencia_maquina\tabuleiroTeste.lua para grupos
 function Tabuleiro:removerCarta(carta)
