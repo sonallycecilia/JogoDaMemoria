@@ -69,13 +69,11 @@ function JogoCooperativo:draw()
 end
 
 function JogoCooperativo:drawFundo()
-    -- Desenha fundo igual ao partidaLayer
     love.graphics.clear(0, 0, 0, 0)
     
     local LARGURA_TELA = love.graphics.getWidth()
     local ALTURA_TELA = love.graphics.getHeight()
     
-    -- Carrega as imagens se não foram carregadas
     if not self.imagensCarregadas then
         self.imagemFundo = love.graphics.newImage(Config.janela.IMAGEM_TELA_PARTIDA)
         self.imagemTabuleiro = love.graphics.newImage(Config.frames.partida.tabuleiro)
@@ -83,20 +81,19 @@ function JogoCooperativo:drawFundo()
         self.imagemScore = love.graphics.newImage(Config.frames.partida.score)
         self.imagensCarregadas = true
     end
-    
-    -- Fundo principal
+
     local larguraImagem = self.imagemFundo:getWidth()
     local alturaImagem = self.imagemFundo:getHeight()
     local xFundo = (LARGURA_TELA - larguraImagem) / 2
     local yFundo = (ALTURA_TELA - alturaImagem) / 2
     love.graphics.setColor(1, 1, 1, 1)
     love.graphics.draw(self.imagemFundo, xFundo, yFundo)
-    
-    -- Frames
-    love.graphics.draw(self.imagemTabuleiro, 50, 130, 0, 0.9, 0.9)
+
+    -- Mantém o desenho de carta e score
     love.graphics.draw(self.imagemScore, 990, 130, 0, 0.8, 0.8)
     love.graphics.draw(self.imagemCarta, 990, 323, 0, 0.8, 0.8)
 end
+
 
 function JogoCooperativo:drawInterfaceCooperativo()
     if not self.partida then return end
