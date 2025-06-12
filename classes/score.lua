@@ -4,12 +4,16 @@ Score.__index = Score
 function Score:new(nivel)
     local novaScore = {
         nivel = nivel,
-        pontuacao = 0, -- Valor Base
+        pontuacao = 0, 
         valorBase = function (nivel) return (100* nivel) end
     }
     setmetatable(novaScore, Score)
 
     return novaScore
+end
+
+function Score:getPontuacao()
+    return pontuacao
 end
 
 function Score:pontuarGrupoEncontrado(tamGrupoCartas)

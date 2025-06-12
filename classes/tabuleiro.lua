@@ -1,41 +1,48 @@
-local Tabuleiro = {}
-Tabuleiro.__index = Tabuleiro --permite chamadas com self
-
 local ESPACAMENTO = 10
 local POS_X = 175
 local POS_Y = 145
 
+local Tabuleiro = {
+    nivel = 1,
+    largura = 800,
+    altura = 600,
+    cartas = {},
+    mapPares = {},
+    tamanhoCarta = 100,
+    linhas = 4, -- Definido pelo nível, mas provavelmente será fixo em 24
+    colunas = 6, -- Definido pelo nível, mas provavelmente será fixo em 24
+    cartasTotais = nil,
+    cartasRestantes = nil,
+    taxaErroBase = 30,
+    erroBase = 30,
+}
+Tabuleiro.__index = Tabuleiro --permite utilizar o objeto como protótipo para outros
+
+
 -- TODO: Alterar parâmetro dadosCartas para vetorCartas
 function Tabuleiro:new(nivel, dadosCartas)
-    local novoTabuleiro = {
+    self = {
         nivel = nivel or 1,
-        largura = 800,
-        altura = 600,
-        cartas = {},
-        mapPares = {},
-        tamanhoCarta = 100,
         linhas = 4, -- Definido pelo nível, mas provavelmente será fixo em 24
         colunas = 6, -- Definido pelo nível, mas provavelmente será fixo em 24
-        cartasTotais = 0,
-        cartasRestantes = 0,
         taxaErroBase = 30,
         erroBase = 30,
     }
-    setmetatable(novoTabuleiro, Tabuleiro)
+    setmetatable(self, Tabuleiro) 
 
     -- Gerar as cópias das cartas conforme o nível
-    novoTabuleiro:gerarCopiaDeCartas(dadosCartas)
+    self:gerarCopiaDeCartas(dadosCartas)
 
-    -- Adicionar método para adicionar a posX e poxY de cada carta 
+    -- Adicionar método para adicionar a posX e poxY de cada carta
     -- após os pares serem gerados, sem isso a IA não funciona
 
     -- Embaralha as cartas depois de criadas
-    novoTabuleiro:embaralhar()
+    self:embaralhar()
 
     -- Define o layout do tabuleiro
-    novoTabuleiro:definirLayout()
+    self:definirLayout()
 
-    return novoTabuleiro
+    return self
 end
 
 -- Testar para saber se o método está funcionando corretamente
@@ -119,8 +126,20 @@ function Tabuleiro:draw()
 end
 
 -- TODO: Adaptar a implementação de inteligencia_maquina\tabuleiroTeste.lua para grupos
-function Tabuleiro:removerGrupoEncontrado(listaGrupo)
-    
+function Tabuleiro:removerCarta(carta)
+    local indice = self:buscarIndiceCarta(carta)
+    table.remove(self.cartas, indice)
+end
+
+-- Se a carta existe na lista de cartas do trabuleiro, retorna o índice da carta, nil caso contrário
+function Tabuleiro:buscarIndiceCarta(carta)
+    for i, cartaTab in ipairs(self.cartas) do
+        if cartaTab == carta then
+            return i
+        end
+    end
+
+    return nil
 end
 
 return Tabuleiro

@@ -5,23 +5,20 @@ local ALTURA = 100
 local LARGURA = 100
 local VERSO = "midia/images/verso.png"
 
-NAO_ENCONTRADA = -1
-NAO_POSICIONADA = -1
-
--- CONSTRUTOR
 -- Talvez seja interessante utilizar um id para o grupo que a carta pertence, os pares, trincas ou quadras vão possuir o mesmo idGrupo
 function Carta:new(id, caminhoImagemFrente)
     local novaCarta = {
         id = id,
+        idGrupo = nil,
         largura = LARGURA,
         altura = ALTURA,
         pathImagem = caminhoImagemFrente, --precisa ficar pois pegamos o caminho da imagem
         imagemFrente = love.graphics.newImage(caminhoImagemFrente),
         imagemVerso = love.graphics.newImage(VERSO),
         revelada = false, -- se não for passado, assume false
-        posX = NAO_POSICIONADA,
-        posY = NAO_POSICIONADA,
-        rodadaEncontrada = NAO_ENCONTRADA,
+        posX = nil,
+        posY = nil,
+        rodadaEncontrada = nil,
         probErro = 0
     }
     setmetatable(novaCarta, Carta) --permite o uso de :, ligando a metatable de cima
@@ -40,7 +37,7 @@ function Carta:setPosicao(x, y)
 end
 
 
--- Função para verificar se a carta foi clicada (verificação de clique)
+-- Função para verificar se a carta foi clicada (verificação de clique na area)
 function Carta:clicada(mx, my)
     return mx >= self.x and mx <= self.x + self.largura and
            my >= self.y and my <= self.y + self.altura
@@ -70,7 +67,7 @@ end
 
 function Carta:poder()
     if self.id == 1 then
-        -- Poder es
+        -- Poder especial
     end
 end
 
