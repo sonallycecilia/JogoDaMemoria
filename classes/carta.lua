@@ -16,6 +16,7 @@ function Carta:new(id, caminhoImagemFrente, ehEspecial, tipoEspecial)
         imagemFrente = love.graphics.newImage(caminhoImagemFrente),
         imagemVerso = love.graphics.newImage(VERSO),
         revelada = false, -- se não for passado, assume false
+        combinada = false,
         posX = nil,
         posY = nil,
         rodadaEncontrada = nil,
@@ -42,17 +43,15 @@ end
 
 -- Função para verificar se a carta foi clicada (verificação de clique na area)
 function Carta:clicada(mx, my)
-   Carta.revelada = true
     return mx >= self.x and mx <= self.x + self.largura and
            my >= self.y and my <= self.y + self.altura
 
 end
 
--- function Carta:onClick(mx, my)
---     if self:clicada(mx, my) then
---         self:alternarLado()
---     end
--- end
+function Carta:marcarComoCombinada()
+    self.combinada = true
+    self.revelada = true
+end
 
 -- Função para desenhar a carta (exibe a frente ou o verso dependendo do estado)
 function Carta:draw()
@@ -67,6 +66,14 @@ function Carta:draw()
     else
         self:drawImagem(self.imagemVerso)   -- Desenha o verso caso contrário
     end
+    -- define destaque pra carta congelada:
+    if self.taCongelada then
+        love.graphics.setColor(0, 0, 1, 0.5)
+        love.graphics.rectangle("fill", self.x, self.y, self.largura, self.altura)
+        love.graphics.setColor(0, 0, 1, 1)
+        love.graphics.rectangle("line", self.x, self.y, self.largura, self.altura)
+        love.graphics.setColor(1, 1, 1, 1)
+    end
 end
 
 -- Função auxiliar para desenhar a imagem da carta
@@ -79,13 +86,13 @@ end
 function Carta:poder(partidaInstance, tabuleiroInstance)
     if self.ehEspecial and self.tipoEspecial then
         if self.tipoEspecial == "Revelacao" then
-            return cartaEspecial.apply_revelation(partidaInstance, tabuleiroInstance)
+            return cartaEspecial.revelaCartas(partidaInstance, tabuleiroInstance)
         elseif self.tipoEspecial == "Congelamento" then
             -- O congelamento é um poder que requer input do jogador para selecionar a carta alvo
-            return cartaEspecial.activate_freeze_selection(partidaInstance, tabuleiroInstance)
+            return cartaEspecial.congelaCarta(partidaInstance, tabuleiroInstance)
         elseif self.tipoEspecial == "Bomba" then
             -- A bomba revela cartas ao redor dela, e a própria bomba é o ponto de referência
-            return cartaEspecial.apply_bomb(partidaInstance, tabuleiroInstance, self)
+            return cartaEspecial.explode(partidaInstance, tabuleiroInstance, self)
         end
     end
     return false -- Retorna falso se não ativou nenhum poder ou não é especial

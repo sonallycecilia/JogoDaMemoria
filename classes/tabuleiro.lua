@@ -1,37 +1,26 @@
-local ESPACAMENTO = 10
+local Carta = require("classes.carta")
+local Config = require("config")
+
 local POS_X = 175
 local POS_Y = 145
 
-local Tabuleiro = {
-    nivel = 1,
-    largura = 800,
-    altura = 600,
-    cartas = {},
-    mapPares = {},
-    tamanhoCarta = 100,
-    linhas = 4, -- Definido pelo nível, mas provavelmente será fixo em 24
-    colunas = 6, -- Definido pelo nível, mas provavelmente será fixo em 24
-    cartasTotais = nil,
-    cartasRestantes = nil,
-    taxaErroBase = 30,
-    erroBase = 30,
-}
+local Tabuleiro = {}
 Tabuleiro.__index = Tabuleiro --permite utilizar o objeto como protótipo para outros
-
 
 -- TODO: Alterar parâmetro dadosCartas para vetorCartas
 function Tabuleiro:new(nivel, dadosCartas)
-    self = {
+    local instance = {
         nivel = nivel or 1,
-        linhas = 4, -- Definido pelo nível, mas provavelmente será fixo em 24
-        colunas = 6, -- Definido pelo nível, mas provavelmente será fixo em 24
+        linhas = Config.tabuleiro,
+        colunas = Config.tabuleiro,
         taxaErroBase = 30,
         erroBase = 30,
+        cartas = {}
     }
-    setmetatable(self, Tabuleiro) 
+    setmetatable(instance, Tabuleiro) 
 
-    -- Gerar as cópias das cartas conforme o nível
-    self:gerarCopiaDeCartas(dadosCartas)
+    -- Gerar as cópias das cartas conforme o nível e as cartas especiais aleatoriamente
+    self:gerarCopiasComEspeciais(dadosCartas)
 
     -- Adicionar método para adicionar a posX e poxY de cada carta
     -- após os pares serem gerados, sem isso a IA não funciona
@@ -45,25 +34,61 @@ function Tabuleiro:new(nivel, dadosCartas)
     return self
 end
 
--- Testar para saber se o método está funcionando corretamente
-function Tabuleiro:gerarCopiaDeCartas(dadosCartas)
-    -- Número de cópias de acordo com o nível (nível 1 = 2 cópias, nível 2 = 3 cópias, etc.)
-    local numCopia  
-    if self.nivel >= FACIL and self.nivel <= DIFICIL then
+function Tabuleiro:gerarCopiasComEspeciais(dadosCartas) -- configura cartas especiais 
+    local numCopia  -- Número de cópias de acordo com o nível (nível 1 = 2 cópias, nível 2 = 3 cópias, etc.)
+    local numCartasEspeciais = Config.cartasEspeciais.quantidadePorNivel[self.nivel] or 0
+    local tiposEspeciais = {}
+    local cartasEspeciaisColocadas = 0
+    self.cartas = {}
+
+    if self.nivel >= Config.nomes.niveis.Facil and self.nivel <= Config.nomes.niveis.Dificil then
         numCopia = self.nivel + 1
     end
-    if self.nivel == EXTREMO then
+    if self.nivel == Config.nomes.niveis.Extremo then
         -- TODO: Criar uma função para calcular o numéro de cópias aleatória de cada carta
         numCopia = {} -- A quantidade de cópias de cada carta é variável, cara índice representa uma carta e o valor a sua respectiva quantidade de cópias
+    end
+
+    
+    for _, i in ipairs(Config.cartasEspeciais.tipos) do
+        table.insert(tiposEspeciais, i)
     end
 
     -- Para cada carta recebida, gera o número adequado de cópias
     for _, carta in ipairs(dadosCartas) do
         if carta then
             for i = 1, numCopia do
+                local ehEspecial = false
+                local tipoEspecial = nil
+    -- Logica pra colocar carta especial:
+                if cartasEspeciaisColocadas < numCartasEspeciais and #tiposEspeciais>0 then
+                    if math.random() < Config.cartasEspeciais.chance then
+                        local index = math.random(1, #tiposEspeciais)
+                        tipoEspecial = table.remove(tiposEspeciais, index)
+                        ehEspecial = true
+                        cartasEspeciaisColocadas = cartasEspeciaisColocadas+1
+                    end
+                end
                 local copia = self:gerarCopiaUnica(carta)
                 table.insert(self.cartas, copia)
-            end
+        end
+    end
+end
+
+while cartasEspeciaisColocadas < numCartasEspeciais and #tiposEspeciais > 0 do 
+    local cartaComum = {}
+    for _, carta in ipairs(self.cartas) do
+        if not Carta.ehEspecial then 
+            table.insert(cartaComum, carta)
+        end
+    end
+    if #cartaComum > 0 then
+        local cartaEscolhida = cartaComum[math.random(1, #cartaComum)]
+        cartaEscolhida.ehEspecial = true
+        cartaEscolhida.tipoEspecial = table.remove(tiposEspeciais, math.random(1, #tiposEspeciais))
+        cartasEspeciaisColocadas = cartasEspeciaisColocadas + 1
+    else 
+        break
         end
     end
 end
@@ -107,8 +132,8 @@ function Tabuleiro:draw()
     love.graphics.setColor(0, 0, 0)
     for linha = 0, self.linhas - 1 do
         for coluna = 0, self.colunas - 1 do
-            local x = self.x + coluna * (self.tamanhoCarta + ESPACAMENTO)
-            local y = self.y + linha * (self.tamanhoCarta + ESPACAMENTO)
+            local x = self.x + coluna * (self.tamanhoCarta + Config.tabuleiro.ESPACAMENTO)
+            local y = self.y + linha * (self.tamanhoCarta + Config.tabuleiro.ESPACAMENTO)
 
             -- Desenhar a parte do tabuleiro
             love.graphics.setColor(1, 1, 1)

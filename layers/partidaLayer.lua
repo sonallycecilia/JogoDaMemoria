@@ -15,10 +15,10 @@ function LayerPartida:new(manager, modoDeJogo, nivel)
     self.proximaLayer = nil
     self.partida = function () 
         if modoDeJogo == "competitivo" then 
-            return PartidaCompetitiva:new(modoDeJogo, nivel) 
+            return Partida:new(modoDeJogo, nivel) 
         end 
         if modoDeJogo == "cooperativo" then
-            return PartidaCooperativa:new(modoDeJogo, nivel)
+            return Partida:new(modoDeJogo, nivel)
         end
     end
 
@@ -152,10 +152,6 @@ function LayerPartida:mousepressed(x, y, button)
             end
         end
     end
-end
-
-function LayerPartida:mousemoved(x, y, dx, dy)
-    -- Se quiser hover ou efeitos de destaque. Sem tempo pra isso, vai ter não
 end
 
 return LayerPartida

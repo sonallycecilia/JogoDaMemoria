@@ -25,7 +25,10 @@ local Partida = {
     jogadorAtual = "humano" or "maquina", -- jogador sempre começa jogando
     nomeJogador = "convidado",
     cartas = nil,
-    adversarioIA = nil,
+    adversarioIA = nil,   
+    seleciontarCartaCongela = false,
+    cartaCongelada = nil,
+    tempoGelo = 0
 }
 Partida.__index = Partida
 
@@ -49,9 +52,6 @@ function Partida:new(modoDeJogo, nivel)
     self.horaInicio = DataHora:formatarHora()
     self.dataFinal = nil
     self.horaFinal = nil
-    
-    self.tabuleiro = Tabuleiro:new(nivel, cartas)
-
     self.rodadaAtual = 1
     self.cartasViradasNoTurno = {} 
     self.partidaFinalizada = false
@@ -59,10 +59,11 @@ function Partida:new(modoDeJogo, nivel)
     self.nomeJogador = nil
 
     local cartas = self:carregarCartas()
-
+    self.tabuleiro = Tabuleiro:new(nivel, cartas)
     self.adversarioIA = require("inteligencia_maquina.adversario")
     self.adversarioIA:inicializarMemoria(self.tabuleiro.linhas, self.tabuleiro.colunas)
 
+    
     return self
 end
 
@@ -146,10 +147,10 @@ function Partida:finalizarPartida()
     -- local nomejogador = self.manager:setLayar("telaNomeJogador"):inputNome()
     
     -- TODO: dar merge com o que foi feito no BD 
-    Ranking:adicionarResultado(nomeJogador, dataInicio, horaInicio, dataFinal, horaFinal, pontuacao, dificuldade, modoDeJogo )
+   -- ranking:adicionarResultado(nomeJogador, dataInicio, horaInicio, dataFinal, horaFinal, pontuacao, dificuldade, modoDeJogo )
 
     -- TODO: criar rankingLayer e adiconar ao layersMap
-    self.manager:setLayer("rankingLayer")
+    --self.manager:setLayer("rankingLayer")
 end
 
 return Partida

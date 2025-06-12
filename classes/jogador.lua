@@ -3,7 +3,7 @@ require("classes.utils.score")
 Jogador = {
     nome = "Convidado",
     paresEncontrados = 0,
-    score = Score:new(nivel)
+    score = Score:new("nivel")
 }
 Jogador.__index = Jogador
 
