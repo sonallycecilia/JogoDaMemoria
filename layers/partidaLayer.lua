@@ -13,7 +13,7 @@ function PartidaLayer:new(manager, modoDeJogo, nivel)
     self.modoDeJogo = modoDeJogo
     self.manager = manager
     self.proximaLayer = nil
-    self.partida = Partida:new(modoDeJogo, nivel)
+self.partida = Partida:new(modoDeJogo, nivel)
     -- function () 
     --     if self.modoDeJogo == "competitivo" then 
     --         return PartidaCompetitiva:new(self.modoDeJogo, nivel) 
@@ -149,7 +149,6 @@ function PartidaLayer:mousepressed(x, y, button)
         end
     end
 end
-
 
 function PartidaLayer:jogadaMaquina()
     local carta1, carta2 = self.partida.adversarioIA:buscarParConhecido()

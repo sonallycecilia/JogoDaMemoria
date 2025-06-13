@@ -69,8 +69,6 @@ function Partida:new(modoDeJogo, nivel)
     return self
 end
 
-
-
 function Partida:mousepressed(x, y, button)
     print("=== DEBUG CLIQUE ===")
     print("Posição:", x, y, "Botão:", button)
@@ -157,6 +155,88 @@ function Partida:cliqueGeral(x, y)
     return false
 end
 
+function Partida:mousepressed(x, y, button)
+    print("=== DEBUG CLIQUE ===")
+    print("Posição:", x, y, "Botão:", button)
+    print("Modo de jogo:", self.modoDeJogo)
+    print("Partida finalizada:", self.partidaFinalizada)
+    
+    if button == 1 and not self.partidaFinalizada then -- Clique esquerdo
+        if self.modoDeJogo == "cooperativo" then
+            print("Chamando clique cooperativo...")
+            return self:cliqueModoCooperativo(x, y)
+        elseif self.modoDeJogo == "solo" then
+            print("Chamando clique solo...")
+            return self:cliqueModoSolo(x, y)
+        else
+            print("Chamando clique geral...")
+            return self:cliqueGeral(x, y)
+        end
+    end
+    print("Clique ignorado")
+    return false
+end
+
+function Partida:cliqueModoCooperativo(x, y)
+    if not self.modoCooperativo then
+        return false
+    end
+    
+    -- Busca a carta clicada
+    local cartaClicada = nil
+    for i, carta in ipairs(self.tabuleiro.cartas) do
+        if carta:clicada(x, y) then
+            cartaClicada = carta
+            break
+        end
+    end
+    
+    if not cartaClicada then
+        return false
+    end
+    
+    return self.modoCooperativo:cliqueCarta(cartaClicada)
+end
+
+function Partida:cliqueModoSolo(x, y)
+    if not self.modoSolo then
+        return false
+    end
+    
+    -- Busca a carta clicada
+    local cartaClicada = nil
+    for i, carta in ipairs(self.tabuleiro.cartas) do
+        if carta:clicada(x, y) then
+            cartaClicada = carta
+            break
+        end
+    end
+    
+    if not cartaClicada then
+        return false
+    end
+    
+    return self.modoSolo:cliqueCarta(cartaClicada)
+end
+
+function Partida:cliqueGeral(x, y)
+    -- Implementação para outros modos de jogo
+    for _, carta in ipairs(self.tabuleiro.cartas) do
+        if carta:clicada(x, y) and not carta.encontrada then
+            if #self.cartasViradasNoTurno < 2 then
+                carta:alternarLado()
+                table.insert(self.cartasViradasNoTurno, carta)
+                
+                if #self.cartasViradasNoTurno == 2 then
+                    self:verificaGrupoCartas()
+                end
+                return true
+            end
+        end
+    end
+    return false
+end
+
 function Partida:verificaGrupoCartas()
     -- Método original para outros modos
     local grupoFormado = true
@@ -180,7 +260,6 @@ function Partida:verificaGrupoCartas()
             carta.encontrada = true
         end
     end
-
     --Removi os returns se não os métodos abaixo não seria chamados
     if (not grupoFormado) or (self.modoDeJogo == "competitivo") then
         if #self.cartasViradasNoTurno == 0 then
@@ -191,7 +270,9 @@ function Partida:verificaGrupoCartas()
 end
 
 function Partida:update(dt)
+
     local ganhou 
+
     if not self.partidaFinalizada then
         self.tempoRestante = self.tempoRestante - dt
         
@@ -211,6 +292,7 @@ function Partida:update(dt)
 end
 
 function Partida:adicionarPontuacao()
+
     local ehNil = EhNil(self.cartasViradasNoTurno)  
     if not ehNil then
         self.score:pontuarGrupoEncontrado(self.cartasViradasNoTurno)
@@ -261,6 +343,7 @@ function Partida:finalizarPartida(vitoria)
         -- Bonus por tempo restante
         local bonusTempo = math.floor(self.tempoRestante * 10)
         self.score:adicionarPontuacao(bonusTempo)
+    
         if bonusTempo > 0 then
             print("Bônus de tempo: +" .. tostring(bonusTempo) .. " pontos")
         end
@@ -300,6 +383,7 @@ function Partida:getStatusInfo()
             info[k] = v
         end
     end
+  
     if self.modoDeJogo == "competitivo" and self.modoCompetitivo then
         local statusSolo = self.modoCompetitivo:getStatus()
         for k, v in pairs(statusSolo) do
@@ -333,7 +417,6 @@ function Partida:draw()
             love.graphics.print("Multiplicador: " .. string.format("%.1f", info.multiplicador) .. "x", 10, y)
             y = y + 25
         end
-
         if info.paresConsecutivos > 1 then
             love.graphics.print("Sequência: " .. tostring(info.paresConsecutivos) .. " pares", 10, y)
             y = y + 25

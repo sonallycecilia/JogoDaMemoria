@@ -21,17 +21,28 @@ function Carta:new(id, caminhoImagemFrente)
         rodadaEncontrada = nil,
         probErro = 0,
         encontrada = false,
+        cartasEspeciais
+        ehEspecial = false,
+        tiposEspeciais = {},
+        taCongelada = false
+
         numCopias = 0 -- Será definido em tabuleiro
+
     }
     setmetatable(novaCarta, Carta)
     return novaCarta
 end
 
---ALTERADO PARA TESTES
 function Carta:alternarLado()
     if not self.encontrada then
         self.revelada = not self.revelada
     end
+end
+
+function Carta:marcarComoCombinada()
+    self.encontrada = true
+    self.revelada = true
+
 end
 
 function Carta:setPosicao(x, y)
@@ -56,10 +67,20 @@ function Carta:draw(largura, altura)
     end
 end
 
-function Carta:poder()
-    if self.id == 1 then
-        -- Poder especial aqui
+
+function Carta:ativarPoder(partidaInstance, tabuleiroInstance) -- Use partidaInstance, tabuleiroInstance para consistência
+    if self.ehEspecial and self.tipoEspecial then
+        -- Chama a função correspondente em CartasEspeciais (seu módulo de poderes)
+        if self.tipoEspecial == "Revelacao" then
+            return CartasEspeciais:ativarRevelacao(tabuleiroInstance, partidaInstance)
+        elseif self.tipoEspecial == "Congelamento" then
+            return CartasEspeciais:ativarCongelamentoSelecao(partidaInstance) -- Mude o nome do método aqui também
+        elseif self.tipoEspecial == "Bomba" then
+            return CartasEspeciais:explode(partidaInstance, tabuleiroInstance, self)
+        end
+
     end
+    return false
 end
 
 return Carta

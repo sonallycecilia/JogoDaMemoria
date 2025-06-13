@@ -24,7 +24,7 @@ function Tabuleiro:new(nivel)
         erroBase = 30,
         imagemTabuleiro = love.graphics.newImage(Config.frames.partida.tabuleiro),
     }
-    setmetatable(self, Tabuleiro) 
+    setmetatable(tabuleiro, Tabuleiro) 
 
     self:carregarCartas()
     self:definirLayout()
@@ -34,13 +34,19 @@ function Tabuleiro:new(nivel)
     -- Adicionar método para adicionar a posX e poxY de cada carta
     -- após os pares serem gerados, sem isso a IA não funciona
     -- Embaralha as cartas depois de criadas
-    return self
+ return self
 end
 
--- Eh assim que realmente deveria funcionar?
 function Tabuleiro:atualizarCartasRestantes()
+     local count = 0
+    for _, carta in ipairs(self.cartas) do
+        if not carta.encontrada then
+            count = count + 1
+        end
+    end
     self.cartasRestantes = 0
 end
+   
 
 function Tabuleiro:definirLayout()
     if self.nivel == FACIL then
@@ -107,6 +113,42 @@ function Tabuleiro:gerarCopiaDeCartas()
 
     self.cartasRestantes = #self.cartas
     print("[Tabuleiro] Total de cartas criadas: " .. #self.cartas)
+end
+
+function Tabuleiro:geraCartasEspeciais(dadosCartas, nivel)
+    local numCartasEspeciais = self.tamGrupo - 1
+    local cartasEspeciaisColocadas = 0
+    self.cartas = {}
+    local tiposEspeciais = {
+    "Revelação", "Bomba"}
+    
+
+    if cartasEspeciaisColocadas < numCartasEspeciais and #tiposEspeciais>0 then
+                    if math.random() < 10 then
+                        local index = math.random(1, #tiposEspeciais)
+                        table.remove(tiposEspeciais, index)
+                        Carta.ehEspecial = true
+                        Carta.tipoEspecial = tiposEspeciais[index]
+                        cartasEspeciaisColocadas = cartasEspeciaisColocadas+1
+                    end
+                end
+                
+    while cartasEspeciaisColocadas < numCartasEspeciais and #tiposEspeciais > 0 do 
+    local cartaComum = {}
+    for _, carta in ipairs(self.cartas) do
+        if not Carta.ehEspecial then 
+            table.insert(cartaComum, carta)
+        end
+    end
+    if #cartaComum > 0 then
+        local cartaEscolhida = cartaComum[math.random(1, #cartaComum)]
+        cartaEscolhida.ehEspecial = true
+        cartaEscolhida.tipoEspecial = table.remove(tiposEspeciais, math.random(1, #tiposEspeciais))
+        cartasEspeciaisColocadas = cartasEspeciaisColocadas + 1
+    else 
+        break
+        end
+    end
 end
 
 --Lidar com um array unidimensional como se fosse um array bidimensional
@@ -214,11 +256,6 @@ function Tabuleiro:definirNumCopiasDoGrupoExtremo()
     end
 
     return copiasPorGrupo
-end
-
--- Adicionar o que?
-function Tabuleiro:adicionar()
-    
 end
 
 function Tabuleiro:gerarCopiaUnica(cartaOriginal)
