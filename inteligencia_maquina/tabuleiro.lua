@@ -3,7 +3,7 @@ require("inteligencia_maquina.utils.String")
 require("inteligencia_maquina.utils.Array")
 require("classes.niveldeJogo")
 
-Tabuleiro = {
+tabuleiro = {
     cartas = {}, 
     mapPares = {},
     nivel = 1, 
@@ -14,9 +14,9 @@ Tabuleiro = {
     taxaErroBase = 30,
     erroBase = 30,
 }
-Tabuleiro.__index = Tabuleiro
+tabuleiro.__index = tabuleiro
 
-function Tabuleiro:new(lin, col, cartas, nivel) 
+function tabuleiro:new(lin, col, cartas, nivel) 
     local novoTabuleiro = {
         --nivel = nivel,
         --linhas = lin, 
@@ -25,7 +25,7 @@ function Tabuleiro:new(lin, col, cartas, nivel)
     }
     -- Balancear os erros depois (caso dê tempo)
     
-    setmetatable(novoTabuleiro, Tabuleiro)
+    setmetatable(novoTabuleiro, tabuleiro)
     novoTabuleiro.cartas = cartas
 
     novoTabuleiro:calculaProbErro()
@@ -58,7 +58,7 @@ function Tabuleiro:new(lin, col, cartas, nivel)
     return novoTabuleiro
 end
 
-function Tabuleiro:exibir() 
+function tabuleiro:exibir() 
     local maxTamColunas = {} 
     maxTamColunas = self:getMaxStringColunas("imagemExibida")
     for i = 1, self.linhas, 1 do
@@ -82,7 +82,7 @@ function Tabuleiro:exibir()
     print("-----------------------------------------------------------")
 end
 
-function Tabuleiro:getMaxStringColunas(nomeIndice)
+function tabuleiro:getMaxStringColunas(nomeIndice)
     local maxTamColunas = {}
     for j = 1, self.colunas, 1 do
         local maxTam = 0
@@ -107,7 +107,7 @@ function Tabuleiro:getMaxStringColunas(nomeIndice)
     return maxTamColunas
 end
 
-function Tabuleiro:gerarCopiaDeCartas(dadosCartas)
+function tabuleiro:gerarCopiaDeCartas(dadosCartas)
     local numCopia = self.nivel + 1  -- Nível 1 gera 2 cópias, Nível 2 gera 3 cópias, etc.
     -- Para cada carta recebida, gera o número adequado de cópias
     for _, carta in ipairs(dadosCartas) do
@@ -120,11 +120,11 @@ function Tabuleiro:gerarCopiaDeCartas(dadosCartas)
     end
 end
 
-function Tabuleiro:gerarCopiaUnica(cartaOriginal)
+function tabuleiro:gerarCopiaUnica(cartaOriginal)
     return CartaTeste:new(cartaOriginal.id, cartaOriginal.pathImagem)
 end
 
-function Tabuleiro:gerarMapPares()
+function tabuleiro:gerarMapPares()
     io.write("Map Pares:\n")
     local nomeParesAdicionados = {}
     local map = {}
@@ -150,7 +150,7 @@ function Tabuleiro:gerarMapPares()
     return map
 end
 
-function Tabuleiro:verificaSeCartaExiste(i, j, nomeAtributo)
+function tabuleiro:verificaSeCartaExiste(i, j, nomeAtributo)
     nomeAtributo = nomeAtributo or "id"
     local valorAtributo
     local carta
@@ -164,7 +164,7 @@ end
 
 -- NECESSITA DE TESTES
 -- Retorna verdadeiro caso a posicao self[posX][posY] seja diferente de nil ou false, caso contrário retorna true 
-function Tabuleiro:verificaPosicao(posX, posY)
+function tabuleiro:verificaPosicao(posX, posY)
     local posExiste = false
     if self[posX] and self[posX][posY] then
         posExiste = true
@@ -175,7 +175,7 @@ end
 
 -- NECESSITA DE TESTES
 -- Retorna uma nova lista de posicoes não nil
-function Tabuleiro:verificaListaPosicao(listaTuplaPosicoes, primeiraCarta)
+function tabuleiro:verificaListaPosicao(listaTuplaPosicoes, primeiraCarta)
     local listaPosicaoValida = {}
     local posicaoExiste = false
     local tuplaAtual = {}
@@ -190,14 +190,14 @@ function Tabuleiro:verificaListaPosicao(listaTuplaPosicoes, primeiraCarta)
     return listaPosicaoValida
 end
 
-function Tabuleiro:virarCarta(posX, posY)
+function tabuleiro:virarCarta(posX, posY)
     local posicaoExiste = self:verificaPosicao(posX, posY)
     if posicaoExiste then
         self[posX][posY]:virar()
     end
 end
 
-function Tabuleiro:removerParEncontrado(carta1, carta2)
+function tabuleiro:removerParEncontrado(carta1, carta2)
     local ehNil = true
     if carta1 and carta2 then
         ehNil = false
@@ -211,7 +211,7 @@ function Tabuleiro:removerParEncontrado(carta1, carta2)
 
 end
 
-function Tabuleiro:calculaProbErro()
+function tabuleiro:calculaProbErro()
     if self.nivel == FACIL then
         self.erroBase = 40
         self.taxaErroBase = 20

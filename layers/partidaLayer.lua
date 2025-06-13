@@ -15,7 +15,7 @@ function LayerPartida:new(manager, modoDeJogo, nivel)
     self.proximaLayer = nil
     self.partida = function () 
         if modoDeJogo == "competitivo" then 
-            return Partida:new(modoDeJogo, nivel) 
+            return Partida:new(modoDeJogo, nivel)
         end 
         if modoDeJogo == "cooperativo" then
             return Partida:new(modoDeJogo, nivel)
