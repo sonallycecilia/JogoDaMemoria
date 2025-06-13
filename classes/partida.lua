@@ -6,6 +6,7 @@ local DataHora = require("classes.utils.dataHora")
 local Cooperativo = require("classes.modos.cooperativo")
 local Competitivo = require("classes.modos.competitivo")
 local Solo = require("classes.modos.solo")
+local EhNil = require("classes.utils.validacao")
 
 local Partida = {}
 Partida.__index = Partida

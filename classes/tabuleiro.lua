@@ -22,6 +22,7 @@ function Tabuleiro:new(nivel, dadosCartas)
         colunas = 6,
         taxaErroBase = 30,
         erroBase = 30,
+        imagemTabuleiro = love.graphics.newImage(Config.frames.partida.tabuleiro),
     }
     setmetatable(self, Tabuleiro) 
 
@@ -73,11 +74,11 @@ function Tabuleiro:definirLayout()
 end
 
 function Tabuleiro:ajustarTamanhoCarta()
-    local larguraTela = love.graphics.getWidth()
-    local alturaTela = love.graphics.getHeight()
+    local larguraFrame = self.imagemTabuleiro:getWidth()
+    local alturaFrame = self.imagemTabuleiro:getHeight()
 
-    local larguraDisponivel = larguraTela - ((self.colunas + 1) * ESPACAMENTO)
-    local alturaDisponivel = alturaTela - ((self.linhas + 1) * ESPACAMENTO)
+    local larguraDisponivel = larguraFrame - ((self.colunas + 1) * ESPACAMENTO)
+    local alturaDisponivel = alturaFrame - ((self.linhas + 1) * ESPACAMENTO)
 
     local larguraCarta = math.floor(larguraDisponivel / self.colunas)
     local alturaCarta = math.floor(alturaDisponivel / self.linhas)
@@ -236,31 +237,58 @@ function Tabuleiro:embaralhar()
 end
 
 function Tabuleiro:draw()
-    local totalLargura = self.colunas * (self.tamanhoCarta + ESPACAMENTO) - ESPACAMENTO
-    local totalAltura = self.linhas * (self.tamanhoCarta + ESPACAMENTO) - ESPACAMENTO
+    local escala = 0.9
 
-    local xInicial = (love.graphics.getWidth() - totalLargura) / 2
-    local yInicial = (love.graphics.getHeight() - totalAltura) / 2
+    local posTabuleiroX, posTabuleiroY = 50, 130
+    local larguraFrame = self.imagemTabuleiro:getWidth() * escala
+    local alturaFrame = self.imagemTabuleiro:getHeight() * escala
+
+    love.graphics.setColor(1, 1, 1)
+    love.graphics.draw(self.imagemTabuleiro, posTabuleiroX, posTabuleiroY, 0, escala, escala)
+
+    -- Calcula o espaço total que as cartas ocupam
+    local totalLarguraCartas = self.colunas * (self.tamanhoCarta + ESPACAMENTO) * escala - ESPACAMENTO * escala
+    local totalAlturaCartas = self.linhas * (self.tamanhoCarta + ESPACAMENTO) * escala - ESPACAMENTO * escala
+
+    -- Centraliza as cartas dentro do frame do tabuleiro
+    local xInicial = posTabuleiroX + (larguraFrame - totalLarguraCartas) / 2
+    local yInicial = posTabuleiroY + (alturaFrame - totalAlturaCartas) / 2
 
     for linha = 0, self.linhas - 1 do
         for coluna = 0, self.colunas - 1 do
-            local x = xInicial + coluna * (self.tamanhoCarta + ESPACAMENTO)
-            local y = yInicial + linha * (self.tamanhoCarta + ESPACAMENTO)
-
-            love.graphics.setColor(1, 1, 1)
-            love.graphics.rectangle("fill", x, y, self.tamanhoCarta, self.tamanhoCarta, 12, 12)
+            local x = xInicial + coluna * (self.tamanhoCarta + ESPACAMENTO) * escala
+            local y = yInicial + linha * (self.tamanhoCarta + ESPACAMENTO) * escala
 
             local indice = linha * self.colunas + coluna + 1
             local carta = self.cartas[indice]
+
             if carta then
-                carta:setPosicao(x, y)
-                carta.largura = self.tamanhoCarta
-                carta.altura = self.tamanhoCarta
-                carta:draw(self.tamanhoCarta, self.tamanhoCarta)
+                local margemVerso = 6
+                local margemFrente = 2
+
+                love.graphics.setColor(1, 1, 1)
+                love.graphics.rectangle("fill", x, y, self.tamanhoCarta * escala, self.tamanhoCarta * escala, 12, 12)
+
+                local margem = carta.revelada and margemFrente or margemVerso
+
+                local cartaLargura = (self.tamanhoCarta * escala) - margem * 2
+                local cartaAltura = (self.tamanhoCarta * escala) - margem * 2
+                local cartaX = x + margem
+                local cartaY = y + margem
+
+                carta:setPosicao(cartaX, cartaY)
+                carta.largura = cartaLargura
+                carta.altura = cartaAltura
+                carta:draw(cartaLargura, cartaAltura)
+            else
+                love.graphics.setColor(1,1,1)
+                love.graphics.rectangle("fill", x, y, self.tamanhoCarta * escala, self.tamanhoCarta * escala, 12, 12)
             end
         end
     end
 end
+
+
 
 -- TODO: Adaptar a implementação de inteligencia_maquina\tabuleiroTeste.lua para grupos
 function Tabuleiro:removerCarta(carta)

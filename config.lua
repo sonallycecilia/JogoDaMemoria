@@ -38,10 +38,10 @@ Config.botoes = {
             pausar = "midia/botoes/partida/pausar.png",
         },
         menuSelecaoNivel = {
-            facil = "midia/botoes/selecaoNivel/botao_base_selecao_nivel.png",
-            medio = "midia/botoes/selecaoNivel/botao_base_selecao_nivel.png",
-            dificil = "midia/botoes/selecaoNivel/botao_base_selecao_nivel.png",
-            extremo = "midia/botoes/selecaoNivel/botao_base_selecao_nivel.png",
+            facil = "midia/botoes/niveisDeJogo/facil.png",
+            medio = "midia/botoes/niveisDeJogo/medio.png",
+            dificil = "midia/botoes/niveisDeJogo/dificil.png",
+            extremo = "midia/botoes/niveisDeJogo/extremo.png",
             voltar = "midia/botoes/menuJogo/voltar.png"
         }
     }
@@ -51,16 +51,16 @@ Config.botoes = {
 Config.deck = {
     "midia/images/cartas/fada.png",
     "midia/images/cartas/naly.png",
-    "midia/images/cartas/elfa.png",
     "midia/images/cartas/draenei.png",
-    "midia/images/cartas/borboleta.png",
-    "midia/images/cartas/lua.png",
+    "midia/images/cartas/thales.png",
+    "midia/images/cartas/lucy.png",
+    "midia/images/cartas/fury.png",
+    "midia/images/cartas/bomba.png",
+    "midia/images/cartas/yule.png",
     "midia/images/cartas/coracao.png",
-    "midia/images/cartas/espelho.png", -- Observação: você tem draenei duplicado
+    "midia/images/cartas/borboleta.png",
     "midia/images/cartas/flor.png",
-    "midia/images/cartas/gato.png",
-    "midia/images/cartas/pocao.png",
-    "midia/images/cartas/planta.png",
+    "midia/images/cartas/lua.png",
 }
 
 -- Frames (MANTIDOS)
