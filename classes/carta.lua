@@ -15,17 +15,19 @@ function Carta:new(id, caminhoImagemFrente)
         pathImagem = caminhoImagemFrente,
         imagemFrente = love.graphics.newImage(caminhoImagemFrente),
         imagemVerso = love.graphics.newImage(VERSO),
-        revelada = false, -- se não for passado, assume false
+        revelada = false, -- ALTERADO PARA TESTES
         posX = nil,
         posY = nil,
         rodadaEncontrada = nil,
         probErro = 0,
-        encontrada = false
+        encontrada = false,
+        numCopias = 0 -- Será definido em tabuleiro
     }
     setmetatable(novaCarta, Carta)
     return novaCarta
 end
 
+--ALTERADO PARA TESTES
 function Carta:alternarLado()
     if not self.encontrada then
         self.revelada = not self.revelada

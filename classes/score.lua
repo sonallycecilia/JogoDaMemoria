@@ -21,7 +21,7 @@ function Score:pontuarGrupoEncontrado(tamGrupoCartas)
     -- Adicionar pontuacao adicional com base no tempo ou um sistema de combo para pares encontrados em sequência
 end
 
-function Score:adicionarAoScore(pontos)
+function Score:adicionarPontuacao(pontos)
     self.pontuacao = self.pontuacao + pontos
 end
 

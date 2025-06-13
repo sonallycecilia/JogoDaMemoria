@@ -17,7 +17,12 @@ end
 local manager = LayerManager:new()
 local animacao
 
-function love.load()
+function love.load(arg)
+    -- Debugger para o ZeroBrane
+    if arg and arg[#arg] == "-debug" then
+        require("mobdebug").start()
+    end
+
     animacao = Animacao.nova("midia/sprites/heart_sprite.png", 64, 64, '1-7', 0.1)
     animacao:setPosicao(850, 0)
 

@@ -11,20 +11,21 @@ function Cooperativo:new(partida)
     self.ia = Adversario:new()
     self.ia:inicializarMemoria(partida.tabuleiro.linhas, partida.tabuleiro.colunas)
     
-    -- Configurações específicas do modo cooperativo
+    -- Configurações específicas do modo cooperativo e deveriam ser do competitivo também
     self.multiplicadorSequencia = 1
     self.paresConsecutivos = 0
     self.ultimoAcerto = false
     self.timerVezIA = 0
-    self.intervaloPensamento = 2.0
+    self.intervaloPensamento = 1.5 -- Tá muito alto
     self.vezIA = false
     
     -- Timer para cartas que não formaram par/trinca
     self.timerCartasViradas = 0
-    self.tempoExibirCartas = 2.0
+    self.tempoExibirCartas = 1.5
     
     -- Controla quem fez a última jogada
     self.ultimaJogadaFoiIA = false
+    
     -- Flag para controlar se IA deve jogar após desvirar
     self.iaDeveJogarAposDesvirar = false
     

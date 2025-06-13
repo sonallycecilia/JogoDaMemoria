@@ -7,6 +7,7 @@ print(conn)
 --criarRanking()
 
 -- CREATE 
+-- Utilizar string.format igual em C para "preparar" a declaracao
 local function addRegistro(nome_jogador, data_inicio, hora_inicio, data_final, hora_final, pontuacao, dificuldade, modo)
     if conn ~= nil then
         local declaracao = [[

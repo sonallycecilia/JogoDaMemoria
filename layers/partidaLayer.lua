@@ -1,4 +1,4 @@
-local nivelDeJogo = require("classes.niveldeJogo")
+local nivelDeJogo = require("classes.niveldeJogoEnum")
 local Partida = require("classes.partida")
 local Config = require("config")
 
@@ -35,7 +35,7 @@ end
 function PartidaLayer:update(dt)
     if self.partidaFinalizada then return end
     
-    self.partida:update(dt) -- REVISAR ISSO AQUI, A classe partida não deveria ter relação com o framework
+    self.partida:update(dt) -- REVISAR ISSO AQUI
 
     -- Lógica de tempo para o modo cooperativo
     if self.partida.modoDeJogo == "cooperativo" and not self.partida.partidaFinalizada then
