@@ -40,6 +40,8 @@ function Partida:new(modoDeJogo, nivel)
         self.tempoLimite = ({180, 150, 120, 90})[nivel] or 180
     elseif modoDeJogo == "solo" then
         self.tempoLimite = ({300, 360, 420, 480})[nivel] or 300
+    elseif modoDeJogo == "competitivo" then
+        self.tempoLimite = ({240, 300, 360, 420})[nivel] or 240
     else
         self.tempoLimite = 180
     end
@@ -61,6 +63,8 @@ function Partida:new(modoDeJogo, nivel)
     end
     if modoDeJogo == "solo" then
         self.modoSolo = Solo:new(self)
+    elseif modoDeJogo == "competitivo" then
+        self.modoCompetitivo = Competitivo:new(self)
     end
     if modoDeJogo == "competitivo" then
         --self.modoCompetitivo = Competitivo:new(self)
@@ -156,77 +160,56 @@ function Partida:cliqueGeral(x, y)
 end
 
 function Partida:mousepressed(x, y, button)
-    print("=== DEBUG CLIQUE ===")
-    print("Posição:", x, y, "Botão:", button)
-    print("Modo de jogo:", self.modoDeJogo)
-    print("Partida finalizada:", self.partidaFinalizada)
-    
-    if button == 1 and not self.partidaFinalizada then -- Clique esquerdo
+    if button == 1 and not self.partidaFinalizada then
         if self.modoDeJogo == "cooperativo" then
-            print("Chamando clique cooperativo...")
             return self:cliqueModoCooperativo(x, y)
         elseif self.modoDeJogo == "solo" then
-            print("Chamando clique solo...")
             return self:cliqueModoSolo(x, y)
+        elseif self.modoDeJogo == "competitivo" then
+            return self:cliqueModoCompetitivo(x, y)
         else
-            print("Chamando clique geral...")
             return self:cliqueGeral(x, y)
         end
     end
-    print("Clique ignorado")
     return false
 end
 
 function Partida:cliqueModoCooperativo(x, y)
-    if not self.modoCooperativo then
-        return false
-    end
-    
-    -- Busca a carta clicada
-    local cartaClicada = nil
-    for i, carta in ipairs(self.tabuleiro.cartas) do
+    if not self.modoCooperativo then return false end
+    for _, carta in ipairs(self.tabuleiro.cartas) do
         if carta:clicada(x, y) then
-            cartaClicada = carta
-            break
+            return self.modoCooperativo:cliqueCarta(carta)
         end
     end
-    
-    if not cartaClicada then
-        return false
-    end
-    
-    return self.modoCooperativo:cliqueCarta(cartaClicada)
+    return false
 end
 
 function Partida:cliqueModoSolo(x, y)
-    if not self.modoSolo then
-        return false
-    end
-    
-    -- Busca a carta clicada
-    local cartaClicada = nil
-    for i, carta in ipairs(self.tabuleiro.cartas) do
+    if not self.modoSolo then return false end
+    for _, carta in ipairs(self.tabuleiro.cartas) do
         if carta:clicada(x, y) then
-            cartaClicada = carta
-            break
+            return self.modoSolo:cliqueCarta(carta)
         end
     end
-    
-    if not cartaClicada then
-        return false
+    return false
+end
+
+function Partida:cliqueModoCompetitivo(x, y)
+    if not self.modoCompetitivo then return false end
+    for _, carta in ipairs(self.tabuleiro.cartas) do
+        if carta:clicada(x, y) then
+            return self.modoCompetitivo:cliqueCarta(carta)
+        end
     end
-    
-    return self.modoSolo:cliqueCarta(cartaClicada)
+    return false
 end
 
 function Partida:cliqueGeral(x, y)
-    -- Implementação para outros modos de jogo
     for _, carta in ipairs(self.tabuleiro.cartas) do
         if carta:clicada(x, y) and not carta.encontrada then
             if #self.cartasViradasNoTurno < 2 then
                 carta:alternarLado()
                 table.insert(self.cartasViradasNoTurno, carta)
-                
                 if #self.cartasViradasNoTurno == 2 then
                     self:verificaGrupoCartas()
                 end
@@ -238,36 +221,27 @@ function Partida:cliqueGeral(x, y)
 end
 
 function Partida:verificaGrupoCartas()
-    -- Método original para outros modos
     local grupoFormado = true
-    local imgPrimeiraCarta = self.cartasViradasNoTurno[1].imagemFrente
-    
+    local imgPrimeira = self.cartasViradasNoTurno[1].imagemFrente
     for i = 2, #self.cartasViradasNoTurno do
-        if self.cartasViradasNoTurno[i].imagemFrente ~= imgPrimeiraCarta then
+        if self.cartasViradasNoTurno[i].imagemFrente ~= imgPrimeira then
             grupoFormado = false
             break
         end
     end
-    
     if grupoFormado then
-        self:adicionarPontuacao()
-        self:removerCartasViradasNoTurno()
-    else
-        self.timerCartasViradas = self.tempoParaVirarDeVolta -- Timer para desvirar
-        self:desvirarCartasDoTurno()
+        self:adicionarAoScore()
+        for _, carta in ipairs(self.cartasViradasNoTurno) do carta.encontrada = true end
         self.cartasViradasNoTurno = {}
-        for _, carta in ipairs(self.cartasViradasNoTurno) do
-            carta.encontrada = true
-        end
-    end
-    --Removi os returns se não os métodos abaixo não seria chamados
-    if (not grupoFormado) or (self.modoDeJogo == "competitivo") then
-        if #self.cartasViradasNoTurno == 0 then
-            self:trocaJogadorAtual()
-        end
+    else
+        self:desvirarCartasDoTurno()
     end
 
+    if not grupoFormado or self.modoDeJogo == "competitivo" then
+        self:trocaJogadorAtual()
+    end
 end
+
 
 function Partida:update(dt)
 
@@ -300,56 +274,45 @@ function Partida:adicionarPontuacao()
 end
 
 function Partida:desvirarCartasDoTurno()
-    local ehNil = EhNil(self.cartasViradasNoTurno)
-    if not ehNil then
+    if self.cartasViradasNoTurno and #self.cartasViradasNoTurno > 0 then
         for _, carta in ipairs(self.cartasViradasNoTurno) do
             carta:alternarLado()
         end
-    self.cartasViradasNoTurno = {}
+        self.cartasViradasNoTurno = {}
     end
 end
 
 function Partida:trocaJogadorAtual()
-    if self.jogadorAtual == "humano" then
-        self.jogadorAtual = "maquina"
-    end
-    if self.jogadorAtual == "maquina" then
-        self.jogadorAtual = "humano"
+    self.jogadorAtual = (self.jogadorAtual == "humano") and "maquina" or "humano"
+end
+
+function Partida:update(dt)
+    if not self.partidaFinalizada then
+        self.tempoRestante = self.tempoRestante - dt
+        if self.modoCooperativo then self.modoCooperativo:update(dt) end
+        if self.modoSolo then self.modoSolo:update(dt) end
+        if self.modoCompetitivo then self.modoCompetitivo:update(dt) end
+        self:checkGameEnd()
     end
 end
 
 function Partida:finalizarPartida(vitoria)
-    print("Partida finalizada!") -- debug
-    local modoDeJogo = self.modoDeJogo
-    local dificuldade = self.nivel -- Substituir 1, 2, 3, 4 por FACIL, MEDIO, DIFICIL, EXTREMO. Utilizar a classe nivelDeJogo
-    local pontuacao = self.score
-    local dataInicio = self.dataInicio
-    local horaInicio = self.horaInicio
     self.partidaFinalizada = true
     self.vitoria = vitoria
-    
-    local DataHora = require("classes.utils.dataHora")
-    DataHora = DataHora:new()
     DataHora:atualizar()
-    local dataFinal = DataHora:formatarData()
-    local horaFinal = DataHora:formatarHora()
-    
     if vitoria then
         local tempoGasto = self.tempoLimite - self.tempoRestante
-        local mensagem = self.modoDeJogo == "solo" and "VITÓRIA! Parabéns! Você completou" or "VITÓRIA! Parabéns! Vocês completaram"
-        print(mensagem .. " em " .. string.format("%.1f", tempoGasto) .. " segundos!")
-        print("Pontuacao final: " .. tostring(self.score) .. " pontos")
-        
-        -- Bonus por tempo restante
+        print((self.modoDeJogo == "solo" and "VITÓRIA! Parabéns! Você completou" or "VITÓRIA! Parabéns! Vocês completaram") .. " em " .. string.format("%.1f", tempoGasto) .. " segundos!")
+        print("Pontuação final: " .. tostring(self.score))
         local bonusTempo = math.floor(self.tempoRestante * 10)
-        self.score:adicionarPontuacao(bonusTempo)
-    
+        self.score:adicionarAoScore(bonusTempo)
+ 
         if bonusTempo > 0 then
             print("Bônus de tempo: +" .. tostring(bonusTempo) .. " pontos")
         end
     else
         print("DERROTA! O tempo acabou!")
-        print("Pontuação final: " .. tostring(self.score) .. " pontos")
+        print("Pontuação final: " .. tostring(self.score))
     end
 end
 
@@ -367,7 +330,8 @@ function Partida:getStatusInfo()
         score = self.score,
         cartasRestantes = self.tabuleiro.cartasRestantes,
         partidaFinalizada = self.partidaFinalizada,
-        vitoria = self.vitoria
+        vitoria = self.vitoria,
+        jogadorAtual = self.jogadorAtual
     }
     
     -- Adiciona informações específicas do modo cooperativo
@@ -439,30 +403,14 @@ function Partida:draw()
             y = y + 25
         end
     end
-
-    -- === TELA DE FIM DE PARTIDA ===
-    if self.partidaFinalizada then
-        local largura = love.graphics.getWidth()
-        local altura = love.graphics.getHeight()
-
-        -- Fundo escuro semi-transparente
-        love.graphics.setColor(0, 0, 0, 0.7)
-        love.graphics.rectangle("fill", 0, 0, largura, altura)
-
-        -- Texto principal
-        love.graphics.setColor(1, 1, 1)
-        love.graphics.setFont(love.graphics.newFont(40))
-        local texto = self.vitoria and "VITÓRIA!" or "DERROTA!"
-        local fonte = love.graphics.getFont()
-        local textoLargura = fonte:getWidth(texto)
-        love.graphics.print(texto, (largura - textoLargura) / 2, altura / 2 - 50)
-
-        -- Pontuação final
-        love.graphics.setFont(love.graphics.newFont(20))
-        local pontuacao = "Pontuação: " .. tostring(info.score)
-        local pontuacaoLargura = love.graphics.getFont():getWidth(pontuacao)
-        love.graphics.print(pontuacao, (largura - pontuacaoLargura) / 2, altura / 2 + 10)
+    if self.modoSolo then
+        for k, v in pairs(self.modoSolo:getStatus()) do info[k] = v end
     end
+    if self.modoCompetitivo then
+        for k, v in pairs(self.modoCompetitivo:getStatus()) do info[k] = v end
+    end
+
+    return info
 end
 
 return Partida

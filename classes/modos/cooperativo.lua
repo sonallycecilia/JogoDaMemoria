@@ -29,6 +29,9 @@ function Cooperativo:new(partida)
     -- Flag para controlar se IA deve jogar após desvirar
     self.iaDeveJogarAposDesvirar = false
     
+    -- ✅ PROTEÇÃO: Flag para evitar múltiplas jogadas da IA
+    self.iaEstaJogando = false
+    
     -- Sistema de memória próprio da IA (mais confiável)
     self.memoriaIA = {}
     
@@ -60,6 +63,9 @@ function Cooperativo:new(partida)
         print("Modo Cooperativo - EXTREMO: Combinações variáveis!")
         self:mostrarGruposObjetivo()
     end
+    
+    -- IA sempre inteligente no modo cooperativo (90% chance de usar memória)
+    self.chanceUsarMemoria = 0.90
     
     -- Atualiza o tempo da partida
     partida.tempoLimite = self.tempoLimite
@@ -153,16 +159,19 @@ function Cooperativo:update(dt)
         end
     end
     
-    -- Controla a vez da IA (só quando explicitamente ativada E não há cartas viradas)
-    if self.vezIA and #self.partida.cartasViradasNoTurno == 0 then
+    -- ✅ PROTEÇÃO: Controla a vez da IA com verificações extras
+    if self.vezIA and #self.partida.cartasViradasNoTurno == 0 and not self.iaEstaJogando then
         self.timerVezIA = self.timerVezIA + dt
         if self.timerVezIA >= self.intervaloPensamento then
+            print("[Sistema] 🤖 Ativando jogada da IA cooperativa...")
             self:jogadaIA()
             self.timerVezIA = 0
             -- SEMPRE desativa IA após jogar, independente do resultado
             self.vezIA = false
             print("[Sistema] IA jogou, SEMPRE volta para humano")
         end
+    elseif self.iaEstaJogando then
+        print("[Sistema] ⏳ IA ainda está jogando, aguardando...")
     end
 end
 
@@ -378,11 +387,13 @@ function Cooperativo:selecionarCartaInteligente(ignorarCarta)
     end
     
     if #cartasDisponiveis == 0 then
+        print("[IA] ⚠️ NENHUMA CARTA DISPONÍVEL!")
         return nil
     end
     
-    -- Retorna carta aleatória das disponíveis
-    return cartasDisponiveis[math.random(1, #cartasDisponiveis)]
+    local cartaSelecionada = cartasDisponiveis[math.random(1, #cartasDisponiveis)]
+    print("[IA] 🎲 Carta aleatória selecionada: ID", cartaSelecionada.id)
+    return cartaSelecionada
 end
 
 function Cooperativo:adicionarCartaMemoriaIA(carta)
@@ -445,6 +456,7 @@ function Cooperativo:buscarGrupoNaMemoria()
             -- Encontra cartas disponíveis deste ID
             local cartasDisponiveis = {}
             for _, item in ipairs(listaCartas) do
+                -- ✅ CORREÇÃO MELHORADA: Só verifica se não está encontrada e não revelada
                 if not item.carta.encontrada and not item.carta.revelada then
                     table.insert(cartasDisponiveis, item.carta)
                 end
@@ -452,7 +464,7 @@ function Cooperativo:buscarGrupoNaMemoria()
             
             if #cartasDisponiveis >= tamanhoNecessario then
                 local tipoGrupo = tamanhoNecessario == 2 and "PAR" or (tamanhoNecessario == 3 and "TRINCA" or "QUADRA")
-                print("[IA] ENCONTREI " .. tipoGrupo .. " NA MEMÓRIA! ID:", id, "- Cartas disponíveis:", #cartasDisponiveis)
+                print("[IA] 🎯 GRUPO ENCONTRADO NA MEMÓRIA! ID:", id, "Tipo:", tipoGrupo)
                 local grupo = {}
                 for i = 1, tamanhoNecessario do
                     table.insert(grupo, cartasDisponiveis[i])
@@ -462,7 +474,7 @@ function Cooperativo:buscarGrupoNaMemoria()
         end
     end
     
-    print("[IA] Não encontrei grupos completos na minha memória")
+    print("[IA] 🤔 Não encontrei grupos completos na minha memória")
     return {}
 end
 
@@ -510,10 +522,29 @@ end
 function Cooperativo:jogadaIA()
     print("[IA] === INICIANDO MINHA JOGADA ===")
     
+    -- ✅ PROTEÇÃO 1: Verifica se realmente é vez da IA
+    if not self.vezIA then
+        print("[IA] ❌ ERRO: Não é minha vez! vezIA:", self.vezIA)
+        return
+    end
+    
+    -- ✅ PROTEÇÃO 2: Verifica se pode jogar
+    if #self.partida.cartasViradasNoTurno > 0 then
+        print("[IA] ❌ ERRO: Ainda há " .. #self.partida.cartasViradasNoTurno .. " cartas viradas")
+        return
+    end
+    
+    -- ✅ PROTEÇÃO 3: Marca que IA está jogando para evitar múltiplas chamadas
+    if self.iaEstaJogando then
+        print("[IA] ❌ ERRO: Já estou jogando! Evitando chamada dupla")
+        return
+    end
+    self.iaEstaJogando = true
+    
     if self.modoVariavel then
-        print("[IA] Modo extremo - analisando objetivos...")
+        print("[IA] 🎯 Modo extremo - analisando objetivos...")
     else
-        print("[IA] Preciso virar " .. self.cartasPorGrupo .. " cartas")
+        print("[IA] 🎯 Preciso virar " .. self.cartasPorGrupo .. " cartas")
     end
     
     self:mostrarEstadoMemoria()
@@ -521,67 +552,88 @@ function Cooperativo:jogadaIA()
     -- MARCA: Esta jogada é da IA
     self.ultimaJogadaFoiIA = true
     
-    -- Verifica se pode jogar
-    if #self.partida.cartasViradasNoTurno > 0 then
-        print("[IA] ERRO: Ainda tem cartas viradas, não posso jogar")
-        return
-    end
-    
     local cartas = {}
     
-    -- PRIMEIRO: Busca grupo conhecido na MINHA memória (90% de chance)
-    local usarMemoria = math.random() < 0.90
+    -- PRIMEIRO: Busca grupo conhecido na MINHA memória (sempre tenta usar memória no cooperativo)
+    local usarMemoria = math.random() < self.chanceUsarMemoria
     
     if usarMemoria then
         cartas = self:buscarGrupoNaMemoria()
         
         if #cartas > 0 then
-            print("[IA] PERFEITO! Vou formar o grupo que já conheço: ID " .. cartas[1].id)
+            print("[IA] 🧠 PERFEITO! Vou formar o grupo que já conheço: ID " .. cartas[1].id)
         else
             cartas = {}  -- Limpa se não conseguiu grupo completo
         end
     else
-        print("[IA] Decidi não usar memória desta vez (explorando)")
+        print("[IA] 🎲 Decidi não usar memória desta vez (explorando)")
     end
     
     -- SEGUNDO: Se não tem grupo conhecido, escolhe uma carta e define tamanho
     if #cartas == 0 then
-        print("[IA] Vou jogar de forma exploratória...")
+        print("[IA] 🔍 Vou jogar de forma exploratória...")
         
         local primeiraCarta = self:selecionarCartaInteligente()
         if not primeiraCarta then
             print("[IA] ERRO: Não consegui encontrar primeira carta")
+            self.iaEstaJogando = false  -- ✅ LIBERA proteção
             return
         end
         
         local tamanhoGrupo = self.modoVariavel and self:obterTamanhoGrupoEsperado(primeiraCarta.id) or self.cartasPorGrupo
         
         table.insert(cartas, primeiraCarta)
-        primeiraCarta.revelada = true -- Marca temporariamente
+        print("[IA] 📝 Primeira carta ID " .. primeiraCarta.id .. " - Preciso de " .. tamanhoGrupo .. " cartas")
         
         -- Busca o resto do grupo
         for i = 2, tamanhoGrupo do
             local carta = self:selecionarCartaInteligente()
             if carta then
                 table.insert(cartas, carta)
-                carta.revelada = true -- Marca temporariamente
+                print("[IA] 📝 Adicionei carta " .. i .. ": ID " .. carta.id)
+            else
+                print("[IA] ⚠️ Não consegui encontrar carta " .. i)
             end
-        end
-        
-        -- Desfaz marcação temporária
-        for _, carta in ipairs(cartas) do
-            carta.revelada = false
         end
     end
     
     if #cartas == 0 then
         print("[IA] ERRO: Não consegui encontrar cartas suficientes")
+        self.iaEstaJogando = false  -- ✅ LIBERA proteção
         return
     end
     
-    print("[IA] Virando " .. #cartas .. " cartas:")
+    -- ✅ PROTEÇÃO 4: Verifica se há cartas duplicadas na seleção
+    local cartasUnicas = {}
+    for _, carta in ipairs(cartas) do
+        local chave = carta.x .. "_" .. carta.y
+        if cartasUnicas[chave] then
+            print("[IA] ❌ ERRO: Carta duplicada detectada! Posição:", carta.x, carta.y)
+            self.iaEstaJogando = false
+            return
+        end
+        cartasUnicas[chave] = true
+    end
+    
+    print("[IA] 🎮 Virando " .. #cartas .. " cartas:")
     for i, carta in ipairs(cartas) do
-        print("  Carta " .. i .. ": ID " .. carta.id)
+        print("  Carta " .. i .. ": ID " .. carta.id .. " Pos:", carta.x, carta.y)
+        
+        -- ✅ PROTEÇÃO 5: Verifica se carta já estava revelada
+        if carta.revelada then
+            print("  ⚠️  ERRO CRÍTICO: Carta já estava revelada!")
+            self.iaEstaJogando = false
+            return
+        end
+        
+        -- ✅ PROTEÇÃO 6: Verifica se carta já está no turno
+        for _, cartaTurno in ipairs(self.partida.cartasViradasNoTurno) do
+            if cartaTurno == carta then
+                print("  ⚠️  ERRO CRÍTICO: Carta já está em cartasViradasNoTurno!")
+                self.iaEstaJogando = false
+                return
+            end
+        end
     end
     
     -- Executa a jogada da IA
@@ -591,45 +643,19 @@ function Cooperativo:jogadaIA()
         table.insert(self.partida.cartasViradasNoTurno, carta)
     end
     
+    -- ✅ PROTEÇÃO 7: Confirma quantas cartas foram realmente adicionadas
+    print("[IA] ✅ Adicionei " .. #self.partida.cartasViradasNoTurno .. " cartas ao turno")
+    
     -- No modo extremo, define o grupo esperado
     if self.modoVariavel then
         self.grupoAtualEsperado = #cartas
     end
     
-    -- Verifica se formou grupo
-    local primeiroId = cartas[1].id
-    local formouGrupo = true
-    for _, carta in ipairs(cartas) do
-        if carta.id ~= primeiroId then
-            formouGrupo = false
-            break
-        end
-    end
+    -- Verifica se formou grupo através da função padrão
+    self:verificarGrupo()
     
-    -- No modo extremo, verifica tamanho correto
-    if self.modoVariavel and formouGrupo then
-        local tamanhoEsperado = self:obterTamanhoGrupoEsperado(primeiroId)
-        if #cartas ~= tamanhoEsperado then
-            formouGrupo = false
-        end
-    end
-    
-    if formouGrupo then
-        -- IA acertou
-        print("[IA] SUCESSO! Formei o grupo correto!")
-        self:processarGrupoEncontrado(cartas)
-        if self.modoVariavel then
-            self.grupoAtualEsperado = nil
-        end
-    else
-        -- IA errou
-        print("[IA] Errei, mas agora sei onde estão essas cartas...")
-        self.timerCartasViradas = self.tempoExibirCartas
-        if self.modoVariavel then
-            self.grupoAtualEsperado = nil
-        end
-    end
-    
+    -- ✅ PROTEÇÃO 8: Libera flag no final
+    self.iaEstaJogando = false
     print("[IA] === TERMINEI MINHA JOGADA ===")
 end
 

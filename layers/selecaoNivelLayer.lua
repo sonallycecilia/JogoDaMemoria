@@ -14,41 +14,25 @@ function SelecaoNivelLayer:new(manager)
         Botao:new(Config, Config.botoes.imagemPath.menuSelecaoNivel.facil, 100, 300, 0.8, 0.8, function()
             self.manager.nivelSelecionado = 1
             -- DETECTA O MODO E VAI PARA O LAYER CORRETO
-            if self.manager.modoSelecionado == "cooperativo" then
-                self.proximaLayer = "jogoCooperativo"
-            else
-                self.proximaLayer = "partida"
-            end
+            self.proximaLayer = self:obterLayerPorModo()
         end),
         
         Botao:new(Config, Config.botoes.imagemPath.menuSelecaoNivel.medio, 100, 360, 0.8, 0.8, function()
             self.manager.nivelSelecionado = 2
             -- DETECTA O MODO E VAI PARA O LAYER CORRETO
-            if self.manager.modoSelecionado == "cooperativo" then
-                self.proximaLayer = "jogoCooperativo"
-            else
-                self.proximaLayer = "partida"
-            end
+            self.proximaLayer = self:obterLayerPorModo()
         end),
         
         Botao:new(Config, Config.botoes.imagemPath.menuSelecaoNivel.dificil, 100, 420, 0.8, 0.8, function()
             self.manager.nivelSelecionado = 3
             -- DETECTA O MODO E VAI PARA O LAYER CORRETO
-            if self.manager.modoSelecionado == "cooperativo" then
-                self.proximaLayer = "jogoCooperativo"
-            else
-                self.proximaLayer = "partida"
-            end
+            self.proximaLayer = self:obterLayerPorModo()
         end),
         
         Botao:new(Config, Config.botoes.imagemPath.menuSelecaoNivel.extremo, 100, 480, 0.8, 0.8, function()
             self.manager.nivelSelecionado = 4
             -- DETECTA O MODO E VAI PARA O LAYER CORRETO
-            if self.manager.modoSelecionado == "cooperativo" then
-                self.proximaLayer = "jogoCooperativo"
-            else
-                self.proximaLayer = "partida"
-            end
+            self.proximaLayer = self:obterLayerPorModo()
         end),
         
         Botao:new(Config, Config.botoes.imagemPath.menuSelecaoNivel.voltar, 100, 540, 0.8, 0.8, function()
@@ -59,9 +43,24 @@ function SelecaoNivelLayer:new(manager)
     return self
 end
 
-function SelecaoNivelLayer:load()
-
+-- ✅ FUNÇÃO ATUALIZADA: Determina qual layer usar baseado no modo selecionado
+function SelecaoNivelLayer:obterLayerPorModo()
+    print("Modo selecionado:", self.manager.modoSelecionado) -- Debug
     
+    if self.manager.modoSelecionado == "cooperativo" then
+        print("Direcionando para jogoCooperativo")
+        return "jogoCooperativo"
+    elseif self.manager.modoSelecionado == "competitivo" then
+        print("Direcionando para jogoCompetitivo")
+        return "jogoCompetitivo"
+    elseif self.manager.modoSelecionado == "solo" then
+        print("Direcionando para jogoSolo")
+        return "jogoSolo"  -- ✅ AGORA USA LAYER ESPECÍFICA
+    else
+        print("Modo desconhecido, usando partidaLayer como fallback")
+        return "partida"  -- Fallback para outros modos
+    end
+
 end
 
 function SelecaoNivelLayer:update(dt)

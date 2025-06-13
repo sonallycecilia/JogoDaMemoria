@@ -231,7 +231,7 @@ function Solo:processarGrupoEncontrado(grupo)
     local bonusSequencia = math.floor(pontosGrupo * (self.multiplicadorSequencia - 1))
     local pontosTotal = pontosGrupo + bonusSequencia
     
-    self.partida.score:adicionarPontuacao(pontosTotal)
+    self.partida.score:adicionarAoScore(pontosTotal)
     self.ultimoAcerto = true
     
     -- Remove as cartas do tabuleiro
@@ -267,7 +267,61 @@ function Solo:desvirarCartas()
     print("[Sistema] Continue jogando...")
 end
 
--- Melhorar a Janela de exibição
+-- ✅ NOVA FUNÇÃO: Interface visual para modo solo
+function Solo:drawInterface()
+    if not self.partida then return end
+    
+    local largura = love.graphics.getWidth()
+    local info = self:getStatus()
+    
+    -- Painel de informações no canto superior direito
+    love.graphics.setColor(0, 0, 0, 0.8)
+    love.graphics.rectangle("fill", largura - 250, 10, 240, 150)
+    
+    love.graphics.setColor(1, 1, 1)
+    love.graphics.setFont(love.graphics.newFont(16))
+    
+    local x, y = largura - 240, 20
+    
+    -- Título
+    love.graphics.setColor(0.2, 0.8, 1) -- Azul para solo
+    love.graphics.print("MODO SOLO", x, y)
+    love.graphics.setColor(1, 1, 1)
+    y = y + 25
+    
+    -- Tempo
+    love.graphics.print("Tempo: " .. math.floor(info.tempoRestante / 60) .. ":" .. string.format("%02d", info.tempoRestante % 60), x, y)
+    y = y + 20
+    
+    -- Pontuação
+    local pontuacao = self.partida.score and self.partida.score.pontuacao or 0
+    love.graphics.print("Pontos: " .. pontuacao, x, y)
+    y = y + 20
+    
+    -- Informações específicas do solo
+    if info.multiplicador and info.multiplicador > 1 then
+        love.graphics.setColor(0.2, 1, 0.2) -- Verde
+        love.graphics.print("Mult: " .. string.format("%.1f", info.multiplicador) .. "x", x, y)
+        love.graphics.setColor(1, 1, 1)
+        y = y + 20
+    end
+    
+    if info.gruposConsecutivos and info.gruposConsecutivos > 1 then
+        love.graphics.setColor(1, 1, 0.2) -- Amarelo
+        love.graphics.print("Sequência: " .. tostring(info.gruposConsecutivos), x, y)
+        love.graphics.setColor(1, 1, 1)
+        y = y + 20
+    end
+    
+    -- Alerta de tempo baixo
+    if info.tempoRestante <= 30 and info.tempoRestante > 0 then
+        love.graphics.setColor(1, 0.2, 0.2) -- Vermelho
+        love.graphics.setFont(love.graphics.newFont(18))
+        love.graphics.print("TEMPO BAIXO!", largura/2 - 60, 50)
+        love.graphics.setColor(1, 1, 1)
+    end
+end
+
 function Solo:getStatus()
     local modoTexto
     if self.partida.nivel == 1 then
