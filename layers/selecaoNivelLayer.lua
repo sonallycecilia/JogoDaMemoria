@@ -60,6 +60,7 @@ function SelecaoNivelLayer:obterLayerPorModo()
         print("Modo desconhecido, usando partidaLayer como fallback")
         return "partida"  -- Fallback para outros modos
     end
+
 end
 
 function SelecaoNivelLayer:update(dt)
@@ -71,18 +72,49 @@ end
 
 function SelecaoNivelLayer:draw()
     love.graphics.clear(0, 0, 0, 1)
-    local largura = love.graphics.getWidth()
-    local altura = love.graphics.getHeight()
-    
+
+    local larguraTela = love.graphics.getWidth()
+    local alturaTela = love.graphics.getHeight()
+
+    -- Fundo principal
     local imagemFundo = love.graphics.newImage(Config.janela.IMAGEM_TELA_INICIAL)
-    local xFundo = (largura - imagemFundo:getWidth()) / 2
-    local yFundo = (altura - imagemFundo:getHeight()) / 2
+    local xFundo = (larguraTela - imagemFundo:getWidth()) / 2
+    local yFundo = (alturaTela - imagemFundo:getHeight()) / 2
+    love.graphics.setColor(1, 1, 1, 1)
     love.graphics.draw(imagemFundo, xFundo, yFundo)
-    
-    -- ✅ REMOVIDO: Todo o texto de indicadores e explicações
-    
+
+    -- Camada preta translúcida
+    love.graphics.setColor(0, 0, 0, 0.8)
+    love.graphics.rectangle("fill", 0, 0, larguraTela, alturaTela)
+
+    -- Frame do menu com escala reduzida
+    local imagemFundoMenu = love.graphics.newImage(Config.frames.menu.imagemPath)
+    local menuScale = 0.8
+    local larguraMenu = imagemFundoMenu:getWidth() * menuScale
+    local alturaMenu = imagemFundoMenu:getHeight() * menuScale
+    local xFundoMenu = (larguraTela - larguraMenu) / 2
+    local yFundoMenu = (alturaTela - alturaMenu) / 2
+
+    love.graphics.setColor(1, 1, 1, 1)
+    love.graphics.draw(imagemFundoMenu, xFundoMenu, yFundoMenu, 0, menuScale, menuScale)
+
+    -- Calcula altura total real dos botões com espaçamento
+    local espacamento = 5  -- margem entre botões
+    local alturaTotal = 0
     for _, botao in ipairs(self.botoes) do
+    alturaTotal = alturaTotal + (botao.height * botao.scaleY)
+    end
+    alturaTotal = alturaTotal + espacamento * (#self.botoes - 1)
+
+    local yInicial = yFundoMenu + (alturaMenu - alturaTotal) / 2
+
+    -- Posiciona centralizado
+    local yAtual = yInicial
+    for _, botao in ipairs(self.botoes) do
+        botao.x = xFundoMenu + (larguraMenu - botao.width * botao.scaleX) / 2
+        botao.y = yAtual
         botao:draw()
+        yAtual = yAtual + (botao.height * botao.scaleY) + espacamento
     end
 end
 

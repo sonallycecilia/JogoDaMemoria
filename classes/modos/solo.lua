@@ -1,108 +1,66 @@
 -- classes/modos/solo.lua
+require("classes.niveldeJogoEnum")
 
 local Solo = {}
 Solo.__index = Solo
 
 function Solo:new(partida)
     local self = setmetatable({}, Solo)
-    
     self.partida = partida
-    
     -- Configurações específicas do modo solo
     self.multiplicadorSequencia = 1
     self.gruposConsecutivos = 0
     self.ultimoAcerto = false
-    
     -- Timer para cartas que não formaram par/trinca
     self.timerCartasViradas = 0
-    self.tempoExibirCartas = 2.0
-    
+    self.tempoExibirCartas = 1
     -- CONFIGURAÇÕES BASEADAS NO NÍVEL
-    if partida.nivel == 1 then
+    if self.partida.nivel == FACIL then
         -- Fácil: pares (2 cartas)
-        self.cartasPorGrupo = 2
         self.tempoLimite = 300  -- 5 minutos (mais tempo que cooperativo)
         self.modoVariavel = false
         print("Modo Solo - FÁCIL: Encontre PARES (2 cartas iguais)")
-    elseif partida.nivel == 2 then
+    end
+    if self.partida.nivel == MEDIO then
         -- Médio: trincas (3 cartas)
-        self.cartasPorGrupo = 3
         self.tempoLimite = 360  -- 6 minutos
         self.modoVariavel = false
         print("Modo Solo - MÉDIO: Encontre TRINCAS (3 cartas iguais)")
-    elseif partida.nivel == 3 then
+    end
+    if self.partida.nivel == DIFICIL then
         -- Difícil: quadras (4 cartas)
-        self.cartasPorGrupo = 4
         self.tempoLimite = 420  -- 7 minutos
         self.modoVariavel = false
         print("Modo Solo - DIFÍCIL: Encontre QUADRAS (4 cartas iguais)")
-    else
+    end
+    if self.partida.nivel == EXTREMO then
         -- Extremo: combinações variáveis
-        self.cartasPorGrupo = nil  -- Será dinâmico
         self.tempoLimite = 480  -- 8 minutos
         self.modoVariavel = true
-        self.gruposDefinidos = self:definirGruposVariaveis()
+        self.tamGrupoAtualEsperado = 0 -- tam do grupo da primeira carta que for virada
         print("Modo Solo - EXTREMO: Combinações variáveis!")
         self:mostrarGruposObjetivo()
     end
-    
     -- Atualiza o tempo da partida
-    partida.tempoLimite = self.tempoLimite
-    partida.tempoRestante = self.tempoLimite
-    
+    self.partida.tempoLimite = self.tempoLimite
+    self.partida.tempoRestante = self.tempoLimite
     -- Garantir que todas as cartas iniciem viradas para baixo
     self:inicializarCartas()
-    
     print("Você tem " .. math.floor(self.tempoLimite/60) .. " minutos para encontrar todos os grupos!")
-    
     return self
-end
-
-function Solo:definirGruposVariaveis()
-    -- Define quais cartas formam grupos de qual tamanho no modo extremo
-    local grupos = {}
-    
-    -- Mesma configuração do modo cooperativo
-    -- 3 pares (6 cartas)
-    grupos[0] = 2  -- fada: par
-    grupos[1] = 2  -- naly: par  
-    grupos[2] = 2  -- elfa: par
-    
-    -- 3 trincas (9 cartas)
-    grupos[3] = 3  -- draenei: trinca
-    grupos[4] = 3  -- borboleta: trinca
-    grupos[5] = 3  -- lua: trinca
-    
-    -- 2 quadras (8 cartas)
-    grupos[6] = 4  -- coracao: quadra
-    grupos[7] = 4  -- espelho: quadra
-    
-    -- Restantes são pares para completar
-    grupos[8] = 2  -- flor: par
-    grupos[9] = 2  -- gato: par
-    grupos[10] = 2 -- pocao: par
-    grupos[11] = 2 -- planta: par
-    
-    return grupos
 end
 
 function Solo:mostrarGruposObjetivo()
     print("=== OBJETIVOS DO MODO EXTREMO ===")
     local nomeCartas = {"fada", "naly", "elfa", "draenei", "borboleta", "lua", "coracao", "espelho", "flor", "gato", "pocao", "planta"}
-    
-    for id, tamanho in pairs(self.gruposDefinidos) do
-        local tipo = tamanho == 2 and "PAR" or (tamanho == 3 and "TRINCA" or "QUADRA")
-        print("- " .. nomeCartas[id + 1] .. ": " .. tipo .. " (" .. tamanho .. " cartas)")
+    local numCopias
+
+    for indice, carta in pairs(self.partida.tabuleiro.tiposCartas) do
+        numCopias = carta.numCopias
+        local tipo = (carta.numCopias == 2 and "PAR") or (carta == 3 and "TRINCA") or (carta.numCopias == 4 and "QUADRA")
+        print("-", nomeCartas[indice], ":", tipo, "(", numCopias, "cartas)")
     end
     print("=================================")
-end
-
-function Solo:obterTamanhoGrupoEsperado(idCarta)
-    if self.modoVariavel then
-        return self.gruposDefinidos[idCarta] or 2  -- Default para par se não definido
-    else
-        return self.cartasPorGrupo
-    end
 end
 
 function Solo:inicializarCartas()
@@ -126,6 +84,7 @@ function Solo:inicializarCartas()
     print("[DEBUG] ================================")
 end
 
+-- Conexao com o Love deveria ser feito pelo Layer
 function Solo:update(dt)
     -- Atualiza timer das cartas viradas (que não formaram grupo)
     if #self.partida.cartasViradasNoTurno > 0 and self.timerCartasViradas > 0 then
@@ -141,30 +100,32 @@ function Solo:cliqueCarta(carta)
     -- Debug: verificar estado da carta
     print("Clique na carta - ID:", carta.id, "Revelada:", carta.revelada, "Encontrada:", carta.encontrada)
     
-    if carta.encontrada then
-        print("Carta já foi encontrada")
-        return false
-    end
     
     if carta.revelada then
         print("Carta já está revelada")
         return false
     end
+    if carta.encontrada then
+        print("Carta já foi encontrada")
+        return false
+    end
+    
     
     -- No modo extremo, o limite é dinâmico baseado na primeira carta
     local limiteCartas
     if self.modoVariavel then
         if #self.partida.cartasViradasNoTurno == 0 then
             -- Primeira carta define o tipo de grupo esperado
-            limiteCartas = self:obterTamanhoGrupoEsperado(carta.id)
-            self.grupoAtualEsperado = limiteCartas
-            local tipoGrupo = (limiteCartas == 2 and "PAR" or (limiteCartas == 3 and "TRINCA" or "QUADRA"))
+            limiteCartas = carta.numCopias
+            self.tamGrupoAtualEsperado = limiteCartas
+            local tipoGrupo = (limiteCartas == 2 and "PAR" or (limiteCartas == 3 and "TRINCA") or (limiteCartas == 4 and "QUADRA"))
             print("[Extremo] Primeira carta ID " .. carta.id .. " - Objetivo: " .. tipoGrupo)
         else
-            limiteCartas = self.grupoAtualEsperado or 2  -- Default se não definido
+            limiteCartas = self.tamGrupoAtualEsperado or 2  -- Default se não definido
         end
-    else
-        limiteCartas = self.cartasPorGrupo or 2  -- Default se não definido
+    end
+    if not self.modoVariavel then
+        limiteCartas = carta.numCopias or 2  -- Default se não definido
     end
     
     -- Não permite mais cartas que o necessário por turno
@@ -189,12 +150,12 @@ end
 
 function Solo:verificarGrupo()
     local cartasViradas = self.partida.cartasViradasNoTurno
-    local primeiraCartaId = cartasViradas[1].id
+    local primeiraCarta = cartasViradas[1]
     local grupoFormado = true
     
     -- Verifica se todas as cartas têm o mesmo ID
     for i = 2, #cartasViradas do
-        if cartasViradas[i].id ~= primeiraCartaId then
+        if cartasViradas[i].id ~= primeiraCarta.id then
             grupoFormado = false
             break
         end
@@ -202,9 +163,9 @@ function Solo:verificarGrupo()
     
     -- No modo extremo, verifica se o tamanho está correto
     if self.modoVariavel and grupoFormado then
-        local tamanhoEsperado = self:obterTamanhoGrupoEsperado(primeiraCartaId)
+        local tamanhoEsperado = primeiraCarta.numCopias
         if #cartasViradas ~= tamanhoEsperado then
-            print("[Sistema] ERRO: Carta ID " .. primeiraCartaId .. " precisa de " .. tamanhoEsperado .. " cartas, mas você revelou " .. #cartasViradas)
+            print("[Sistema] ERRO: Carta ID " .. primeiraCarta.id .. " precisa de " .. tamanhoEsperado .. " cartas, mas você revelou " .. #cartasViradas)
             grupoFormado = false
         end
     end
@@ -212,37 +173,39 @@ function Solo:verificarGrupo()
     local tipoGrupo
     if #cartasViradas == 2 then
         tipoGrupo = "PAR"
-    elseif #cartasViradas == 3 then
+    end
+    if #cartasViradas == 3 then
         tipoGrupo = "TRINCA"
-    elseif #cartasViradas == 4 then
+    end
+    if #cartasViradas == 4 then
         tipoGrupo = "QUADRA"
-    else
-        tipoGrupo = "GRUPO"
+    end
+    if #cartasViradas > 4 or #cartasViradas < 2 then
+        tipoGrupo = "GRUPO" -- Se entrou aqui algo deu errado
     end
     
-    print("[Sistema] Verificando " .. tipoGrupo .. " - ID:", primeiraCartaId, "Total cartas:", #cartasViradas)
+    print("[Sistema] Verificando " .. tipoGrupo .. " - ID:", primeiraCarta, "Total cartas:", #cartasViradas)
     
     if grupoFormado then
         -- Grupo encontrado!
         print("[Sistema] " .. tipoGrupo .. " ENCONTRADO!")
         self:processarGrupoEncontrado(cartasViradas)
         -- Reset para próximo grupo no modo extremo
-        if self.modoVariavel then
-            self.grupoAtualEsperado = nil
-        end
-    else
+    end
+    if not grupoFormado then
         -- Não formou grupo - mostra cartas e depois desvira
         print("[Sistema] Não formou " .. tipoGrupo .. ", mostrando cartas por", self.tempoExibirCartas, "segundos")
         self.timerCartasViradas = self.tempoExibirCartas
         self.ultimoAcerto = false
         self.gruposConsecutivos = 0
         self.multiplicadorSequencia = 1
-        
-        -- Reset para próximo grupo no modo extremo
-        if self.modoVariavel then
-            self.grupoAtualEsperado = nil
-        end
     end
+
+    -- Reset para próximo grupo no modo extremo
+    if self.modoVariavel then
+        self.tamGrupoAtualEsperado = nil
+    end
+
 end
 
 function Solo:processarGrupoEncontrado(grupo)
@@ -255,8 +218,10 @@ function Solo:processarGrupoEncontrado(grupo)
     -- Atualiza estatísticas de sequência
     if self.ultimoAcerto then
         self.gruposConsecutivos = self.gruposConsecutivos + 1
+        -- REMOVER LIMITAÇÃO DE MULTIPLICADOR DE 5X
         self.multiplicadorSequencia = math.min(self.multiplicadorSequencia + 0.5, 5) -- Max 5x
-    else
+    end
+    if not self.ultimoAcerto then
         self.gruposConsecutivos = 1
         self.multiplicadorSequencia = 1
     end
@@ -266,7 +231,6 @@ function Solo:processarGrupoEncontrado(grupo)
     local bonusSequencia = math.floor(pontosGrupo * (self.multiplicadorSequencia - 1))
     local pontosTotal = pontosGrupo + bonusSequencia
     
-    -- ✅ CORREÇÃO: Usar o método correto para adicionar pontos
     self.partida.score:adicionarAoScore(pontosTotal)
     self.ultimoAcerto = true
     

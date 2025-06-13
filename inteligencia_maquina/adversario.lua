@@ -1,6 +1,8 @@
 -- inteligencia_maquina/adversario.lua
 math.randomseed(os.time())
 
+local SEM_CARTA = -1
+
 local Adversario = {}
 Adversario.__index = Adversario
 
@@ -12,11 +14,8 @@ function Adversario:new()
 end
 
 function Adversario:inicializarMemoria(linhas, colunas)
-    for i = 1, linhas do
-        self.memoria[i] = {}
-        for j = 1, colunas do
-            self.memoria[i][j] = nil
-        end
+    for i = 1, linhas*colunas do
+        self.memoria[i] = SEM_CARTA
     end
 end
 

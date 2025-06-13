@@ -2,9 +2,9 @@ local Config = {}
 
 -- Configurações de janela (MANTIDAS)
 Config.janela = {
-    LARGURA_TELA = love.graphics.getWidth(),
-    ALTURA_TELA = love.graphics.getHeight(),
-    IMAGEM_TELA_INICIAL = "midia/images/telaInicial.png",
+    LARGURA_TELA = 1200,
+    ALTURA_TELA = 800,
+    IMAGEM_TELA_INICIAL = "midia/images/telaInicial.png" ,
     IMAGEM_TELA_PARTIDA = "midia/images/telaPartida.jpg",
 }
 
@@ -38,10 +38,10 @@ Config.botoes = {
             pausar = "midia/botoes/partida/pausar.png",
         },
         menuSelecaoNivel = {
-            facil = "midia/botoes/selecaoNivel/botao_base_selecao_nivel.png",
-            medio = "midia/botoes/selecaoNivel/botao_base_selecao_nivel.png",
-            dificil = "midia/botoes/selecaoNivel/botao_base_selecao_nivel.png",
-            extremo = "midia/botoes/selecaoNivel/botao_base_selecao_nivel.png",
+            facil = "midia/botoes/niveisDeJogo/facil.png",
+            medio = "midia/botoes/niveisDeJogo/medio.png",
+            dificil = "midia/botoes/niveisDeJogo/dificil.png",
+            extremo = "midia/botoes/niveisDeJogo/extremo.png",
             voltar = "midia/botoes/menuJogo/voltar.png"
         }
     }
@@ -51,16 +51,16 @@ Config.botoes = {
 Config.deck = {
     "midia/images/cartas/fada.png",
     "midia/images/cartas/naly.png",
-    "midia/images/cartas/elfa.png",
     "midia/images/cartas/draenei.png",
-    "midia/images/cartas/borboleta.png",
-    "midia/images/cartas/lua.png",
+    "midia/images/cartas/thales.png",
+    "midia/images/cartas/lucy.png",
+    "midia/images/cartas/fury.png",
+    "midia/images/cartas/bomba.png",
+    "midia/images/cartas/yule.png",
     "midia/images/cartas/coracao.png",
-    "midia/images/cartas/espelho.png", -- Observação: você tem draenei duplicado
+    "midia/images/cartas/borboleta.png",
     "midia/images/cartas/flor.png",
-    "midia/images/cartas/gato.png",
-    "midia/images/cartas/pocao.png",
-    "midia/images/cartas/planta.png",
+    "midia/images/cartas/lua.png",
 }
 
 -- Frames (MANTIDOS)
@@ -74,6 +74,46 @@ Config.frames = {
         score = "midia/frames/score.png",
     }
 }
+
+Config.cartasEspeciais = {
+    tipos = {
+    "Revelacao",
+    "Congelamento",
+    "Bomba"
+},
+quantidadePorNivel = {
+    FACIL = 1,
+    MEDIO = 2,
+    DIFICIL = 3,
+    EXTREMO = 3
+},
+chance = 0.5 --probabilidade de ser especial
+}
+Config.tempoRevelada = 1 --demora 1 segundo virada as cartas pos bomba
+
+Config.nomes = {
+    niveis = {
+        Facil = 1,
+        Medio = 2,
+        Dificil = 3,
+        Extremo = 4
+    }
+}
+
+Config.CARTA = {
+    Largura = 100,
+    Altura = 100,
+    Verso_carta = "midia/images/verso.png"
+}
+
+Config.tabuleiro = {
+    ESPACAMENTO = 10,
+    Facil = {colunas = 6, linhas = 4, max_cartas = 24},
+    Medio = {colunas = 8, linhas = 5, max_cartas = 40},
+    Dificil = {colunas = 8, linhas = 6, max_cartas = 48},
+    Extremo = {colunas = 10, linhas = 6, max_cartas = 60}
+}
+return Config
 
 -- ===== CONFIGURAÇÕES NOVAS PARA MODO COOPERATIVO =====
 

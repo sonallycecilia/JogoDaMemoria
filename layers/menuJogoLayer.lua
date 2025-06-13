@@ -22,9 +22,9 @@ function MenuJogo:new(manager)
         end),
     
         Botao:new(Config, Config.botoes.imagemPath.menuJogo.solo, 80, 620, 0.8, 0.8, function()
-    self.manager.modoSelecionado = "solo"
-    self.proximaLayer = "selecaoNivel"
-end),
+        self.manager.modoSelecionado = "solo"
+        self.proximaLayer = "selecaoNivel"
+        end),
     
         Botao:new(Config, Config.botoes.imagemPath.menuJogo.voltar, 80, 740, 0.8, 0.8, function()
             self.proximaLayer = "menuPrincipal"

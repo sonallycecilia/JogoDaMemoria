@@ -11,20 +11,21 @@ function Cooperativo:new(partida)
     self.ia = Adversario:new()
     self.ia:inicializarMemoria(partida.tabuleiro.linhas, partida.tabuleiro.colunas)
     
-    -- Configurações específicas do modo cooperativo
+    -- Configurações específicas do modo cooperativo e deveriam ser do competitivo também
     self.multiplicadorSequencia = 1
     self.paresConsecutivos = 0
     self.ultimoAcerto = false
     self.timerVezIA = 0
-    self.intervaloPensamento = 2.0
+    self.intervaloPensamento = 1 -- Tá muito alto
     self.vezIA = false
     
-    -- Timer para cartas que não formaram par/trinca
+    -- Timer para cartas que não formaram grupos
     self.timerCartasViradas = 0
-    self.tempoExibirCartas = 2.0
+    self.tempoExibirCartas = 1
     
     -- Controla quem fez a última jogada
     self.ultimaJogadaFoiIA = false
+    
     -- Flag para controlar se IA deve jogar após desvirar
     self.iaDeveJogarAposDesvirar = false
     
@@ -325,7 +326,7 @@ function Cooperativo:processarGrupoEncontrado(grupo)
     local bonusSequencia = math.floor(pontosGrupo * (self.multiplicadorSequencia - 1))
     local pontosTotal = pontosGrupo + bonusSequencia
     
-    self.partida.score:adicionarAoScore(pontosTotal)
+    self.partida.score:adicionarPontuacao(pontosTotal)
     self.ultimoAcerto = true
     
     -- Remove as cartas do tabuleiro

@@ -1,4 +1,4 @@
-local nivelDeJogo = require("classes.niveldeJogo")
+local nivelDeJogo = require("classes.niveldeJogoEnum")
 local Partida = require("classes.partida")
 local Config = require("config")
 
@@ -13,7 +13,16 @@ function PartidaLayer:new(manager, modoDeJogo, nivel)
     self.modoDeJogo = modoDeJogo
     self.manager = manager
     self.proximaLayer = nil
-    self.partida = Partida:new(modoDeJogo, nivel)
+
+self.partida = Partida:new(modoDeJogo, nivel)
+    -- function () 
+    --     if self.modoDeJogo == "competitivo" then 
+    --         return PartidaCompetitiva:new(self.modoDeJogo, nivel) 
+    --     end 
+    --     if self.modoDeJogo == "cooperativo" then
+    --         return PartidaCooperativa:new(self.modoDeJogo, nivel)
+    --     end
+    -- end
 
     self.tempoParaVirarDeVolta = 1
     self.timerCartasViradas = 0
@@ -28,8 +37,9 @@ function PartidaLayer:update(dt)
         self:updateFinalizacao(dt)
         return 
     end
-    
+
     self.partida:update(dt)
+
 
     if self.partida.modoDeJogo == "cooperativo" and not self.partida.partidaFinalizada then
         self.partida.tempoRestante = self.partida.tempoRestante - dt

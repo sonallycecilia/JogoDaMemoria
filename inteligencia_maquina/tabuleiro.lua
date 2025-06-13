@@ -5,6 +5,7 @@ Tabuleiro.__index = Tabuleiro
 local ESPACAMENTO = 10
 
 function Tabuleiro:new(nivel, dadosCartas)
+
     local novoTabuleiro = {
         nivel = nivel or 1,
         cartas = {},
@@ -118,8 +119,5 @@ function Tabuleiro:allCardsFound()
     return true -- Todas as cartas foram reveladas
 end
 
-function Tabuleiro:removerGrupoEncontrado(listaGrupo)
-    -- TODO
-end
 
 return Tabuleiro
