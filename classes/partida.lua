@@ -69,10 +69,21 @@ function Partida:mousepressed(x, y, button)
     print("Posição:", x, y, "Botão:", button)
     print("Modo de jogo:", self.modoDeJogo)
     print("Partida finalizada:", self.partidaFinalizada)
-    
+
     if button == 1 and not self.partidaFinalizada then -- Clique esquerdo
+        -- Verifica clique em botões
+        if self.botoes then
+            for _, botao in ipairs(self.botoes) do
+                botao:mousepressed(x, y, button)
+                if botao.mouseSobre then
+                    print("Botão clicado:", botao.texto or "<imagem>")
+                    return true
+                end
+            end
+        end
+
+        -- Caso nenhum botão tenha sido clicado, verifica o modo de jogo
         if self.modoDeJogo == "cooperativo" then
-            print("Chamando clique cooperativo...")
             return self:cliqueModoCooperativo(x, y)
         elseif self.modoDeJogo == "solo" then
             print("Chamando clique solo...")
@@ -82,9 +93,12 @@ function Partida:mousepressed(x, y, button)
             return self:cliqueGeral(x, y)
         end
     end
+
     print("Clique ignorado")
     return false
 end
+
+
 
 function Partida:cliqueModoCooperativo(x, y)
     if not self.modoCooperativo then
