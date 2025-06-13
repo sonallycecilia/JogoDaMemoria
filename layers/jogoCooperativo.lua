@@ -30,7 +30,7 @@ function JogoCooperativo:new()
             end
         ),
         configuracoes = Botao:new(Config, Config.botoes.imagemPath.partida.configuracoes,
-            995, 50, 0.8, 0.8,
+            1267, 50, 0.8, 0.8,
             function()
                 print("Configurações clicadas")
             end
