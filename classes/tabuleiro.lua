@@ -26,6 +26,7 @@ function Tabuleiro:new(nivel, dadosCartas)
     }
     setmetatable(self, Tabuleiro) 
 
+    self:carregarCartas(dadosCartas)
     self:definirLayout()
     self:ajustarTamanhoCarta()
     self:gerarCopiaDeCartas()
@@ -335,7 +336,7 @@ end
 
 function Tabuleiro:carregarCartas()
     local carta
-    for i = 1, 12 do
+    for i = 1, #Config.deck do
         carta = Carta:new(i, Config.deck[i])
         table.insert(self.cartas, carta)
     end

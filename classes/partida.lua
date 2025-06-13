@@ -51,8 +51,7 @@ function Partida:new(modoDeJogo, nivel)
     self.horaInicio = dh:formatarHora()
 
     -- A partida não deveria acessar as cartas diretamente, deveria fazer isso por meio de tabuleiro 
-    local cartas = self:carregarCartasInterno()
-    self.tabuleiro = Tabuleiro:new(nivel, cartas)
+    self.tabuleiro = Tabuleiro:new(nivel)
     print("[Partida] Tabuleiro:", self.tabuleiro)
     self.adversarioIA = require("inteligencia_maquina.adversario"):new()
     self.adversarioIA:inicializarMemoria(self.tabuleiro.linhas, self.tabuleiro.colunas)
@@ -70,14 +69,7 @@ function Partida:new(modoDeJogo, nivel)
     return self
 end
 
-function Partida:carregarCartasInterno()
-    local cartas = {}
-    for i = 1, 12 do
-        local carta = Carta:new(i, Config.deck[i])
-        table.insert(cartas, carta)
-    end
-    return cartas
-end
+
 
 function Partida:mousepressed(x, y, button)
     print("=== DEBUG CLIQUE ===")
