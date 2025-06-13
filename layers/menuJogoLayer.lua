@@ -11,22 +11,25 @@ function MenuJogo:new(manager)
     self.anteriorLayer = nil
 
     self.botoes = {
-    Botao:new(Config, Config.botoes.imagemPath.menuJogo.cooperativo, 80, 500, 0.8, 0.8, function()
-        self.proximaLayer = "partida"
-    end),
-
-    Botao:new(Config, Config.botoes.imagemPath.menuJogo.competitivo, 80, 560, 0.8, 0.8, function()
-        --configurar
-    end),
-
-    Botao:new(Config, Config.botoes.imagemPath.menuJogo.solo, 80, 620, 0.8, 0.8, function()
-        --configurar
-    end),
-
-    Botao:new(Config, Config.botoes.imagemPath.menuJogo.voltar, 80, 740, 0.8, 0.8, function()
-        --configurar
-    end)
-}
+        Botao:new(Config, Config.botoes.imagemPath.menuJogo.cooperativo, 80, 500, 0.8, 0.8, function()
+            self.proximaLayer = "selecaoNivel"
+            self.manager.modoSelecionado = "cooperativo"
+        end),        
+    
+        Botao:new(Config, Config.botoes.imagemPath.menuJogo.competitivo, 80, 560, 0.8, 0.8, function()
+            self.manager.modoSelecionado = "competitivo"
+            self.proximaLayer = "selecaoNivel"
+        end),
+    
+        Botao:new(Config, Config.botoes.imagemPath.menuJogo.solo, 80, 620, 0.8, 0.8, function()
+        self.manager.modoSelecionado = "solo"
+        self.proximaLayer = "selecaoNivel"
+        end),
+    
+        Botao:new(Config, Config.botoes.imagemPath.menuJogo.voltar, 80, 740, 0.8, 0.8, function()
+            self.proximaLayer = "menuPrincipal"
+        end)
+    }
 
     return self
 end

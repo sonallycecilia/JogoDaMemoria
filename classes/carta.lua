@@ -15,15 +15,19 @@ function Carta:new(id, caminhoImagemFrente)
         pathImagem = caminhoImagemFrente,
         imagemFrente = love.graphics.newImage(caminhoImagemFrente),
         imagemVerso = love.graphics.newImage(VERSO),
-        revelada = false, -- se não for passado, assume false
+        revelada = false, -- ALTERADO PARA TESTES
         posX = nil,
         posY = nil,
         rodadaEncontrada = nil,
         probErro = 0,
         encontrada = false,
+        cartasEspeciais
         ehEspecial = false,
         tiposEspeciais = {},
         taCongelada = false
+
+        numCopias = 0 -- Será definido em tabuleiro
+
     }
     setmetatable(novaCarta, Carta)
     return novaCarta
@@ -38,6 +42,7 @@ end
 function Carta:marcarComoCombinada()
     self.encontrada = true
     self.revelada = true
+
 end
 
 function Carta:setPosicao(x, y)
@@ -62,6 +67,7 @@ function Carta:draw(largura, altura)
     end
 end
 
+
 function Carta:ativarPoder(partidaInstance, tabuleiroInstance) -- Use partidaInstance, tabuleiroInstance para consistência
     if self.ehEspecial and self.tipoEspecial then
         -- Chama a função correspondente em CartasEspeciais (seu módulo de poderes)
@@ -72,6 +78,7 @@ function Carta:ativarPoder(partidaInstance, tabuleiroInstance) -- Use partidaIns
         elseif self.tipoEspecial == "Bomba" then
             return CartasEspeciais:explode(partidaInstance, tabuleiroInstance, self)
         end
+
     end
     return false
 end

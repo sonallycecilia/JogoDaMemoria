@@ -2,6 +2,7 @@ local LayerManager = require("layers.layerManager")
 local Animacao = require("interface.animacao")
 local Config = require("config")
 
+-- Inicialização do debugger, se for o caso
 if os.getenv "LOCAL_LUA_DEBUGGER_VSCODE" == "1" then
     local lldebugger = require "lldebugger"
     lldebugger.start()
@@ -12,26 +13,27 @@ if os.getenv "LOCAL_LUA_DEBUGGER_VSCODE" == "1" then
     end
 end
 
+-- Instância principal do gerenciador de camadas
 local manager = LayerManager:new()
 local animacao
 
-function love.load()
+function love.load(arg)
+    -- Debugger para o ZeroBrane
+    if arg and arg[#arg] == "-debug" then
+        require("mobdebug").start()
+    end
+
     animacao = Animacao.nova("midia/sprites/heart_sprite.png", 64, 64, '1-7', 0.1)
     animacao:setPosicao(850, 0)
 
-    -- Passa o nome da layer (string), LayerManager cria a instância e associa o manager
-    manager:setLayer("partida")
-
-    -- Exemplo de música
-    -- local song = love.audio.newSource("midia/audio/loop-8-28783.mp3", "stream")
-    -- song:setLooping(true)
-    -- song:play()
+    manager:setLayer("menuPrincipal") -- começa no menu principal
 end
 
 function love.update(dt)
     animacao:update(dt)
     manager:update(dt)
 
+    -- Verifica troca de camada
     local layerAtual = manager.currentLayer
     if layerAtual and layerAtual.proximaLayer then
         manager:setLayer(layerAtual.proximaLayer)
@@ -55,5 +57,4 @@ end
 
 function love.draw()
     manager:draw()
-    -- animacao:draw()
 end
