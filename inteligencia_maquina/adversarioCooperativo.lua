@@ -1,3 +1,4 @@
+require("classes.niveldeJogoEnum")
 -- inteligencia_maquina/adversarioCooperativo.lua
 -- Versão específica para o modo cooperativo
 math.randomseed(os.time())
@@ -14,10 +15,10 @@ function AdversarioCooperativo:new(nivel)
     
     -- Configurações de inteligência baseadas no nível
     local configInteligencia = {
-        [1] = {probabilidadeMemoria = 0.85, probabilidadeAcerto = 0.90}, -- Fácil
-        [2] = {probabilidadeMemoria = 0.75, probabilidadeAcerto = 0.80}, -- Médio  
-        [3] = {probabilidadeMemoria = 0.65, probabilidadeAcerto = 0.70}, -- Difícil
-        [4] = {probabilidadeMemoria = 0.55, probabilidadeAcerto = 0.60}  -- Extremo
+        [FACIL] = {probabilidadeMemoria = 0.85, probabilidadeAcerto = 0.90}, -- Fácil
+        [MEDIO] = {probabilidadeMemoria = 0.75, probabilidadeAcerto = 0.80}, -- Médio  
+        [DIFICIL] = {probabilidadeMemoria = 0.65, probabilidadeAcerto = 0.70}, -- Difícil
+        [EXTREMO] = {probabilidadeMemoria = 0.55, probabilidadeAcerto = 0.60}  -- Extremo
     }
     
     local config = configInteligencia[nivel] or configInteligencia[1]
