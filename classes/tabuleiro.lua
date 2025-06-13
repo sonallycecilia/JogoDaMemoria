@@ -8,13 +8,13 @@ Tabuleiro.__index = Tabuleiro --permite utilizar o objeto como protótipo para o
 
 
 -- TODO: Alterar parâmetro dadosCartas para vetorCartas
-function Tabuleiro:new(nivel, dadosCartas)
+function Tabuleiro:new(nivel)
     self = {
         nivel = nivel or 1,
         largura = 800,
         altura = 600,
         cartas = {},
-        tiposCartas = dadosCartas,
+        tiposCartas = {},
         tamanhoCarta = 100,
         cartasTotais = nil,
         cartasRestantes = nil,
@@ -26,7 +26,7 @@ function Tabuleiro:new(nivel, dadosCartas)
     }
     setmetatable(self, Tabuleiro) 
 
-    self:carregarCartas(dadosCartas)
+    self:carregarCartas()
     self:definirLayout()
     self:ajustarTamanhoCarta()
     self:gerarCopiaDeCartas()
@@ -338,10 +338,10 @@ function Tabuleiro:carregarCartas()
     local carta
     for i = 1, #Config.deck do
         carta = Carta:new(i, Config.deck[i])
-        table.insert(self.cartas, carta)
+        table.insert(self.tiposCartas, carta)
     end
     
-    print("Carregadas " .. #self.cartas .. " tipos de cartas (IDs 1 a " .. (#self.cartas) .. ")")
+    print("Carregadas " .. #self.tiposCartas .. " tipos de cartas (IDs 1 a " .. (#self.tiposCartas) .. ")")
 end
 
 return Tabuleiro

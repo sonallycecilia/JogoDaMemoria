@@ -150,12 +150,12 @@ end
 
 function Solo:verificarGrupo()
     local cartasViradas = self.partida.cartasViradasNoTurno
-    local primeiraCartaId = cartasViradas[1].id
+    local primeiraCarta = cartasViradas[1]
     local grupoFormado = true
     
     -- Verifica se todas as cartas têm o mesmo ID
     for i = 2, #cartasViradas do
-        if cartasViradas[i].id ~= primeiraCartaId then
+        if cartasViradas[i].id ~= primeiraCarta.id then
             grupoFormado = false
             break
         end
@@ -163,9 +163,9 @@ function Solo:verificarGrupo()
     
     -- No modo extremo, verifica se o tamanho está correto
     if self.modoVariavel and grupoFormado then
-        local tamanhoEsperado = primeiraCartaId.numCopias
+        local tamanhoEsperado = primeiraCarta.numCopias
         if #cartasViradas ~= tamanhoEsperado then
-            print("[Sistema] ERRO: Carta ID " .. primeiraCartaId .. " precisa de " .. tamanhoEsperado .. " cartas, mas você revelou " .. #cartasViradas)
+            print("[Sistema] ERRO: Carta ID " .. primeiraCarta.id .. " precisa de " .. tamanhoEsperado .. " cartas, mas você revelou " .. #cartasViradas)
             grupoFormado = false
         end
     end
@@ -184,7 +184,7 @@ function Solo:verificarGrupo()
         tipoGrupo = "GRUPO" -- Se entrou aqui algo deu errado
     end
     
-    print("[Sistema] Verificando " .. tipoGrupo .. " - ID:", primeiraCartaId, "Total cartas:", #cartasViradas)
+    print("[Sistema] Verificando " .. tipoGrupo .. " - ID:", primeiraCarta, "Total cartas:", #cartasViradas)
     
     if grupoFormado then
         -- Grupo encontrado!

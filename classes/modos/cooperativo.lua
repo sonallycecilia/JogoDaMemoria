@@ -16,12 +16,12 @@ function Cooperativo:new(partida)
     self.paresConsecutivos = 0
     self.ultimoAcerto = false
     self.timerVezIA = 0
-    self.intervaloPensamento = 1.5 -- Tá muito alto
+    self.intervaloPensamento = 1 -- Tá muito alto
     self.vezIA = false
     
-    -- Timer para cartas que não formaram par/trinca
+    -- Timer para cartas que não formaram grupos
     self.timerCartasViradas = 0
-    self.tempoExibirCartas = 1.5
+    self.tempoExibirCartas = 1
     
     -- Controla quem fez a última jogada
     self.ultimaJogadaFoiIA = false
@@ -317,7 +317,7 @@ function Cooperativo:processarGrupoEncontrado(grupo)
     local bonusSequencia = math.floor(pontosGrupo * (self.multiplicadorSequencia - 1))
     local pontosTotal = pontosGrupo + bonusSequencia
     
-    self.partida.score:adicionarAoScore(pontosTotal)
+    self.partida.score:adicionarPontuacao(pontosTotal)
     self.ultimoAcerto = true
     
     -- Remove as cartas do tabuleiro

@@ -206,11 +206,7 @@ function Partida:update(dt)
             self.modoCompetitivo:update(dt)
         end
         
-        if Partida:finalizou() then
-            print("[Partida] Método finalizou(), Tabuleiro: ", self.tabuleiro)
-            ganhou = self:verificaVitoria()
-            self:finalizarPartida(ganhou)
-        end
+        self:checkGameEnd()
     end
 end
 
@@ -274,25 +270,12 @@ function Partida:finalizarPartida(vitoria)
     end
 end
 
-function Partida:finalizou()
-    local finalizou = false
-    print("[Partida] entrou no metodo finalizou()")
-    print("[Partida] tabuleiro :", self.tabuleiro)
-    if self.tabuleiro:allCardsFound() or self.tempoRestante <= 0 then
-        finalizou = true    
-    end
-    return finalizou
-end
-
-function Partida:verificaVitoria()
-    local ganhou
+function Partida:checkGameEnd()
     if self.tabuleiro:allCardsFound() then
-        ganhou = true
+        self:finalizarPartida(true)
+    elseif self.tempoRestante <= 0 then
+        self:finalizarPartida(false)
     end
-    if self.tempoRestante <= 0 then
-        ganhou = false
-    end
-    return ganhou
 end
 
 function Partida:getStatusInfo()
