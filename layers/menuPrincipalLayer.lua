@@ -10,6 +10,7 @@ function MenuPrincipalLayer:new(manager)
     self.proximaLayer = nil
 
     self.imagemFundo = love.graphics.newImage(Config.janela.IMAGEM_TELA_INICIAL)
+    self.imagemNome = love.graphics.newImage("midia/images/nome.png")
 
     self.botoes = {
         iniciarJogo = Botao:new(Config,
@@ -64,6 +65,7 @@ function MenuPrincipalLayer:draw()
     local yFundo = (alturaTela - alturaImagem) / 2
 
     love.graphics.draw(self.imagemFundo, xFundo, yFundo)
+    love.graphics.draw(self.imagemNome, 800, 200, 0, 0.8, 0.8)
 
     for _, botao in pairs(self.botoes) do
         botao:draw()
