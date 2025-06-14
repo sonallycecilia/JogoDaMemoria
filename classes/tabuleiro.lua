@@ -24,7 +24,7 @@ function Tabuleiro:new(nivel)
         erroBase = 30,
         imagemTabuleiro = love.graphics.newImage(Config.frames.partida.tabuleiro),
     }
-    setmetatable(tabuleiro, Tabuleiro) 
+    setmetatable(self, Tabuleiro)
 
     self:carregarCartas()
     self:definirLayout()
@@ -53,28 +53,28 @@ function Tabuleiro:definirLayout()
         self.colunas = 6
         self.linhas = 4
         self.cartasTotais = self.linhas * self.colunas
-        self.cartasRestantes = cartasTotais
+        self.cartasRestantes = self.cartasTotais
         -- 4x6 = 24 cartas = 12 pares perfeito!
     end
     if self.nivel == MEDIO then
         self.colunas = 6
         self.linhas = 6
         self.cartasTotais = self.linhas * self.colunas
-        self.cartasRestantes = cartasTotais
+        self.cartasRestantes = self.cartasTotais
         -- 6x6 = 36 cartas = 12 trincas
     end
     if self.nivel == DIFICIL then
         self.colunas = 8
         self.linhas = 6
         self.cartasTotais = self.linhas * self.colunas
-        self.cartasRestantes = cartasTotais
+        self.cartasRestantes = self.cartasTotais
         -- 8x6 = 48 cartas = 12 quadras
     end
     if self.nivel == EXTREMO then
         self.colunas = 6
         self.linhas = 6
         self.cartasTotais = self.linhas * self.colunas
-        self.cartasRestantes = cartasTotais
+        self.cartasRestantes = self.cartasTotais
         -- 6x6 = 36 cartas = numeros variáveis de trincas e quadras
     end
     print("[Tabuleiro] Nível " .. self.nivel .. ": " .. self.linhas .. "x" .. self.colunas .. " = " .. (self.cartasTotais) .. " posições")

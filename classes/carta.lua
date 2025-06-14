@@ -21,10 +21,10 @@ function Carta:new(id, caminhoImagemFrente)
         rodadaEncontrada = nil,
         probErro = 0,
         encontrada = false,
-        cartasEspeciais
+        cartasEspeciais = nil,
         ehEspecial = false,
         tiposEspeciais = {},
-        taCongelada = false
+        taCongelada = false,
 
         numCopias = 0 -- Será definido em tabuleiro
 
@@ -76,7 +76,7 @@ function Carta:ativarPoder(partidaInstance, tabuleiroInstance) -- Use partidaIns
         elseif self.tipoEspecial == "Congelamento" then
             return CartasEspeciais:ativarCongelamentoSelecao(partidaInstance) -- Mude o nome do método aqui também
         elseif self.tipoEspecial == "Bomba" then
-            return CartasEspeciais:explode(partidaInstance, tabuleiroInstance, self)
+            return CartasEspeciais:explode(partidaInstance, tabuleiroInstance)
         end
 
     end

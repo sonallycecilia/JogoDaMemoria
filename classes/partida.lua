@@ -73,31 +73,6 @@ function Partida:new(modoDeJogo, nivel)
     return self
 end
 
-function Partida:mousepressed(x, y, button)
-    print("=== DEBUG CLIQUE ===")
-    print("Posição:", x, y, "Botão:", button)
-    print("Modo de jogo:", self.modoDeJogo)
-    print("Partida finalizada:", self.partidaFinalizada)
-    
-    if button == 1 and not self.partidaFinalizada then -- Clique esquerdo
-        if self.modoDeJogo == "cooperativo" then
-            print("Chamando clique cooperativo...")
-            return self:cliqueModoCooperativo(x, y)
-        end
-        if self.modoDeJogo == "solo" then
-            print("Chamando clique solo...")
-            return self:cliqueModoSolo(x, y)
-        end
-        if self.modoDeJogo == "competitivo" then
-            print("Chamando clique geral...")
-            return self:cliqueGeral(x, y)
-        end
-    end
-
-    print("Clique ignorado")
-    return false
-end
-
 function Partida:cliqueModoCooperativo(x, y)
     -- Check nil
     if not self.modoCooperativo then
@@ -141,24 +116,6 @@ function Partida:cliqueModoSolo(x, y)
     return self.modoSolo:cliqueCarta(cartaClicada)
 end
 
-function Partida:cliqueGeral(x, y)
-    -- Implementação para outros modos de jogo
-    for _, carta in ipairs(self.tabuleiro.cartas) do
-        if carta:clicada(x, y) and not carta.encontrada then
-            if #self.cartasViradasNoTurno < 2 then
-                carta:alternarLado()
-                table.insert(self.cartasViradasNoTurno, carta)
-                
-                if #self.cartasViradasNoTurno == 2 then
-                    self:verificaGrupoCartas()
-                end
-                return true
-            end
-        end
-    end
-    return false
-end
-
 function Partida:mousepressed(x, y, button)
     if button == 1 and not self.partidaFinalizada then
         if self.modoDeJogo == "cooperativo" then
@@ -169,26 +126,6 @@ function Partida:mousepressed(x, y, button)
             return self:cliqueModoCompetitivo(x, y)
         else
             return self:cliqueGeral(x, y)
-        end
-    end
-    return false
-end
-
-function Partida:cliqueModoCooperativo(x, y)
-    if not self.modoCooperativo then return false end
-    for _, carta in ipairs(self.tabuleiro.cartas) do
-        if carta:clicada(x, y) then
-            return self.modoCooperativo:cliqueCarta(carta)
-        end
-    end
-    return false
-end
-
-function Partida:cliqueModoSolo(x, y)
-    if not self.modoSolo then return false end
-    for _, carta in ipairs(self.tabuleiro.cartas) do
-        if carta:clicada(x, y) then
-            return self.modoSolo:cliqueCarta(carta)
         end
     end
     return false
@@ -284,16 +221,6 @@ end
 
 function Partida:trocaJogadorAtual()
     self.jogadorAtual = (self.jogadorAtual == "humano") and "maquina" or "humano"
-end
-
-function Partida:update(dt)
-    if not self.partidaFinalizada then
-        self.tempoRestante = self.tempoRestante - dt
-        if self.modoCooperativo then self.modoCooperativo:update(dt) end
-        if self.modoSolo then self.modoSolo:update(dt) end
-        if self.modoCompetitivo then self.modoCompetitivo:update(dt) end
-        self:checkGameEnd()
-    end
 end
 
 function Partida:finalizarPartida(vitoria)

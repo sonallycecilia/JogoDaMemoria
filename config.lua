@@ -113,7 +113,6 @@ Config.tabuleiro = {
     Dificil = {colunas = 8, linhas = 6, max_cartas = 48},
     Extremo = {colunas = 10, linhas = 6, max_cartas = 60}
 }
-return Config
 
 -- ===== CONFIGURAÇÕES NOVAS PARA MODO COOPERATIVO =====
 

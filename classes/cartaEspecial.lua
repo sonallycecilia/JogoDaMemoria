@@ -7,7 +7,9 @@ local partida = require("classes.partida")
 function CartasEspeciais:new(Carta)
     local cartaEspecial = {
       tamGrupo = Carta.nivel + 1,
-      idGrupo = Carta.idGrupo 
+      idGrupo = Carta.idGrupo,
+      allCartas = {},
+      bombIndex = -1,
     }
 setmetatable(cartaEspecial, CartasEspeciais)
 return cartaEspecial
@@ -52,8 +54,8 @@ end
 function CartasEspeciais.explode(partida, tabuleiro, bombCard)
   local contReveladas = 0
   local allCards = tabuleiro:getAllCards()
-  
-  local indexBomba =-1
+
+  local bombIndex = -1
   for i, card in ipairs(allCards) do
     if card == bombCard then 
       bombIndex = i
@@ -64,10 +66,9 @@ function CartasEspeciais.explode(partida, tabuleiro, bombCard)
   if bombIndex == -1 then
     return false
   end
-end
-
-local colunas= (bombIndex - 1) % tabuleiro.colunas
-local row = math.floor((bombIndex - 1) / tabuleiro.colunas)
+    -- Agora que bombIndex está definido e válido, podemos calcular colunas e linhas
+    local colunas = (bombIndex - 1) % tabuleiro.colunas
+    local row = math.floor((bombIndex - 1) / tabuleiro.colunas)
 
     -- Offsets para os vizinhos (inclui a própria carta bomba no centro como referência, que será excluída)
     local neighborOffsets = {
@@ -76,16 +77,16 @@ local row = math.floor((bombIndex - 1) / tabuleiro.colunas)
         {-1,  1}, {0,  1}, {1,  1} 
     }
   
-  local cartasPraRevelar = {}
-  for _, offset in ipairs(neighborOffsets) do
-  local nCol = colunas + offset[1]
+    local cartasPraRevelar = {}
+    for _, offset in ipairs(neighborOffsets) do
+        local nCol = colunas + offset[1]
         local nRow = row + offset[2]
 
         -- Verifica se o vizinho está dentro dos limites do tabuleiro e não é a própria bomba
         if nCol >= 0 and nCol < tabuleiro.colunas and
            nRow >= 0 and nRow < tabuleiro.linhas and
            not (offset[1] == 0 and offset[2] == 0) then
-            
+            local allCards = tabuleiro:getAllCards()
             local neighborIndex = nRow * tabuleiro.colunas + nCol + 1
             local neighborCard = allCards[neighborIndex]
             if neighborCard and not neighborCard.revelada and not neighborCard.combinada and not neighborCard.isFrozen then
@@ -93,23 +94,24 @@ local row = math.floor((bombIndex - 1) / tabuleiro.colunas)
             end
         end
     end  
-  if #cartasPraRevelar > 4 then
-    local cartasEscolhidas = {}
-    for _, v in ipairs(cartasPraRevelar) do 
-      table.insert(cartasEscolhidas, v) end
-     for i = #cartasEscolhidas, 2, -1 do
+    if #cartasPraRevelar > 4 then
+        local cartasEscolhidas = {}
+        for _, v in ipairs(cartasPraRevelar) do 
+            table.insert(cartasEscolhidas, v)
+        end
+        for i = #cartasEscolhidas, 2, -1 do
             local j = math.random(i)
             cartasEscolhidas[i], cartasEscolhidas[j] = cartasEscolhidas[j], cartasEscolhidas[i]
         end
         cartasPraRevelar = {cartasEscolhidas[1], cartasEscolhidas[2], cartasEscolhidas[3], cartasEscolhidas[4]}
     end
-    contReveladas = #cartasPraRevelar
-  
-  -- Revela as cartas temporariamente
+    local contReveladas = #cartasPraRevelar
+
+    -- Revela as cartas temporariamente
     for _, card in ipairs(cartasPraRevelar) do
         card:alternarLado()
         love.timer.after(1, function()
-          card:alternarLado()
-          
-      end)
+            card:alternarLado()
+        end)
     end
+end
