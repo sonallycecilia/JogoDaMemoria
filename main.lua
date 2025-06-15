@@ -55,6 +55,12 @@ function love.keypressed(key)
     end
 end
 
+function love.wheelmoved(x, y)
+    if manager and manager.currentLayer and manager.currentLayer.wheelmoved then
+        manager.currentLayer:wheelmoved(x, y)
+    end
+end
+
 function love.draw()
     manager:draw()
 end
