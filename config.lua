@@ -11,6 +11,7 @@ Config.janela = {
 Config.scaleX = 0.5
 Config.scaleY = 0.5
 Config.defaultErrorImage = "assets/erro.png"
+Config.fonte = love.graphics.newFont("midia/fontes/PixelifySans-VariableFont_wght.ttf", 28)
 
 -- Configurações de botões (MANTIDAS)
 Config.botoes = {

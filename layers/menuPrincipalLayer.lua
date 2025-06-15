@@ -36,7 +36,7 @@ function MenuPrincipalLayer:new(manager)
         skins = Botao:new(Config,
             Config.botoes.imagemPath.menuPrincipal.skins,
             50, 740, 0.7, 0.7,
-            function() print("Skins") end),
+            function() self.proximaLayer = "rank" end),
 
         sair = Botao:new(Config,
             Config.botoes.imagemPath.menuPrincipal.sair,
