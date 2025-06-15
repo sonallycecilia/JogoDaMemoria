@@ -12,7 +12,7 @@ function RankLayer:new(manager)
     
     self.botoes = {
         Botao:new(Config,
-            Config.botoes.imagemPath.menuJogo.voltar,
+            Config.botoes.imagemPath.menuPrincipal.sair,
             50, 50, 0.7, 0.7,
             function() self.proximaLayer = "menuPrincipal" end),
     }
@@ -139,7 +139,7 @@ function RankLayer:draw()
     -- Posiciona centralizado
     local yAtual = yInicial
     for _, botao in ipairs(self.botoes) do
-        botao.x = xFundoMenu + (larguraMenu - botao.width * botao.scaleX) / 2
+        botao.x = xFundoMenu + 200 + (larguraMenu - botao.width * botao.scaleX) / 2
         botao.y = 150 + yAtual
         botao:draw()
         yAtual = yAtual + (botao.height * botao.scaleY) + espacamento
