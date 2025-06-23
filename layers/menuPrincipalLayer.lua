@@ -65,7 +65,7 @@ function MenuPrincipalLayer:draw()
     local yFundo = (alturaTela - alturaImagem) / 2
 
     love.graphics.draw(self.imagemFundo, xFundo, yFundo)
-    love.graphics.draw(self.imagemNome, 800, 95, 0, 0.8, 0.8)
+    love.graphics.draw(self.imagemNome, 900, 95, 0, 0.7, 0.7)
 
     for _, botao in pairs(self.botoes) do
         botao:draw()
