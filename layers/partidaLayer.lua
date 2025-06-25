@@ -280,8 +280,8 @@ function PartidaLayer:jogadaMaquina()
     if carta1.id == carta2.id then
         carta1.encontrada = true
         carta2.encontrada = true
-        if self.partida.score and self.partida.score.adicionarAoScore then
-            self.partida.score:adicionarAoScore(200)
+        if self.partida.score and self.partida.score.adicionarPontuacao then
+            self.partida.score:adicionarPontuacao(200)
         else
             self.partida.score = (self.partida.score or 0) + 200
         end

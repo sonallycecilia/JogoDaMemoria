@@ -322,14 +322,6 @@ function Competitivo:processarGrupoEncontrado(grupo, jogador)
     -- Adiciona pontos ao jogador (usando o sistema do modo solo)
     if jogador == "HUMANO" then
         self.scoreHumano = self.scoreHumano + pontosTotal
-        -- Também atualiza o score da partida para compatibilidade
-        if self.partida.score then
-            if type(self.partida.score) == "table" and self.partida.score.adicionarAoScore then
-                self.partida.score:adicionarAoScore(pontosTotal)
-            else
-                self.partida.score = (self.partida.score or 0) + pontosTotal
-            end
-        end
     else
         self.scoreIA = self.scoreIA + pontosTotal
     end

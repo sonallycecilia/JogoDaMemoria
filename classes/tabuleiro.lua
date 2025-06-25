@@ -4,8 +4,7 @@ local Config = require("config")
 local Array = require("inteligencia_maquina.utils.Array")
 
 local Tabuleiro = {}
-Tabuleiro.__index = Tabuleiro --permite utilizar o objeto como protótipo para outros
-
+Tabuleiro.__index = Tabuleiro
 
 -- TODO: Alterar parâmetro dadosCartas para vetorCartas
 function Tabuleiro:new(nivel)
@@ -17,7 +16,7 @@ function Tabuleiro:new(nivel)
         tiposCartas = {},
         tamanhoCarta = 100,
         cartasTotais = nil,
-        cartasRestantes = nil,
+        cartasRestantes = 0,
         linhas = 4, 
         colunas = 6,
         taxaErroBase = 30,
@@ -46,7 +45,20 @@ function Tabuleiro:atualizarCartasRestantes()
     end
     self.cartasRestantes = 0
 end
-   
+
+function Tabuleiro:carregarCartas()
+    self.tiposCartas = {} 
+
+    for i = 1, #Config.deck do
+        local tipoCarta = {
+            id = "g" .. tostring(i),
+            pathImagem = Config.deck[i]
+        }
+        table.insert(self.tiposCartas, tipoCarta)
+    end
+
+    print("Carregadas " .. #self.tiposCartas .. " tipos de cartas (IDs 1 a " .. #self.tiposCartas .. ")")
+end
 
 function Tabuleiro:definirLayout()
     if self.nivel == FACIL then
@@ -71,11 +83,10 @@ function Tabuleiro:definirLayout()
         -- 8x6 = 48 cartas = 12 quadras
     end
     if self.nivel == EXTREMO then
-        self.colunas = 6
+        self.colunas = 8
         self.linhas = 6
         self.cartasTotais = self.linhas * self.colunas
         self.cartasRestantes = self.cartasTotais
-        -- 6x6 = 36 cartas = numeros variáveis de trincas e quadras
     end
     print("[Tabuleiro] Nível " .. self.nivel .. ": " .. self.linhas .. "x" .. self.colunas .. " = " .. (self.cartasTotais) .. " posições")
 end
@@ -98,13 +109,16 @@ end
 function Tabuleiro:gerarCopiaDeCartas()
     local mapCartaCopias = self:definirNumCopiasDoGrupo()
     local tipoCarta
+
     print("[Tabuleiro] Retorno do mapCartaCopias", mapCartaCopias)
     print("[Tabuleiro] Gerando cartas - Preciso de " .. self.cartasTotais .. " cartas")
     print("[Tabuleiro] Tenho " .. #self.tiposCartas .. " tipos diferentes\n")
+
     for i = 1, #self.tiposCartas, 1 do
         tipoCarta = self.tiposCartas[i]
         tipoCarta.numCopias = mapCartaCopias[tipoCarta]
         print("[Tabuleiro] Fazendo ", mapCartaCopias[tipoCarta], " cópias da carta", tipoCarta.pathImagem)
+
         for _ = 1, tipoCarta.numCopias do
             local copia = self:gerarCopiaUnica(tipoCarta)
             table.insert(self.cartas, copia) -- Vetor de cartas inicia Vazio
@@ -112,43 +126,45 @@ function Tabuleiro:gerarCopiaDeCartas()
     end
 
     self.cartasRestantes = #self.cartas
+
+    -- Agora adiciona até 3 cartas especiais em cartas normais
+    self:geraCartasEspeciais()
+
     print("[Tabuleiro] Total de cartas criadas: " .. #self.cartas)
 end
 
-function Tabuleiro:geraCartasEspeciais(dadosCartas, nivel)
-    local numCartasEspeciais = self.tamGrupo - 1
-    local cartasEspeciaisColocadas = 0
-    self.cartas = {}
-    local tiposEspeciais = {
-    "Revelação", "Bomba"}
-    
+function Tabuleiro:geraCartasEspeciais()
+    local tiposDisponiveis = {"Revelacao", "Bomba", "Congelamento"}
+    local iconesEspeciais = {
+        Revelacao = "midia/images/cartas/cartaRevela.png",
+        Bomba = "midia/images/cartas/bombaEspecial.png",
+        Congelamento = "midia/images/cartas/congelamento.png"
+    }
 
-    if cartasEspeciaisColocadas < numCartasEspeciais and #tiposEspeciais>0 then
-                    if math.random() < 10 then
-                        local index = math.random(1, #tiposEspeciais)
-                        table.remove(tiposEspeciais, index)
-                        Carta.ehEspecial = true
-                        Carta.tipoEspecial = tiposEspeciais[index]
-                        cartasEspeciaisColocadas = cartasEspeciaisColocadas+1
-                    end
-                end
-                
-    while cartasEspeciaisColocadas < numCartasEspeciais and #tiposEspeciais > 0 do 
-    local cartaComum = {}
-    for _, carta in ipairs(self.cartas) do
-        if not Carta.ehEspecial then 
-            table.insert(cartaComum, carta)
+    local maxCartasEspeciais = 3
+    local colocadas = 0
+    local tentativas = 0
+    local maxTentativas = 50
+
+    while colocadas < maxCartasEspeciais and tentativas < maxTentativas do
+        local index = math.random(1, #self.cartas)
+        local carta = self.cartas[index]
+
+        if carta and not carta.ehEspecial and carta.idGrupo ~= "especiais" then
+            local tipo = table.remove(tiposDisponiveis, math.random(1, #tiposDisponiveis))
+            if tipo then
+                carta:setEspecial(tipo, iconesEspeciais[tipo])
+                carta.revelada = false -- 👈 Garante que ela esteja virada ao entrar no jogo
+                colocadas = colocadas + 1
+
+                print(string.format(" → Carta especial adicionada: %s [%s] no índice %d", tipo, carta.idGrupo, index))
+            end
         end
+
+        tentativas = tentativas + 1
     end
-    if #cartaComum > 0 then
-        local cartaEscolhida = cartaComum[math.random(1, #cartaComum)]
-        cartaEscolhida.ehEspecial = true
-        cartaEscolhida.tipoEspecial = table.remove(tiposEspeciais, math.random(1, #tiposEspeciais))
-        cartasEspeciaisColocadas = cartasEspeciaisColocadas + 1
-    else 
-        break
-        end
-    end
+
+    print(string.format("[Tabuleiro] %d cartas especiais posicionadas com sucesso", colocadas))
 end
 
 --Lidar com um array unidimensional como se fosse um array bidimensional
@@ -197,31 +213,21 @@ function Tabuleiro:definirNumCopiasDoGrupoExtremo()
     local totalCartas, totalCartasAtual = self.cartasTotais, 0
     local tipoCarta, numCopias
 
-    for i = 1, #self.tiposCartas , 1 do
+    for i = 1, #self.tiposCartas, 1 do
         tipoCarta = self.tiposCartas[i]
         numCopias = math.random(minCopias, maxCopias)
         totalCartasAtual = totalCartasAtual + numCopias
         copiasPorGrupo[tipoCarta] = numCopias
-        print(string.format("[Tabuleiro] Carta: %d, NumCopias: %d, TotalCartasAtual: %d\n", tipoCarta.id, numCopias, totalCartasAtual))
+        print(string.format("[Tabuleiro] Carta: %s, NumCopias: %d, TotalCartasAtual: %d", tipoCarta.id, numCopias, totalCartasAtual))
     end
-    
-    --[[
-        Após o primeiro laço teremos dois casos problemáticos:
-        1ºCaso: totalCartasAtual > totalCartas
-        2ºCaso: totalCartasAtual < totalCartas
-        3ºCaso: totalCartasAtual == totalCarta, estamos na situação ideal
-    ]]--
-        
-    -- 1º Caso, temos que reduzir o número de cópias de alguns tipos de carta
+
+    -- Caso 1: Se totalCartasAtual > totalCartas, reduzir cópias de alguns tipos de carta
     local posCartaSorteada, tipoCartaSorteada
     if totalCartasAtual > totalCartas then
         print("[Tabuleiro] Entrou no 1º Caso: totalCartasAtual > totalCartas")
         while totalCartasAtual > totalCartas do
-            -- Escolhendo o tipo de carta que terá seu número de cópias reduzido
             posCartaSorteada = math.random(1, #self.tiposCartas)
             tipoCartaSorteada = self.tiposCartas[posCartaSorteada]
-            
-            -- Reduzindo o número de cópias em 1, caso este tipo de carta tenha mais que 2 cópias
             if copiasPorGrupo[tipoCartaSorteada] > minCopias then
                 print("[Tabuleiro] TotalCartasAtual:", totalCartasAtual)
                 print("[Tabuleiro] Numero de Copias de:", tipoCartaSorteada.pathImagem, " = ", copiasPorGrupo[tipoCartaSorteada])
@@ -233,16 +239,13 @@ function Tabuleiro:definirNumCopiasDoGrupoExtremo()
             end
         end
     end
-    
-    -- 2ºCaso, temos que aumentar o número de cópias de alguns tipos de carta
+
+    -- Caso 2: Se totalCartasAtual < totalCartas, aumentar cópias de alguns tipos de carta
     if totalCartasAtual < totalCartas then
         print("[Tabuleiro] Entrou no 2º Caso: totalCartasAtual < totalCartas")
         while totalCartasAtual < totalCartas do
-            -- Escolhendo o tipo de carta que terá seu número de cópias aumentado
             posCartaSorteada = math.random(1, #self.tiposCartas)
             tipoCartaSorteada = self.tiposCartas[posCartaSorteada]
-
-            -- aumentando o número de cópias em 1, caso este tipo de carta tenha menos que 4 cópias
             if copiasPorGrupo[tipoCartaSorteada] < maxCopias then
                 print("[Tabuleiro] TotalCartasAtual:", totalCartasAtual)
                 print("[Tabuleiro] Numero de Copias de:", tipoCartaSorteada.pathImagem, " = ", copiasPorGrupo[tipoCartaSorteada])
@@ -255,13 +258,14 @@ function Tabuleiro:definirNumCopiasDoGrupoExtremo()
         end
     end
 
+    print("[Tabuleiro] Finalizando configuração de cópias. TotalCartasAtual =", totalCartasAtual)
     return copiasPorGrupo
 end
 
-function Tabuleiro:gerarCopiaUnica(cartaOriginal)
-    local carta = Carta:new(cartaOriginal.id, cartaOriginal.pathImagem)
-    carta.numCopias = cartaOriginal.numCopias
-
+function Tabuleiro:gerarCopiaUnica(tipoCarta)
+    local carta = Carta:new(tipoCarta.id, tipoCarta.pathImagem)
+    carta.numCopias = tipoCarta.numCopias
+    carta.idGrupo = tipoCarta.id
     return carta
 end
 
@@ -284,11 +288,9 @@ function Tabuleiro:draw()
     love.graphics.setColor(1, 1, 1)
     love.graphics.draw(self.imagemTabuleiro, posTabuleiroX, posTabuleiroY, 0, escala, escala)
 
-    -- Calcula o espaço total que as cartas ocupam
     local totalLarguraCartas = self.colunas * (self.tamanhoCarta + ESPACAMENTO) * escala - ESPACAMENTO * escala
     local totalAlturaCartas = self.linhas * (self.tamanhoCarta + ESPACAMENTO) * escala - ESPACAMENTO * escala
 
-    -- Centraliza as cartas dentro do frame do tabuleiro
     local xInicial = posTabuleiroX + (larguraFrame - totalLarguraCartas) / 2
     local yInicial = posTabuleiroY + (alturaFrame - totalAlturaCartas) / 2
 
@@ -301,31 +303,24 @@ function Tabuleiro:draw()
             local carta = self.cartas[indice]
 
             if carta then
-                local margemVerso = 6
-                local margemFrente = 2
-
-                love.graphics.setColor(1, 1, 1)
-                love.graphics.rectangle("fill", x, y, self.tamanhoCarta * escala, self.tamanhoCarta * escala, 12, 12)
-
-                local margem = carta.revelada and margemFrente or margemVerso
-
+                local margem = carta.revelada and 2 or 6
                 local cartaLargura = (self.tamanhoCarta * escala) - margem * 2
                 local cartaAltura = (self.tamanhoCarta * escala) - margem * 2
                 local cartaX = x + margem
                 local cartaY = y + margem
 
-                carta:setPosicao(cartaX, cartaY)
+                -- POSICIONAMENTO E DIMENSÃO
+                carta:setPosicao(cartaX, cartaY, linha, coluna)
                 carta.largura = cartaLargura
                 carta.altura = cartaAltura
-                carta:draw(cartaLargura, cartaAltura)
-            else
-                love.graphics.setColor(1,1,1)
+
+                love.graphics.setColor(1, 1, 1)
                 love.graphics.rectangle("fill", x, y, self.tamanhoCarta * escala, self.tamanhoCarta * escala, 12, 12)
+                carta:draw(cartaLargura, cartaAltura)
             end
         end
     end
 end
-
 
 
 -- TODO: Adaptar a implementação de inteligencia_maquina\tabuleiroTeste.lua para grupos
@@ -369,16 +364,6 @@ function Tabuleiro:desvirarGrupo(listaGrupo)
             carta.revelada = false
         end
     end
-end
-
-function Tabuleiro:carregarCartas()
-    local carta
-    for i = 1, #Config.deck do
-        carta = Carta:new(i, Config.deck[i])
-        table.insert(self.tiposCartas, carta)
-    end
-    
-    print("Carregadas " .. #self.tiposCartas .. " tipos de cartas (IDs 1 a " .. (#self.tiposCartas) .. ")")
 end
 
 return Tabuleiro

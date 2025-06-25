@@ -14,27 +14,54 @@ function Adversario:new()
 end
 
 function Adversario:inicializarMemoria(linhas, colunas)
-    for i = 1, linhas*colunas do
-        self.memoria[i] = SEM_CARTA
+    self.memoriaLinhas = linhas 
+    self.memoriaColunas = colunas 
+    self.memoria = {}
+
+  
+    for r = 0, linhas - 1 do
+        self.memoria[r] = {}
+        for c = 0, colunas - 1 do
+            self.memoria[r][c] = nil 
+        end
     end
+    print("[IA] Memória inicializada para " .. linhas .. "x" .. colunas .. " slots.")
 end
 
 function Adversario:adicionarCartaMemoria(carta)
-    local x, y = carta.posX, carta.posY
-    if not x or not y then return end
-    if not carta.revelada then return end
+    -- ✅ USAR AS COORDENADAS DE GRID (row, col)
+    local row = carta.row
+    local col = carta.col
 
-    if not self.memoria[x] then self.memoria[x] = {} end
-    self.memoria[x][y] = carta
+    -- ✅ Adicione verificações de segurança:
+    if row == nil or col == nil then
+        print("[IA][AVISO] Tentativa de adicionar carta sem row/col à memória. Pulando. Carta ID:", carta.id)
+        return -- A IA não pode memorizar esta carta sem suas coordenadas de grid.
+    end
+    if carta.ehEspecial then -- A IA não precisa memorizar cartas especiais para combinação.
+        return
+    end
+    -- if not carta.revelada then return end -- Se essa check for para a IA só memorizar cartas que ela virou, mantenha.
+
+    -- Garante que a sub-tabela da linha exista
+    if not self.memoria[row] then
+        self.memoria[row] = {}
+        print(string.format("[IA][DEBUG] Criada nova linha de memória: %d", row))
+    end
+
+    -- Armazena o objeto da carta real na posição correta da matriz
+    self.memoria[row][col] = carta
+    print(string.format("[IA] Adicionado à memória: ID %s em (%d, %d)", carta.id, row, col))
 end
 
 function Adversario:buscarParConhecido()
     local memoriaPorID = {}
 
-    for i = 1, #self.memoria do
-        for j = 1, #self.memoria[i] do
-            local carta = self.memoria[i][j]
-            if carta and not carta.encontrada then
+    -- ✅ Itera sobre a matriz 2D
+    for r = 0, self.memoriaLinhas - 1 do
+        for c = 0, self.memoriaColunas - 1 do
+            local carta = self.memoria[r] and self.memoria[r][c]
+            if carta and not carta.encontrada and not carta.revelada and not carta.ehEspecial then
                 local id = carta.id
                 memoriaPorID[id] = memoriaPorID[id] or {}
                 table.insert(memoriaPorID[id], carta)

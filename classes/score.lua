@@ -17,8 +17,8 @@ function Score:getPontuacao()
 end
 
 function Score:pontuarGrupoEncontrado(tamGrupoCartas)
-    self.pontuacao = self.pontuacao + self.valorBase * tamGrupoCartas
-    -- Adicionar pontuacao adicional com base no tempo ou um sistema de combo para pares encontrados em sequência
+    local base = self.valorBase(self.nivel or 1)
+    self.pontuacao = self.pontuacao + base * tamGrupoCartas
 end
 
 function Score:adicionarPontuacao(pontos)
