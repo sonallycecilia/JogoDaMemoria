@@ -46,7 +46,7 @@ if grupoParaCombinar and #grupoParaCombinar>0 then
     for _, carta in ipairs(grupoParaCombinar) do
         if not carta.encontrada then
             carta:alternarLado()
-            carta.revelada = true -- opcional, já setado no alternarLado
+            carta.revelada = false -- opcional já setado no alternarLado
         end
     end
 
