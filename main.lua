@@ -50,8 +50,14 @@ function love.mousemoved(x, y, dx, dy)
 end
 
 function love.keypressed(key)
-    if (key == "ralt") and (key == "escape") then
+    if (key == "ralt") or (key == "escape") or (key == "x") then
         love.event.quit()
+    end
+end
+
+function love.wheelmoved(x, y)
+    if manager and manager.currentLayer and manager.currentLayer.wheelmoved then
+        manager.currentLayer:wheelmoved(x, y)
     end
 end
 

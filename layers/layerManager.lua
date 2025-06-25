@@ -52,6 +52,7 @@ function LayerManager:update(dt)
     end
 end
 
+
 function LayerManager:draw()
     if self.currentLayer and self.currentLayer.draw then
         self.currentLayer:draw()

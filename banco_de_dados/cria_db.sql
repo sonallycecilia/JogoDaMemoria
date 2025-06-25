@@ -11,4 +11,3 @@ CREATE TABLE IF NOT EXISTS ranking (
   dificuldade VARCHAR(20) NOT NULL,
   modo VARCHAR(20) NOT NULL,
   PRIMARY KEY (nome_jogador, data_inicio, hora_inicio)
-)

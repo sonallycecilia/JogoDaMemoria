@@ -25,5 +25,6 @@ function Score:adicionarPontuacao(pontos)
     self.pontuacao = self.pontuacao + pontos
 end
 
+
 return Score
 

@@ -84,7 +84,7 @@ function JogoCooperativo:draw()
         self.partida.tabuleiro:draw()
         
         -- Desenha interface adicional do cooperativo
-        self:drawInterfaceCooperativo()
+        self:drawPlacarCooperativo()
     else
         -- Debug: mostra se partida não foi criada
         love.graphics.setColor(1, 0, 0)
@@ -130,25 +130,22 @@ function JogoCooperativo:drawBotoes()
     end
 end
 
-function JogoCooperativo:drawInterfaceCooperativo()
+function JogoCooperativo:drawPlacarCooperativo()
     if not self.partida then return end
     
     local largura = love.graphics.getWidth()
     local info = self.partida:getStatusInfo()
-    local fonte = love.graphics.newFont("midia/fontes/PixelifySans-VariableFont_wght.ttf", 26)
-    
     
     love.graphics.setColor(1, 1, 1)
-    love.graphics.setFont(fonte)
-    
+    love.graphics.setFont(Config.fonte)
     local x, y = largura - 390, 150
     
+    -- tempo
+    love.graphics.print("   " .. math.floor(info.tempo / 60) .. ":" .. string.format("%02d", info.tempo % 60), 1025, 150)
+    --modo
     love.graphics.print("MODO COOPERATIVO", x, y)
     y = y + 20
-    
-    love.graphics.print("Tempo: " .. math.floor(info.tempo / 60) .. ":" .. string.format("%02d", info.tempo % 60), x, y)
-    y = y + 20
-    
+    --pontos
     love.graphics.print("Pontos: " .. tostring(info.score.pontuacao), x, y)
     y = y + 20
     
@@ -176,7 +173,7 @@ function JogoCooperativo:drawInterfaceCooperativo()
     -- Alerta de tempo baixo
     if info.tempo <= 30 and info.tempo > 0 then
         love.graphics.setColor(1, 0.2, 0.2) -- Vermelho
-        love.graphics.setFont(love.graphics.newFont(18))
+        love.graphics.setFont(Config.fonte, 36)
         love.graphics.print("TEMPO BAIXO!", largura/2 - 50, 50)
         love.graphics.setColor(1, 1, 1)
     end
