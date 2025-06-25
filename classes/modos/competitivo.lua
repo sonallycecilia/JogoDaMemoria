@@ -170,23 +170,23 @@ function Competitivo:update(dt)
         end
     end
     
-    -- ✅ PROTEÇÃO: Controla a vez da IA com verificações extras
+    -- Controla a vez da IA com verificações extras
     if self.jogadorAtual == "IA" and #self.partida.cartasViradasNoTurno == 0 and not self.iaEstaJogando then
         self.timerVezIA = self.timerVezIA + dt
         if self.timerVezIA >= self.intervaloPensamento then
-            print("[Sistema] 🤖 Ativando jogada da IA...")
+            print("[Sistema] Ativando jogada da IA...")
             self:jogadaIA()
             self.timerVezIA = 0
         end
     elseif self.iaEstaJogando then
-        print("[Sistema] ⏳ IA ainda está jogando, aguardando...")
+        print("[Sistema] IA ainda está jogando, aguardando...")
     end
 end
 
 function Competitivo:cliqueCarta(carta)
-    -- ✅ VERIFICAÇÃO INICIAL
+    -- VERIFICAÇÃO INICIAL
     if not carta then
-        print("ERRO: Carta é nil")
+        print("ERRO: Carta eh nil")
         return false
     end
     
@@ -201,17 +201,17 @@ function Competitivo:cliqueCarta(carta)
     
     -- Só permite clique se é vez do humano
     if self.jogadorAtual ~= "HUMANO" then
-        print("Não é sua vez! Aguarde a IA jogar...")
+        print("Nao eh sua vez! Aguarde a IA jogar...")
         return false
     end
     
     if carta.encontrada then
-        print("Carta já foi encontrada")
+        print("Carta ja foi encontrada")
         return false
     end
     
     if carta.revelada then
-        print("Carta já está revelada")
+        print("Carta ja esta revelada")
         return false
     end
     
@@ -232,7 +232,7 @@ function Competitivo:cliqueCarta(carta)
     
     -- Verifica limite de cartas por turno
     if #self.partida.cartasViradasNoTurno >= limiteCartas then
-        print("Já tem " .. limiteCartas .. " cartas viradas, aguarde...")
+        print("Ja tem " .. limiteCartas .. " cartas viradas, aguarde...")
         return false
     end
     
@@ -324,7 +324,7 @@ function Competitivo:processarGrupoEncontrado(grupo, jogador)
         self.scoreHumano = self.scoreHumano + pontosTotal
         -- Também atualiza o score da partida para compatibilidade
         if self.partida.score then
-            if type(self.partida.score) == "table" and self.partida.score.adicionarAoScore then
+            if type(self.partida.score) == "table" and self.partida.score.adicionarPontuacao then
                 self.partida.score:adicionarAoScore(pontosTotal)
             else
                 self.partida.score = (self.partida.score or 0) + pontosTotal
@@ -343,7 +343,7 @@ function Competitivo:processarGrupoEncontrado(grupo, jogador)
     local streak = jogador == "HUMANO" and self.streakHumano or self.streakIA
     
     if streak > 1 then
-        print("[" .. jogador .. "] " .. tipoGrupo .. " encontrado! Streak de " .. streak .. "! Multiplicador: " .. string.format("%.1f", multiplicador) .. "x (+" .. bonusStreak .. " bonus)")
+        print("[" .. jogador .. "] " .. tipoGrupo .. " encontrado! Streak de " .. streak .. "! Multiplicador: " .. string.format("%.2f", multiplicador) .. "x (+" .. bonusStreak .. " bonus)")
     else
         print("[" .. jogador .. "] " .. tipoGrupo .. " encontrado! +" .. pontosBase .. " pontos")
     end
@@ -380,19 +380,18 @@ function Competitivo:desvirarCartas()
 end
 
 function Competitivo:adicionarCartaMemoriaIA(carta)
-    -- ✅ VERIFICAÇÃO DE SEGURANÇA ROBUSTA
     if not carta then
-        print("[IA] ERRO: Carta é nil")
+        print("[IA] ERRO: Carta eh nil")
         return
     end
     
     if not carta.id then
-        print("[IA] ERRO: Carta.id é nil")
+        print("[IA] ERRO: Carta.id eh nil")
         return
     end
     
     if type(carta.id) ~= "number" then
-        print("[IA] ERRO: Carta.id não é número:", type(carta.id), carta.id)
+        print("[IA] ERRO: Carta.id nao eh número:", type(carta.id), carta.id)
         return
     end
     
@@ -405,16 +404,14 @@ function Competitivo:adicionarCartaMemoriaIA(carta)
         self.contadorMemoriaIA = 0
     end
     
-    local chave = tostring(carta.id)  -- ✅ FORÇA CONVERSÃO PARA STRING
+    local chave = tostring(carta.id) 
     
-    -- ✅ VERIFICAÇÃO DUPLA: Garante que a chave existe antes de usar table.insert
     if not self.memoriaIA[chave] then
         self.memoriaIA[chave] = {}
     end
     
-    -- ✅ VERIFICAÇÃO TRIPLA: Confirma que ainda é uma tabela
     if type(self.memoriaIA[chave]) ~= "table" then
-        print("[IA] ERRO: memoriaIA[" .. chave .. "] não é tabela:", type(self.memoriaIA[chave]))
+        print("[IA] ERRO: memoriaIA[" .. chave .. "] nao e tabela:", type(self.memoriaIA[chave]))
         self.memoriaIA[chave] = {}
     end
     
@@ -423,27 +420,23 @@ function Competitivo:adicionarCartaMemoriaIA(carta)
         -- Remove memória mais antiga
         self:removerMemoriaAntiga()
         
-        -- ✅ RECONFIRMA após remover memória antiga
         if not self.memoriaIA[chave] then
             self.memoriaIA[chave] = {}
         end
     end
     
-    -- ✅ VERIFICAÇÃO FINAL antes do table.insert
     if not self.memoriaIA[chave] or type(self.memoriaIA[chave]) ~= "table" then
-        print("[IA] ERRO CRÍTICO: Não consegui garantir tabela válida para chave", chave)
+        print("[IA] ERRO CRITICO: Não consegui garantir tabela váaida para chave", chave)
         self.memoriaIA[chave] = {}
     end
     
-    -- Agora tenta inserir com proteção adicional
     local novoItem = {
         carta = carta,
         posX = carta.x or 0,
         posY = carta.y or 0,
         tempoVista = love.timer.getTime()
     }
-    
-    -- ✅ INSERÇÃO PROTEGIDA
+
     local sucesso, erro = pcall(function()
         table.insert(self.memoriaIA[chave], novoItem)
     end)
@@ -455,7 +448,7 @@ function Competitivo:adicionarCartaMemoriaIA(carta)
     
     self.contadorMemoriaIA = self.contadorMemoriaIA + 1
     
-    -- Remove duplicatas (com verificação de segurança)
+    -- Remove duplicatas
     if self.memoriaIA[chave] and type(self.memoriaIA[chave]) == "table" then
         local novaLista = {}
         local cartasVistas = {}
@@ -471,7 +464,6 @@ function Competitivo:adicionarCartaMemoriaIA(carta)
         self.memoriaIA[chave] = novaLista
     end
     
-    -- Também usa a memória original da IA (com verificação)
     if self.ia and self.ia.adicionarCartaMemoria then
         self.ia:adicionarCartaMemoria(carta)
     end
@@ -515,7 +507,6 @@ function Competitivo:buscarGrupoNaMemoria()
         if #listaCartas >= tamanhoNecessario then
             local cartasDisponiveis = {}
             for _, item in ipairs(listaCartas) do
-                -- ✅ CORREÇÃO MELHORADA: Só verifica se não está encontrada e não revelada
                 if not item.carta.encontrada and not item.carta.revelada then
                     table.insert(cartasDisponiveis, item.carta)
                 end
@@ -526,7 +517,7 @@ function Competitivo:buscarGrupoNaMemoria()
                 for i = 1, tamanhoNecessario do
                     table.insert(grupo, cartasDisponiveis[i])
                 end
-                print("[IA] 🎯 GRUPO ENCONTRADO NA MEMÓRIA! ID:", id, "Cartas:", #grupo)
+                print("[IA] GRUPO ENCONTRADO NA MEMÓRIA! ID:", id, "Cartas:", #grupo)
                 return grupo
             end
         end
@@ -545,33 +536,30 @@ function Competitivo:selecionarCartaInteligente(ignorarCarta)
     end
     
     if #cartasDisponiveis == 0 then
-        print("[IA] ⚠️ NENHUMA CARTA DISPONÍVEL!")
+        print("[IA] NENHUMA CARTA DISPONÍVEL!")
         return nil
     end
     
     local cartaSelecionada = cartasDisponiveis[math.random(1, #cartasDisponiveis)]
-    print("[IA] 🎲 Carta aleatória selecionada: ID", cartaSelecionada.id, "Pos:", cartaSelecionada.x, cartaSelecionada.y)
+    print("[IA] Carta aleatória selecionada: ID", cartaSelecionada.id, "Pos:", cartaSelecionada.x, cartaSelecionada.y)
     return cartaSelecionada
 end
 
 function Competitivo:jogadaIA()
     print("[IA] === MINHA VEZ ===")
     
-    -- ✅ PROTEÇÃO 1: Verifica se realmente é vez da IA
     if self.jogadorAtual ~= "IA" then
-        print("[IA] ❌ ERRO: Não é minha vez! Jogador atual:", self.jogadorAtual)
+        print("[IA] ERRO: Não é minha vez! Jogador atual:", self.jogadorAtual)
         return
     end
     
-    -- ✅ PROTEÇÃO 2: Verifica se pode jogar
     if #self.partida.cartasViradasNoTurno > 0 then
-        print("[IA] ❌ ERRO: Ainda há " .. #self.partida.cartasViradasNoTurno .. " cartas viradas")
+        print("[IA] ERRO: Ainda há " .. #self.partida.cartasViradasNoTurno .. " cartas viradas")
         return
     end
     
-    -- ✅ PROTEÇÃO 3: Marca que IA está jogando para evitar múltiplas chamadas
     if self.iaEstaJogando then
-        print("[IA] ❌ ERRO: Já estou jogando! Evitando chamada dupla")
+        print("[IA] ERRO: Já estou jogando! Evitando chamada dupla")
         return
     end
     self.iaEstaJogando = true
@@ -584,58 +572,58 @@ function Competitivo:jogadaIA()
     if usarMemoria then
         cartas = self:buscarGrupoNaMemoria()
         if #cartas > 0 then
-            print("[IA] 🧠 Usando memória para formar grupo ID " .. cartas[1].id)
+            print("[IA] Usando memoria para formar grupo ID " .. cartas[1].id)
         else
-            print("[IA] 🤔 Memória não tem grupos completos")
+            print("[IA] Memória não tem grupos completos")
         end
     else
         if math.random() <= self.chanceErroIA then
-            print("[IA] 😵 Decidindo errar intencionalmente (nível " .. self.partida.nivel .. ")")
+            print("[IA] Decidindo errar intencionalmente (nivel " .. self.partida.nivel .. ")")
         else
-            print("[IA] 🎲 Decidindo explorar ao invés de usar memória")
+            print("[IA] Decidindo explorar ao invés de usar memoria")
         end
     end
     
     -- Se não tem grupo na memória ou decidiu errar, joga aleatório
     if #cartas == 0 then
-        print("[IA] 🎯 Jogando de forma exploratória...")
+        print("[IA] Jogando de forma exploratoria...")
         
         local primeiraCarta = self:selecionarCartaInteligente()
         if not primeiraCarta then
-            print("[IA] ERRO: Não encontrei cartas disponíveis")
-            self.iaEstaJogando = false  -- ✅ LIBERA proteção
+            print("[IA] ERRO: Nao encontrei cartas disponiveis")
+            self.iaEstaJogando = false 
             return
         end
         
         local tamanhoGrupo = self.modoVariavel and self:obterTamanhoGrupoEsperado(primeiraCarta.id) or self.cartasPorGrupo
         table.insert(cartas, primeiraCarta)
         
-        print("[IA] 📝 Primeira carta ID " .. primeiraCarta.id .. " - Preciso de " .. tamanhoGrupo .. " cartas")
+        print("[IA] Primeira carta ID " .. primeiraCarta.id .. " - Preciso de " .. tamanhoGrupo .. " cartas")
         
         -- Completa o grupo
         for i = 2, tamanhoGrupo do
             local carta = self:selecionarCartaInteligente()
             if carta then
                 table.insert(cartas, carta)
-                print("[IA] 📝 Adicionei carta " .. i .. ": ID " .. carta.id)
+                print("[IA] Adicionei carta " .. i .. ": ID " .. carta.id)
             else
-                print("[IA] ⚠️ Não consegui encontrar carta " .. i)
+                print("[IA] Não consegui encontrar carta " .. i)
             end
         end
     end
     
     if #cartas == 0 then
         print("[IA] ERRO: Não consegui encontrar cartas suficientes")
-        self.iaEstaJogando = false  -- ✅ LIBERA proteção
+        self.iaEstaJogando = false 
         return
     end
     
-    -- ✅ PROTEÇÃO 4: Verifica se há cartas duplicadas na seleção
+    -- Verifica se há cartas duplicadas na seleção
     local cartasUnicas = {}
     for _, carta in ipairs(cartas) do
         local chave = carta.x .. "_" .. carta.y
         if cartasUnicas[chave] then
-            print("[IA] ❌ ERRO: Carta duplicada detectada! Posição:", carta.x, carta.y)
+            print("[IA] ERRO: Carta duplicada detectada! Posicao:", carta.x, carta.y)
             self.iaEstaJogando = false
             return
         end
@@ -647,17 +635,17 @@ function Competitivo:jogadaIA()
     for i, carta in ipairs(cartas) do
         print("  Carta " .. i .. ": ID " .. carta.id .. " Pos:", carta.x, carta.y)
         
-        -- ✅ PROTEÇÃO 5: Verifica se carta já estava revelada
+        -- Verifica se carta já estava revelada
         if carta.revelada then
-            print("  ⚠️  ERRO CRÍTICO: Carta já estava revelada!")
+            print("  ⚠️  ERRO CRiTICO: Carta ja estava revelada!")
             self.iaEstaJogando = false
             return
         end
         
-        -- ✅ PROTEÇÃO 6: Verifica se carta já está no turno
+        -- PROTEÇÃO 6: Verifica se carta já está no turno
         for _, cartaTurno in ipairs(self.partida.cartasViradasNoTurno) do
             if cartaTurno == carta then
-                print("  ⚠️  ERRO CRÍTICO: Carta já está em cartasViradasNoTurno!")
+                print("ERRO CRiTICO: Carta ja esta em cartasViradasNoTurno!")
                 self.iaEstaJogando = false
                 return
             end
@@ -668,8 +656,8 @@ function Competitivo:jogadaIA()
         table.insert(self.partida.cartasViradasNoTurno, carta)
     end
     
-    -- ✅ PROTEÇÃO 7: Confirma quantas cartas foram realmente adicionadas
-    print("[IA] ✅ Adicionei " .. #self.partida.cartasViradasNoTurno .. " cartas ao turno")
+    -- Confirma quantas cartas foram realmente adicionadas
+    print("[IA] Adicionei " .. #self.partida.cartasViradasNoTurno .. " cartas ao turno")
     
     -- Define grupo esperado no modo extremo
     if self.modoVariavel then
@@ -679,7 +667,7 @@ function Competitivo:jogadaIA()
     -- Verifica se formou grupo
     self:verificarGrupo("IA")
     
-    -- ✅ PROTEÇÃO 8: Libera flag no final
+    -- Libera flag no final
     self.iaEstaJogando = false
     print("[IA] === TERMINEI MINHA JOGADA ===")
 end

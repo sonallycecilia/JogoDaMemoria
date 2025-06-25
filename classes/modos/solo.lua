@@ -267,7 +267,7 @@ function Solo:desvirarCartas()
     print("[Sistema] Continue jogando...")
 end
 
--- ✅ NOVA FUNÇÃO: Interface visual para modo solo
+-- Interface visual para modo solo
 function Solo:drawInterface()
     if not self.partida then return end
     
