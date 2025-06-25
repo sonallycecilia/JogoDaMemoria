@@ -231,7 +231,7 @@ function Solo:processarGrupoEncontrado(grupo)
     local bonusSequencia = math.floor(pontosGrupo * (self.multiplicadorSequencia - 1))
     local pontosTotal = pontosGrupo + bonusSequencia
     
-    self.partida.score:adicionarAoScore(pontosTotal)
+    self.partida.score:adicionarPontuacao(pontosTotal)
     self.ultimoAcerto = true
     
     -- Remove as cartas do tabuleiro
