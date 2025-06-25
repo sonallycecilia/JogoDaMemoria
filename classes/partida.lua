@@ -222,7 +222,7 @@ function Partida:update(dt)
         self:checkGameEnd()
     end
 
-    -- ✅ Efeito da bomba controlado manualmente
+    -- Efeito da bomba controlado manualmente
     if self.timerBomba then
         self.timerBomba = self.timerBomba - dt
         if self.timerBomba <= 0 then

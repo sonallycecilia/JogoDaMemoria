@@ -34,7 +34,7 @@ function MenuPrincipalLayer:new(manager)
             function() print("Créditos") end),
 
         skins = Botao:new(Config,
-            Config.botoes.imagemPath.menuPrincipal.skins,
+            Config.botoes.imagemPath.menuPrincipal.rank,
             50, 740, 0.7, 0.7,
             function() self.proximaLayer = "rank" end),
 

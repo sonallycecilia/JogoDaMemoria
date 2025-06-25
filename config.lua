@@ -23,7 +23,7 @@ Config.botoes = {
             configuracoes = "midia/botoes/menuPrincipal/configuracoes.png",
             conquistas = "midia/botoes/menuPrincipal/conquistas.png",
             creditos = "midia/botoes/menuPrincipal/creditos.png",
-            skins = "midia/botoes/menuPrincipal/skins.png",
+            rank = "midia/botoes/menuPrincipal/rank.png",
             sair = "midia/botoes/menuPrincipal/sair.png",
         },
         menuJogo = {

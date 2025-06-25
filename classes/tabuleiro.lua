@@ -154,7 +154,7 @@ function Tabuleiro:geraCartasEspeciais()
             local tipo = table.remove(tiposDisponiveis, math.random(1, #tiposDisponiveis))
             if tipo then
                 carta:setEspecial(tipo, iconesEspeciais[tipo])
-                carta.revelada = false -- 👈 Garante que ela esteja virada ao entrar no jogo
+                carta.revelada = false -- Garante que ela esteja virada ao entrar no jogo
                 colocadas = colocadas + 1
 
                 print(string.format(" → Carta especial adicionada: %s [%s] no índice %d", tipo, carta.idGrupo, index))
