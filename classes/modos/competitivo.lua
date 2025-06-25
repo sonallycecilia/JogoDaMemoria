@@ -325,7 +325,7 @@ function Competitivo:processarGrupoEncontrado(grupo, jogador)
         -- Também atualiza o score da partida para compatibilidade
         if self.partida.score then
             if type(self.partida.score) == "table" and self.partida.score.adicionarPontuacao then
-                self.partida.score:adicionarAoScore(pontosTotal)
+                self.partida.score:adicionarPontuacao(pontosTotal)
             else
                 self.partida.score = (self.partida.score or 0) + pontosTotal
             end
