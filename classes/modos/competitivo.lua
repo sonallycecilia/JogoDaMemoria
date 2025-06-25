@@ -16,7 +16,7 @@ function Competitivo:new(partida)
     self.timerVezIA = 0
     self.intervaloPensamento = 1.5
     
-    -- ✅ PROTEÇÃO: Flag para evitar múltiplas jogadas da IA
+    -- Flag para evitar múltiplas jogadas da IA
     self.iaEstaJogando = false
     
     -- Timer para cartas que não formaram grupo

@@ -32,7 +32,6 @@ end
 for idGrupo, grupoDeCartas in pairs(gruposEncontrados) do
     if idGrupo then
         local tamanhoNecessario = partida.modoCompetitivo:obterTamanhoGrupoEsperado(idGrupo)
-        -- resto do código...
 
     if #grupoDeCartas >= tamanhoNecessario then 
       grupoParaCombinar = {}

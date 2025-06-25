@@ -64,7 +64,7 @@ function Cooperativo:new(partida)
         self:mostrarGruposObjetivo()
     end
     
-    -- IA sempre inteligente no modo cooperativo (90% chance de usar memória)
+    -- IA sempre inteligente no modo cooperativo 
     self.chanceUsarMemoria = 0.90
     
     -- Atualiza o tempo da partida
@@ -644,7 +644,7 @@ function Cooperativo:jogadaIA()
     end
     
     -- Confirma quantas cartas foram realmente adicionadas
-    print("[IA] ✅ Adicionei " .. #self.partida.cartasViradasNoTurno .. " cartas ao turno")
+    print("[IA] Adicionei " .. #self.partida.cartasViradasNoTurno .. " cartas ao turno")
     
     -- No modo extremo, define o grupo esperado
     if self.modoVariavel then
